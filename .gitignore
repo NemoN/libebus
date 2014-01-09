@@ -8,7 +8,6 @@
 /depcomp
 /libebus-*.pc
 /libebus-*.tar.*
-/libebusconfig.hpp*
 /install-sh
 /libtool
 /ltmain.sh
