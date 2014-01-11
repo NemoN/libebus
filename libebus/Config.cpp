@@ -86,8 +86,7 @@ ConfigfileXML::~ConfigfileXML()
 
 void ConfigfileXML::readFile(std::istream& is, Command& command)
 {
-	;
-	// ToDo: Implamantion for xml files
+	;	// ToDo: Implamantion for xml files
 }
 
 
@@ -137,18 +136,17 @@ void Config::getCommands(Command& command)
 	
 	for(; i != m_files.end(); i++) {	
 		std::fstream file((*i).c_str(), std::ios::in);
-		std::cout << ">>> " << *i << std::endl;
+		//~ std::cout << ">>> " << *i << std::endl;
 
 		if(file.is_open()) {
 			m_configfile->readFile(file, command);
 			file.close();
+			//~ std::cout << ">>> " << *i << "  done." << std::endl;
 			
 		} else {
-			std::cout << ">>> " << *i << " can't open file." << std::endl;
+			//~ std::cout << ">>> " << *i << " can't open file." << std::endl;
 			
 		}
-
-		std::cout << ">>> " << *i << "  done." << std::endl; 
 	}
 };
 
@@ -164,17 +162,17 @@ void Config::addFiles(const std::string path, const std::string extension)
         while (d) {
 		
                 if (d->d_type == DT_DIR) {
-                        std::string fname = d->d_name;
+                        std::string fn = d->d_name;
                         
-                        if (fname != "." && fname != "..") {
+                        if (fn != "." && fn != "..") {
 				const std::string p = path + "/" + d->d_name;
                                 addFiles(p, extension);
 			}
                                 
                 } else if (d->d_type == DT_REG) {
-                        std::string fname = d->d_name;
+                        std::string fn = d->d_name;
 
-                        if (fname.find(extension, (fname.length() - extension.length())) != std::string::npos) {
+                        if (fn.find(extension, (fn.length() - extension.length())) != std::string::npos) {
 				const std::string p = path + "/" + d->d_name;
                                 m_files.push_back(p);
 			}
