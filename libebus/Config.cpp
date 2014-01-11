@@ -20,6 +20,7 @@
 #include "Config.hpp"
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <dirent.h>
 
 namespace libebus
@@ -56,18 +57,17 @@ void ConfigfileCSV::readFile(std::istream& is, Command& command)
 	while (std::getline(is, line)) {
 		cmd_t row;
 		std::string column;
-		int count;
-
-		count = 0;
 		
 		std::istringstream stream(line);
 		
 		// walk through columns
-		while (std::getline(stream, column, ';')) {
+		while (std::getline(stream, column, ';'))
 			row.push_back(column);
-			count++;
-		}
-		
+
+		// skip empty and commented rows
+		if (row.empty() || row[0][0] == '#')
+			continue;
+
 		command.addCommand(row);
 	}
 };
@@ -124,6 +124,34 @@ void Config::setType(const FileType type)
 	};
 };
 
+void Config::printFiles() const
+{
+	std::vector<std::string>::const_iterator i = m_files.begin();
+	for(; i != m_files.end(); i++)
+		std::cout << *i << std::endl; 	
+};
+
+void Config::getCommands(Command& command)
+{
+	std::vector<std::string>::const_iterator i = m_files.begin();
+	
+	for(; i != m_files.end(); i++) {	
+		std::fstream file((*i).c_str(), std::ios::in);
+		std::cout << ">>> " << *i << std::endl;
+
+		if(file.is_open()) {
+			m_configfile->readFile(file, command);
+			file.close();
+			
+		} else {
+			std::cout << ">>> " << *i << " can't open file." << std::endl;
+			
+		}
+
+		std::cout << ">>> " << *i << "  done." << std::endl; 
+	}
+};
+
 void Config::addFiles(const std::string path, const std::string extension)
 {
         DIR* dir = opendir(path.c_str());
@@ -155,15 +183,6 @@ void Config::addFiles(const std::string path, const std::string extension)
                 d = readdir(dir);
         }
 };
-
-void Config::printFiles()
-{
-	std::vector<std::string>::const_iterator i = m_files.begin();
-	for(; i != m_files.end(); i++)
-		std::cout << *i << std::endl; 	
-};
-
-
 
 
 } //namespace

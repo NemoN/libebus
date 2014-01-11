@@ -36,7 +36,6 @@ public:
 	Configfile();
 	virtual ~Configfile();
 
-private:
 	virtual void readFile(std::istream& is, Command& command) = 0;
 	
 };
@@ -47,7 +46,6 @@ public:
 	ConfigfileCSV();
 	~ConfigfileCSV();
 
-private:
 	void readFile(std::istream& is, Command& command);
 	
 };
@@ -58,7 +56,6 @@ public:
 	ConfigfileXML();
 	~ConfigfileXML();
 
-private:
 	void readFile(std::istream& is, Command& command);
 	
 };
@@ -72,14 +69,14 @@ public:
 	~Config();
 	
 	void setType(const FileType type);
-	void printFiles();
+	void printFiles() const;
+	void getCommands(Command& command);
 	
 private:
 	Configfile* m_configfile;
 	std::string m_path;
 	std::string m_extension;
 	std::vector<std::string> m_files;
-	//~ Command m_command;
 
 	void addFiles(const std::string path, const std::string extension);
 	
