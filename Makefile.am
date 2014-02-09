@@ -2,6 +2,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
+AM_CPPFLAGS = -Wall -Wextra
+
 lib_LTLIBRARIES = libebus-@LIBEBUS_API_VERSION@.la
 
 libebus_@LIBEBUS_API_VERSION@_la_SOURCES = libebus/Port.cpp \

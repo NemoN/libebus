@@ -21,33 +21,12 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+//~ #include <cstdlib>
 #include <dirent.h>
 
 namespace libebus
 {
 
-
-Configfile::Configfile()
-{
-	//~ std::cout << "Configfile()" << std::endl;
-};
-
-Configfile::~Configfile()
-{
-	//~ std::cout << "~Configfile()" << std::endl;
-};
-
-
-
-ConfigfileCSV::ConfigfileCSV()
-{
-	//~ std::cout << "ConfigfileCSV()" << std::endl;
-};
-
-ConfigfileCSV::~ConfigfileCSV()
-{
-	//~ std::cout << "~ConfigfileCSV()" << std::endl;
-};
 
 void ConfigfileCSV::readFile(std::istream& is, Command& command)
 {
@@ -73,17 +52,6 @@ void ConfigfileCSV::readFile(std::istream& is, Command& command)
 };
 
 
-
-ConfigfileXML::ConfigfileXML()
-{
-	//~ std::cout << "ConfigfileXML()" << std::endl;
-};
-
-ConfigfileXML::~ConfigfileXML()
-{
-	//~ std::cout << "~ConfigfileXML()" << std::endl;
-};
-
 void ConfigfileXML::readFile(std::istream& is, Command& command)
 {
 	;	// ToDo: Implamantion for xml files
@@ -93,7 +61,6 @@ void ConfigfileXML::readFile(std::istream& is, Command& command)
 
 Config::Config(const std::string path, const FileType type)
 {
-	//~ std::cout << "Config()" << std::endl;
 	m_path = path;
 	m_configfile = NULL;
 	setType(type);
@@ -102,7 +69,6 @@ Config::Config(const std::string path, const FileType type)
 
 Config::~Config()
 {
-	//~ std::cout << "~Config()" << std::endl;
 	delete m_configfile;
 };
 
@@ -180,6 +146,8 @@ void Config::addFiles(const std::string path, const std::string extension)
                 
                 d = readdir(dir);
         }
+        
+        closedir(dir);
 };
 
 

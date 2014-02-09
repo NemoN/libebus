@@ -24,21 +24,6 @@ namespace libebus
 {
 
 
-Command::Command()
-{
-	//~ std::cout << "Command()" << std::endl;
-};
-
-Command::~Command()
-{
-	//~ std::cout << "~Command()" << std::endl;
-};
-
-void Command::addCommand(cmd_t& command)
-{
-	m_cmdDB.push_back(command);
-}
-
 void Command::printCommand(const cmd_t& command) const
 {
 	if (!command.size())
@@ -59,11 +44,6 @@ void Command::printCommands() const
 	}	
 }
 	
-std::size_t Command::size() const
-{
-	return m_cmdDB.size();
-}
-
 
 } //namespace
 

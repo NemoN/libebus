@@ -37,18 +37,15 @@ class Command
 {
 	
 public:
-	Command();
-	~Command();
+	Command() {}
+	~Command() {}
 
-	void addCommand(cmd_t& command);
+	void addCommand(cmd_t& command) { m_cmdDB.push_back(command); }
 	void printCommands() const;
 
-	std::size_t size() const;
+	std::size_t size() const { return m_cmdDB.size(); }
 
-	cmd_t const& operator[](std::size_t index) const
-	{
-	    return m_cmdDB[index];
-	}
+	cmd_t const& operator[](std::size_t index) const { return m_cmdDB[index]; }
 
 private:
 	cmdDB_t m_cmdDB;

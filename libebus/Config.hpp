@@ -33,8 +33,8 @@ class Configfile
 {
 
 public:
-	Configfile();
-	virtual ~Configfile();
+	Configfile() {}
+	virtual ~Configfile() {}
 
 	virtual void readFile(std::istream& is, Command& command) = 0;
 	
@@ -42,9 +42,10 @@ public:
 
 class ConfigfileCSV : public Configfile
 {
+	
 public:
-	ConfigfileCSV();
-	~ConfigfileCSV();
+	ConfigfileCSV() {}
+	~ConfigfileCSV() {}
 
 	void readFile(std::istream& is, Command& command);
 	
@@ -52,9 +53,10 @@ public:
 
 class ConfigfileXML : public Configfile
 {
+	
 public:
-	ConfigfileXML();
-	~ConfigfileXML();
+	ConfigfileXML() {}
+	~ConfigfileXML() {}
 
 	void readFile(std::istream& is, Command& command);
 	
