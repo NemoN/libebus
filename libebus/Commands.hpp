@@ -17,8 +17,8 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef LIBEBUS_COMMAD_HPP_
-#define LIBEBUS_COMMAD_HPP_
+#ifndef LIBEBUS_COMMADS_HPP_
+#define LIBEBUS_COMMADS_HPP_
 
 #include <string>
 #include <vector>
@@ -33,28 +33,30 @@ typedef cmd_t::const_iterator cmdCI_t;
 typedef std::vector<cmd_t> cmdDB_t;
 typedef cmdDB_t::const_iterator cmdDBCI_t;
 
-class Command
+class Commands
 {
 	
 public:
-	Command() {}
-	~Command() {}
+	Commands() {}
+	~Commands() {}
 
-	void addCommand(cmd_t& command) { m_cmdDB.push_back(command); }
+	void addCommand(const cmd_t& command) { m_cmdDB.push_back(command); }
 	void printCommands() const;
 
 	std::size_t size() const { return m_cmdDB.size(); }
 
 	cmd_t const& operator[](std::size_t index) const { return m_cmdDB[index]; }
 
+	std::size_t findCommand(const std::string string) const;
+
 private:
 	cmdDB_t m_cmdDB;
 
 	void printCommand(const cmd_t& command) const;
-	
+	bool compareString(const std::string src1, const std::string src2) const;
 };
 
 
 } //namespace
 
-#endif //LIBEBUS_COMMAD_HPP_
+#endif //LIBEBUS_COMMADS_HPP_

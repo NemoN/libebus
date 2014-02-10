@@ -21,14 +21,13 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-//~ #include <cstdlib>
 #include <dirent.h>
 
 namespace libebus
 {
 
 
-void ConfigfileCSV::readFile(std::istream& is, Command& command)
+void ConfigfileCSV::readFile(std::istream& is, Commands& commands)
 {
 	std::string line;
 	
@@ -47,12 +46,12 @@ void ConfigfileCSV::readFile(std::istream& is, Command& command)
 		if (row.empty() || row[0][0] == '#')
 			continue;
 
-		command.addCommand(row);
+		commands.addCommand(row);
 	}
 };
 
 
-void ConfigfileXML::readFile(std::istream& is, Command& command)
+void ConfigfileXML::readFile(std::istream& is, Commands& commands)
 {
 	;	// ToDo: Implamantion for xml files
 }
@@ -96,24 +95,20 @@ void Config::printFiles() const
 		std::cout << *i << std::endl; 	
 };
 
-void Config::getCommands(Command& command)
+Commands* Config::getCommands()
 {
+	Commands* commands = new Commands();
 	std::vector<std::string>::const_iterator i = m_files.begin();
 	
 	for(; i != m_files.end(); i++) {	
 		std::fstream file((*i).c_str(), std::ios::in);
-		//~ std::cout << ">>> " << *i << std::endl;
 
 		if(file.is_open()) {
-			m_configfile->readFile(file, command);
+			m_configfile->readFile(file, *commands);
 			file.close();
-			//~ std::cout << ">>> " << *i << "  done." << std::endl;
-			
-		} else {
-			//~ std::cout << ">>> " << *i << " can't open file." << std::endl;
-			
 		}
 	}
+	return commands;
 };
 
 void Config::addFiles(const std::string path, const std::string extension)

@@ -22,7 +22,7 @@
 
 #include <libebus/Port.hpp>
 #include <libebus/Bus.hpp>
-#include <libebus/Command.hpp>
+#include <libebus/Commands.hpp>
 #include <libebus/Config.hpp>
 
 #endif // LIBEBUS_HPP_

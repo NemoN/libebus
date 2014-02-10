@@ -20,7 +20,7 @@
 #ifndef LIBEBUS_CONFIG_HPP_
 #define LIBEBUS_CONFIG_HPP_
 
-#include "Command.hpp"
+#include "Commands.hpp"
 #include <string>
 #include <vector>
 
@@ -36,7 +36,7 @@ public:
 	Configfile() {}
 	virtual ~Configfile() {}
 
-	virtual void readFile(std::istream& is, Command& command) = 0;
+	virtual void readFile(std::istream& is, Commands& commands) = 0;
 	
 };
 
@@ -47,7 +47,7 @@ public:
 	ConfigfileCSV() {}
 	~ConfigfileCSV() {}
 
-	void readFile(std::istream& is, Command& command);
+	void readFile(std::istream& is, Commands& commands);
 	
 };
 
@@ -58,7 +58,7 @@ public:
 	ConfigfileXML() {}
 	~ConfigfileXML() {}
 
-	void readFile(std::istream& is, Command& command);
+	void readFile(std::istream& is, Commands& commands);
 	
 };
 
@@ -72,7 +72,7 @@ public:
 	
 	void setType(const FileType type);
 	void printFiles() const;
-	void getCommands(Command& command);
+	Commands* getCommands();
 	
 private:
 	Configfile* m_configfile;
