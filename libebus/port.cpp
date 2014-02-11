@@ -17,7 +17,7 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#include "Port.hpp"
+#include "port.hpp"
 #include <termios.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>

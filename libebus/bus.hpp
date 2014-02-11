@@ -20,7 +20,7 @@
 #ifndef LIBEBUS_BUS_HPP_
 #define LIBEBUS_BUS_HPP_
 
-#include "Port.hpp"
+#include "port.hpp"
 #include <cstring>
 #include <queue>
 

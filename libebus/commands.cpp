@@ -17,7 +17,7 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#include "Commands.hpp"
+#include "commands.hpp"
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -85,14 +85,14 @@ std::size_t Commands::findCommand(const std::string string) const
 	// walk through commands
 	for (index = 0; i != m_cmdDB.end(); i++, index++) {
 
-		const cmd_t command = *i;
+		// const cmd_t command = *i; --> (*i) <-> command
 
-		if (!command.size())
+		if (!(*i).size())
 			continue;
 
-		if (compareString(command[0], cmd[0]) &&
-		    compareString(command[1], cmd[1]) &&
-		    compareString(command[2], cmd[2]))
+		if (compareString((*i)[0], cmd[0]) &&
+		    compareString((*i)[1], cmd[1]) &&
+		    compareString((*i)[2], cmd[2]))
 			return index;
 
 	}	

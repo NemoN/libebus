@@ -17,7 +17,7 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#include "Bus.hpp"
+#include "bus.hpp"
 #include <unistd.h>
 #include <iostream>
 #include <iomanip>

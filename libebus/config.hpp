@@ -20,7 +20,7 @@
 #ifndef LIBEBUS_CONFIG_HPP_
 #define LIBEBUS_CONFIG_HPP_
 
-#include "Commands.hpp"
+#include "commands.hpp"
 #include <string>
 #include <vector>
 

@@ -6,19 +6,19 @@ AM_CPPFLAGS = -Wall -Wextra
 
 lib_LTLIBRARIES = libebus-@LIBEBUS_API_VERSION@.la
 
-libebus_@LIBEBUS_API_VERSION@_la_SOURCES = libebus/Port.cpp \
-					   libebus/Bus.cpp \
-					   libebus/Commands.cpp \
-					   libebus/Config.cpp
+libebus_@LIBEBUS_API_VERSION@_la_SOURCES = libebus/port.cpp \
+					   libebus/bus.cpp \
+					   libebus/commands.cpp \
+					   libebus/config.cpp
 
 libebus_@LIBEBUS_API_VERSION@_la_LDFLAGS = -version-info $(LIBEBUS_SO_VERSION)
 
 libebus_includedir = $(includedir)/libebus-$(LIBEBUS_API_VERSION)
 nobase_libebus_include_HEADERS = libebus.hpp \
-                                 libebus/Port.hpp \
-                                 libebus/Bus.hpp \
-                                 libebus/Commands.hpp \
-                                 libebus/Config.hpp
+                                 libebus/port.hpp \
+                                 libebus/bus.hpp \
+                                 libebus/commands.hpp \
+                                 libebus/config.hpp
 
 libebus_libincludedir = $(libdir)/libebus-$(LIBEBUS_API_VERSION)/include
 nodist_libebus_libinclude_HEADERS = libebusconfig.hpp

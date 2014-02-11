@@ -20,9 +20,9 @@
 #ifndef LIBEBUS_HPP_
 #define LIBEBUS_HPP_
 
-#include <libebus/Port.hpp>
-#include <libebus/Bus.hpp>
-#include <libebus/Commands.hpp>
-#include <libebus/Config.hpp>
+#include <libebus/port.hpp>
+#include <libebus/bus.hpp>
+#include <libebus/commands.hpp>
+#include <libebus/config.hpp>
 
 #endif // LIBEBUS_HPP_
