@@ -27,7 +27,7 @@ namespace libebus
 {
 
 
-void ConfigfileCSV::readFile(std::istream& is, Commands& commands)
+void ConfigFileCSV::readFile(std::istream& is, Commands& commands)
 {
 	std::string line;
 	
@@ -51,14 +51,14 @@ void ConfigfileCSV::readFile(std::istream& is, Commands& commands)
 };
 
 
-void ConfigfileXML::readFile(std::istream& is, Commands& commands)
+void ConfigFileXML::readFile(std::istream& is, Commands& commands)
 {
 	;	// ToDo: Implamantion for xml files
 }
 
 
 
-Config::Config(const std::string path, const FileType type)
+ConfigCommands::ConfigCommands(const std::string path, const FileType type)
 {
 	m_path = path;
 	m_configfile = NULL;
@@ -66,36 +66,36 @@ Config::Config(const std::string path, const FileType type)
 	addFiles(m_path, m_extension);
 }
 
-Config::~Config()
+ConfigCommands::~ConfigCommands()
 {
 	delete m_configfile;
 };
 
-void Config::setType(const FileType type)
+void ConfigCommands::setType(const FileType type)
 {
 	if (m_configfile != NULL)
 		delete m_configfile;
 	
 	switch (type) {
 	case CSV:
-		m_configfile = new ConfigfileCSV();
+		m_configfile = new ConfigFileCSV();
 		m_extension = "csv";
 		break;
 	case XML:
-		m_configfile = new ConfigfileXML();
+		m_configfile = new ConfigFileXML();
 		m_extension = "xml";
 		break;
 	};
 };
 
-void Config::printFiles() const
+void ConfigCommands::printFiles() const
 {
 	std::vector<std::string>::const_iterator i = m_files.begin();
 	for(; i != m_files.end(); i++)
 		std::cout << *i << std::endl; 	
 };
 
-Commands* Config::getCommands()
+Commands* ConfigCommands::getCommands()
 {
 	Commands* commands = new Commands();
 	std::vector<std::string>::const_iterator i = m_files.begin();
@@ -111,7 +111,7 @@ Commands* Config::getCommands()
 	return commands;
 };
 
-void Config::addFiles(const std::string path, const std::string extension)
+void ConfigCommands::addFiles(const std::string path, const std::string extension)
 {
         DIR* dir = opendir(path.c_str());
 

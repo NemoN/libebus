@@ -29,53 +29,53 @@ namespace libebus
 
 enum FileType {CSV, XML};
 
-class Configfile
+class ConfigFile
 {
 
 public:
-	Configfile() {}
-	virtual ~Configfile() {}
+	ConfigFile() {}
+	virtual ~ConfigFile() {}
 
 	virtual void readFile(std::istream& is, Commands& commands) = 0;
 	
 };
 
-class ConfigfileCSV : public Configfile
+class ConfigFileCSV : public ConfigFile
 {
 	
 public:
-	ConfigfileCSV() {}
-	~ConfigfileCSV() {}
+	ConfigFileCSV() {}
+	~ConfigFileCSV() {}
 
 	void readFile(std::istream& is, Commands& commands);
 	
 };
 
-class ConfigfileXML : public Configfile
+class ConfigFileXML : public ConfigFile
 {
 	
 public:
-	ConfigfileXML() {}
-	~ConfigfileXML() {}
+	ConfigFileXML() {}
+	~ConfigFileXML() {}
 
 	void readFile(std::istream& is, Commands& commands);
 	
 };
 
 
-class Config
+class ConfigCommands
 {
 	
 public:
-	Config(const std::string path, const FileType type);
-	~Config();
+	ConfigCommands(const std::string path, const FileType type);
+	~ConfigCommands();
 	
 	void setType(const FileType type);
 	void printFiles() const;
 	Commands* getCommands();
 	
 private:
-	Configfile* m_configfile;
+	ConfigFile* m_configfile;
 	std::string m_path;
 	std::string m_extension;
 	std::vector<std::string> m_files;

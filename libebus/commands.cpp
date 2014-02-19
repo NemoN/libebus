@@ -75,7 +75,7 @@ std::size_t Commands::findCommand(const std::string string) const
 	
 	// split stream
 	while (std::getline(stream, token, ' ')) {
-		std::cout << token << std::endl;
+		//~ std::cout << token << std::endl;
 		cmd.push_back(token);
 	}
 
