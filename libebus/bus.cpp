@@ -25,17 +25,9 @@
 namespace libebus
 {
 
-
-Bus::Bus(const char *device) : m_connected(false)
-{
-	//~ std::cout << "Bus()" << std::endl;
-	m_device = device;	
-}
-
 Bus::~Bus()
 {
-	//~ std::cout << "~Bus()" << std::endl;
-	if (isConnected())
+	if (isConnected() == true)
 		disconnectBus();
 }
 
@@ -51,12 +43,6 @@ void Bus::disconnectBus()
 	m_connected = m_port.isOpen();
 }
 
-bool Bus::isConnected()
-{
-	return m_connected;
-}
-
-
 void Bus::getBytes()
 {
 	unsigned char byte;
@@ -67,7 +53,7 @@ void Bus::getBytes()
 	for (int i = 0; i < bytes_read; i++) {
 		byte = m_port.getByte();
 		std::cout << std::hex << std::setw(2) << std::setfill('0')
-		<< static_cast<unsigned int>(byte);
+			  << static_cast<unsigned int>(byte);
 		if (byte == 0xAA)
 			std::cout << std::endl;
 	}
@@ -78,7 +64,7 @@ void Bus::printBytes()
 {
 	unsigned char byte;
 	
-	while (!m_ByteBuffer.empty()) {
+	while (m_ByteBuffer.empty() == false) {
 		byte = m_ByteBuffer.front();
 		std::cout << std::hex << std::setw(2) << std::setfill('0')
 		<< static_cast<unsigned int>(byte) << std::endl;

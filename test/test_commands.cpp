@@ -31,7 +31,7 @@ void readCSV(std::istream& is, Commands& commands){
 	std::string line;
 	
 	// read lines
-	while (std::getline(is, line)) {
+	while (std::getline(is, line) != 0) {
 		std::vector<std::string> row;
 		std::string column;
 		int count;
@@ -41,7 +41,7 @@ void readCSV(std::istream& is, Commands& commands){
 		std::istringstream stream(line);
 		
 		// walk through columns
-		while (std::getline(stream, column, ';')) {
+		while (std::getline(stream, column, ';') != 0) {
 			row.push_back(column);
 			count++;
 		}
@@ -59,7 +59,7 @@ int main()
 	//~ std::fstream file("test/command.csv", std::ios::in);
 	std::fstream file("test/vr903.csv", std::ios::in);
 
-	if(file.is_open()) {
+	if(file.is_open() == true) {
 		readCSV(file, commands);
 		file.close();
 

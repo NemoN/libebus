@@ -33,7 +33,6 @@ class ConfigFile
 {
 
 public:
-	ConfigFile() {}
 	virtual ~ConfigFile() {}
 
 	virtual void readFile(std::istream& is, Commands& commands) = 0;
@@ -44,7 +43,6 @@ class ConfigFileCSV : public ConfigFile
 {
 	
 public:
-	ConfigFileCSV() {}
 	~ConfigFileCSV() {}
 
 	void readFile(std::istream& is, Commands& commands);
@@ -55,7 +53,6 @@ class ConfigFileXML : public ConfigFile
 {
 	
 public:
-	ConfigFileXML() {}
 	~ConfigFileXML() {}
 
 	void readFile(std::istream& is, Commands& commands);
@@ -68,7 +65,7 @@ class ConfigCommands
 	
 public:
 	ConfigCommands(const std::string path, const FileType type);
-	~ConfigCommands();
+	~ConfigCommands() { delete m_configfile; }
 	
 	void setType(const FileType type);
 	void printFiles() const;

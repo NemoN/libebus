@@ -29,7 +29,7 @@ int main ()
 
 	port.openPort("/dev/ttyUSB0");
 
-	if(port.isOpen())
+	if(port.isOpen() == true)
 		std::cout << "openPort successful." << std::endl;
 
 	int count = 0;
@@ -50,7 +50,7 @@ int main ()
 
 	port.closePort();
 
-	if(!port.isOpen())
+	if(port.isOpen() == false)
 		std::cout << "closePort successful." << std::endl;
 			
 	return 0;

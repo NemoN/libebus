@@ -32,18 +32,18 @@ void ConfigFileCSV::readFile(std::istream& is, Commands& commands)
 	std::string line;
 	
 	// read lines
-	while (std::getline(is, line)) {
+	while (std::getline(is, line) != 0) {
 		cmd_t row;
 		std::string column;
 		
 		std::istringstream stream(line);
 		
 		// walk through columns
-		while (std::getline(stream, column, ';'))
+		while (std::getline(stream, column, ';') != 0)
 			row.push_back(column);
 
 		// skip empty and commented rows
-		if (row.empty() || row[0][0] == '#')
+		if (row.empty() == true || row[0][0] == '#')
 			continue;
 
 		commands.addCommand(row);
@@ -65,11 +65,6 @@ ConfigCommands::ConfigCommands(const std::string path, const FileType type)
 	setType(type);
 	addFiles(m_path, m_extension);
 }
-
-ConfigCommands::~ConfigCommands()
-{
-	delete m_configfile;
-};
 
 void ConfigCommands::setType(const FileType type)
 {
@@ -103,7 +98,7 @@ Commands* ConfigCommands::getCommands()
 	for(; i != m_files.end(); i++) {	
 		std::fstream file((*i).c_str(), std::ios::in);
 
-		if(file.is_open()) {
+		if(file.is_open() == true) {
 			m_configfile->readFile(file, *commands);
 			file.close();
 		}
@@ -120,7 +115,7 @@ void ConfigCommands::addFiles(const std::string path, const std::string extensio
         
         dirent* d = readdir(dir);
         
-        while (d) {
+        while (d != NULL) {
 		
                 if (d->d_type == DT_DIR) {
                         std::string fn = d->d_name;

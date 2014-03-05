@@ -29,7 +29,7 @@ int main ()
 
 	bus.connectBus();
 
-	if (bus.isConnected())
+	if (bus.isConnected() == true)
 		std::cout << "connectBus successful." << std::endl;
 
 
@@ -42,7 +42,7 @@ int main ()
 
 	bus.disconnectBus();
 
-	if (!bus.isConnected())
+	if (bus.isConnected() == false)
 		std::cout << "disconnectBus successful." << std::endl;
 	
 	return 0;

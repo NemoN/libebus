@@ -32,7 +32,7 @@ class Port
 {
 
 public:
-	Port();
+	Port() : m_fd(-1), m_open(false) {}
 	~Port();
 
 	void openPort(const char *device);

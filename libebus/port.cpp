@@ -29,15 +29,9 @@ namespace libebus
 {
 
 
-Port::Port(): m_fd(-1), m_open(false)
-{
-	//~ std::cout << "Port()" << std::endl;
-}
-
 Port::~Port()
 {
-	//~ std::cout << "~Port()" << std::endl;
-	if (m_open)
+	if (m_open == true)
 		closePort();
 }
 
@@ -96,7 +90,7 @@ void Port::closePort()
 
 bool Port::isOpen()
 {
-	if (!isValid())
+	if (isValid() == false)
 		m_open = false;
 	
 	return m_open;
@@ -115,7 +109,7 @@ bool Port::isValid()
 
 ssize_t Port::sendBytes(const unsigned char *buffer, size_t nbytes)
 {
-	if (!isValid())
+	if (isValid() == false)
 		return -1;
 		
 	// write bytes to serial device	
@@ -124,7 +118,7 @@ ssize_t Port::sendBytes(const unsigned char *buffer, size_t nbytes)
 
 ssize_t Port::recvBytes()
 {
-	if (!isValid())
+	if (isValid() == false)
 		return -1;
 		
 	size_t nbytes;
@@ -147,7 +141,7 @@ unsigned char Port::getByte()
 {
 	unsigned char byte;
 
-	if (!m_RecvBuffer.empty()) {
+	if (m_RecvBuffer.empty() == false) {
 		byte = m_RecvBuffer.front();
 		m_RecvBuffer.pop();
 	

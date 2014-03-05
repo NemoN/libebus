@@ -29,7 +29,7 @@ namespace libebus
 
 void Commands::printCommand(const cmd_t& command) const
 {
-	if (!command.size())
+	if (command.size() == 0)
 		return;
 	
 	for (cmdCI_t i = command.begin(); i != command.end(); i++)
@@ -38,7 +38,7 @@ void Commands::printCommand(const cmd_t& command) const
 
 void Commands::printCommands() const
 {
-	if (!m_cmdDB.size())
+	if (m_cmdDB.size() == 0)
 		return;
 	
 	for (cmdDBCI_t i = m_cmdDB.begin(); i != m_cmdDB.end(); i++) {
@@ -65,7 +65,7 @@ bool Commands::compareString(const std::string src1, const std::string src2) con
 
 std::size_t Commands::findCommand(const std::string string) const
 {
-	if (!m_cmdDB.size())
+	if (m_cmdDB.size() == 0)
 		return -1;
 
 	std::string delimiter = " ";
@@ -74,7 +74,7 @@ std::size_t Commands::findCommand(const std::string string) const
 	std::vector<std::string> cmd;
 	
 	// split stream
-	while (std::getline(stream, token, ' ')) {
+	while (std::getline(stream, token, ' ') != 0) {
 		//~ std::cout << token << std::endl;
 		cmd.push_back(token);
 	}
@@ -87,7 +87,7 @@ std::size_t Commands::findCommand(const std::string string) const
 
 		// const cmd_t command = *i; --> (*i) <-> command
 
-		if (!(*i).size())
+		if ((*i).size() == 0)
 			continue;
 
 		if (compareString((*i)[0], cmd[0]) &&

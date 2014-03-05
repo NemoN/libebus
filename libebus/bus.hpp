@@ -32,12 +32,12 @@ class Bus
 {
 
 public:
-	Bus(const char *device);
+	Bus(const char *device) : m_device(device), m_connected(false) {}
 	~Bus();
 
 	void connectBus();
 	void disconnectBus();
-	bool isConnected();
+	bool isConnected() { return m_connected; }
 	
 	void getBytes();
 	void printBytes();

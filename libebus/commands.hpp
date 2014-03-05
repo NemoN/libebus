@@ -37,9 +37,6 @@ class Commands
 {
 	
 public:
-	Commands() {}
-	~Commands() {}
-
 	void addCommand(const cmd_t& command) { m_cmdDB.push_back(command); }
 	void printCommands() const;
 
