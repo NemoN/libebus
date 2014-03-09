@@ -22,36 +22,92 @@
 
 #include <termios.h>
 #include <unistd.h>
+#include <string>
 #include <queue>
 
 namespace libebus
 {
+
+enum DeviceType { SERIAL, NETWORK };
+
+class Device
+{
+
+public:
+	Device() : m_fd(-1), m_open(false) {}
+	virtual ~Device() {}
+
+	virtual void openDevice(const std::string deviceName) = 0;
+	virtual void closeDevice() = 0;
+	bool isOpen();
+
+	ssize_t sendBytes(const unsigned char* buffer, size_t nbytes);
+	ssize_t recvBytes();
+
+	unsigned char getByte();
+	
+protected:
+	int m_fd;
+	bool m_open;
+
+private:	
+	std::queue<unsigned char> m_RecvBuffer;
+
+	bool isValid();
+
+};
+
+class DeviceSerial : public Device
+{
+
+public:
+	~DeviceSerial() { closeDevice(); }
+	
+	void openDevice(const std::string deviceName);
+	void closeDevice();
+	
+private:
+	termios m_oldSettings;
+
+};
+
+class DeviceNetwork : public Device
+{
+
+public:
+	~DeviceNetwork() { closeDevice(); }
+
+	void openDevice(const std::string deviceName);
+	void closeDevice();
+	
+private:
+
+};
 
 
 class Port
 {
 
 public:
-	Port() : m_fd(-1), m_open(false) {}
-	~Port();
+	Port(const std::string deviceName, const DeviceType type);
+	~Port() { delete m_device; }
 
-	void openPort(const char *device);
-	void closePort();
-	bool isOpen();
+	void open() { m_device->openDevice(m_deviceName); }
+	void close() { m_device->closeDevice(); }
+	bool isOpen() { return m_device->isOpen(); }
 
-	ssize_t sendBytes(const unsigned char *buffer, size_t nbytes);
-	ssize_t recvBytes();
+	ssize_t send(const unsigned char* buffer, size_t nbytes)
+		{ return m_device->sendBytes(buffer, nbytes); }
+	ssize_t recv() { return m_device->recvBytes(); }
 
-	unsigned char getByte();
-	
+	unsigned char byte() { return m_device->getByte(); }
+
 private:
-	int m_fd;
-	bool m_open;
-	termios m_oldSettings;
-	
-	std::queue<unsigned char> m_RecvBuffer;
+	Device* m_device;
+	std::string m_deviceName;
 
-	bool isValid();
+	void setType(const DeviceType type);
+	
 };
 
 

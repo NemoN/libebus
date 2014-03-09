@@ -25,53 +25,53 @@
 namespace libebus
 {
 
-Bus::~Bus()
-{
-	if (isConnected() == true)
-		disconnectBus();
-}
-
-void Bus::connectBus()
-{
-	m_port.openPort(m_device);
-	m_connected = m_port.isOpen();
-}
-
-void Bus::disconnectBus()
-{
-	m_port.closePort();
-	m_connected = m_port.isOpen();
-}
-
-void Bus::getBytes()
-{
-	unsigned char byte;
-	ssize_t bytes_read;
-	
-	bytes_read = m_port.recvBytes();
-
-	for (int i = 0; i < bytes_read; i++) {
-		byte = m_port.getByte();
-		std::cout << std::hex << std::setw(2) << std::setfill('0')
-			  << static_cast<unsigned int>(byte);
-		if (byte == 0xAA)
-			std::cout << std::endl;
-	}
-
-}
-
-void Bus::printBytes()
-{
-	unsigned char byte;
-	
-	while (m_ByteBuffer.empty() == false) {
-		byte = m_ByteBuffer.front();
-		std::cout << std::hex << std::setw(2) << std::setfill('0')
-		<< static_cast<unsigned int>(byte) << std::endl;
-		m_ByteBuffer.pop();
-	}
-}
-
+//~ Bus::~Bus()
+//~ {
+	//~ if (isConnected() == true)
+		//~ disconnectBus();
+//~ }
+//~ 
+//~ void Bus::connectBus()
+//~ {
+	//~ m_port.openPort(m_device);
+	//~ m_connected = m_port.isOpen();
+//~ }
+//~ 
+//~ void Bus::disconnectBus()
+//~ {
+	//~ m_port.closePort();
+	//~ m_connected = m_port.isOpen();
+//~ }
+//~ 
+//~ void Bus::getBytes()
+//~ {
+	//~ unsigned char byte;
+	//~ ssize_t bytes_read;
+	//~ 
+	//~ bytes_read = m_port.recvBytes();
+//~ 
+	//~ for (int i = 0; i < bytes_read; i++) {
+		//~ byte = m_port.getByte();
+		//~ std::cout << std::hex << std::setw(2) << std::setfill('0')
+			  //~ << static_cast<unsigned int>(byte);
+		//~ if (byte == 0xAA)
+			//~ std::cout << std::endl;
+	//~ }
+//~ 
+//~ }
+//~ 
+//~ void Bus::printBytes()
+//~ {
+	//~ unsigned char byte;
+	//~ 
+	//~ while (m_ByteBuffer.empty() == false) {
+		//~ byte = m_ByteBuffer.front();
+		//~ std::cout << std::hex << std::setw(2) << std::setfill('0')
+		//~ << static_cast<unsigned int>(byte) << std::endl;
+		//~ m_ByteBuffer.pop();
+	//~ }
+//~ }
+//~ 
 
 	
 

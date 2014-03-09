@@ -21,7 +21,12 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #include <unistd.h>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 
@@ -29,66 +34,7 @@ namespace libebus
 {
 
 
-Port::~Port()
-{
-	if (m_open == true)
-		closePort();
-}
-
-void Port::openPort(const char *device)
-{
-	termios newSettings;
-
-	// open file descriptor from serial device
-	m_fd = open(device, O_RDWR | O_NOCTTY);
-
-	if (m_fd < 0) {
-		m_open = false;
-		
-	} else {
-		// save current settings of serial device
-		tcgetattr(m_fd, &m_oldSettings);
-		
-		memset(&newSettings, '\0', sizeof(newSettings));
-
-		newSettings.c_cflag = B2400 | CS8 | CLOCAL | CREAD;
-		newSettings.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-		newSettings.c_iflag = IGNPAR;
-		newSettings.c_oflag &= ~OPOST;
-
-		newSettings.c_cc[VMIN]  = 1;
-		newSettings.c_cc[VTIME] = 0;
-
-		// empty device buffer
-		tcflush(m_fd, TCIOFLUSH);
-
-		// activate new settings of serial device
-		tcsetattr(m_fd, TCSANOW, &newSettings);
-
-		// set serial device into blocking mode
-		fcntl(m_fd, F_SETFL, fcntl(m_fd, F_GETFL) & ~O_NONBLOCK);
-		
-		m_open = true;		
-	}
-
-}
-
-void Port::closePort()
-{
-	// empty device buffer
-	tcflush(m_fd, TCIOFLUSH);
-	
-	// activate old settings of serial device
-	tcsetattr(m_fd, TCSANOW, &m_oldSettings);
-
-	// close file descriptor from serial device
-	close(m_fd);
-
-	m_fd = -1;
-	m_open = false;
-}
-
-bool Port::isOpen()
+bool Device::isOpen()
 {
 	if (isValid() == false)
 		m_open = false;
@@ -96,7 +42,7 @@ bool Port::isOpen()
 	return m_open;
 }
 
-bool Port::isValid()
+bool Device::isValid()
 {
 	int status;
 
@@ -106,17 +52,16 @@ bool Port::isValid()
 		return true;	
 }
 
-
-ssize_t Port::sendBytes(const unsigned char *buffer, size_t nbytes)
+ssize_t Device::sendBytes(const unsigned char* buffer, size_t nbytes)
 {
 	if (isValid() == false)
 		return -1;
 		
-	// write bytes to serial device	
+	// write bytes to device	
 	return write(m_fd, buffer, nbytes);
 }
 
-ssize_t Port::recvBytes()
+ssize_t Device::recvBytes()
 {
 	if (isValid() == false)
 		return -1;
@@ -128,7 +73,7 @@ ssize_t Port::recvBytes()
 	memset(buffer, '\0', sizeof(buffer));
 	nbytes = sizeof(buffer);
 
-	// read bytes from serial device
+	// read bytes from device
 	bytes_read = read(m_fd, buffer, nbytes);
 
 	for (int i = 0; i < bytes_read; i++)
@@ -137,7 +82,7 @@ ssize_t Port::recvBytes()
 	return bytes_read;
 }
 
-unsigned char Port::getByte()
+unsigned char Device::getByte()
 {
 	unsigned char byte;
 
@@ -150,6 +95,140 @@ unsigned char Port::getByte()
 
 	return 0;
 }
+
+
+void DeviceSerial::openDevice(const std::string deviceName)
+{
+	termios newSettings;
+
+	m_open = false;
+
+	// open file descriptor from serial device
+	m_fd = open(deviceName.c_str(), O_RDWR | O_NOCTTY);
+
+	if (m_fd < 0)
+		return;
+		
+	// save current settings of serial device
+	tcgetattr(m_fd, &m_oldSettings);
+	
+	memset(&newSettings, '\0', sizeof(newSettings));
+
+	newSettings.c_cflag = B2400 | CS8 | CLOCAL | CREAD;
+	newSettings.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+	newSettings.c_iflag = IGNPAR;
+	newSettings.c_oflag &= ~OPOST;
+
+	newSettings.c_cc[VMIN]  = 1;
+	newSettings.c_cc[VTIME] = 0;
+
+	// empty device buffer
+	tcflush(m_fd, TCIOFLUSH);
+
+	// activate new settings of serial device
+	tcsetattr(m_fd, TCSANOW, &newSettings);
+
+	// set serial device into blocking mode
+	fcntl(m_fd, F_SETFL, fcntl(m_fd, F_GETFL) & ~O_NONBLOCK);
+	
+	m_open = true;		
+
+}
+
+void DeviceSerial::closeDevice()
+{
+	if (m_open == true) {
+		// empty device buffer
+		tcflush(m_fd, TCIOFLUSH);
+		
+		// activate old settings of serial device
+		tcsetattr(m_fd, TCSANOW, &m_oldSettings);
+
+		// close file descriptor from serial device
+		close(m_fd);
+
+		m_fd = -1;
+		m_open = false;
+	}
+}
+
+
+void DeviceNetwork::openDevice(const std::string deviceName)
+{
+	struct sockaddr_in sock;
+	char* hostport;
+	int ret;
+
+	m_open = false;
+
+	memset((char*) &sock, 0, sizeof(sock));
+
+	hostport = strdup(deviceName.c_str());
+	char* host = strtok(hostport, ":");
+	char* port = strtok(NULL, ":");
+
+	if (inet_addr(host) == INADDR_NONE) {
+		struct hostent* he;
+
+		he = gethostbyname(host);
+		if (he == NULL)
+			return;
+
+		memcpy(&sock.sin_addr, he->h_addr_list[0], he->h_length);
+	} else {
+		ret = inet_aton(host, &sock.sin_addr);
+		if (ret == 0)
+			return;
+	}
+
+	sock.sin_family = AF_INET;
+	sock.sin_port = htons(atoi(port));
+
+	m_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (m_fd < 0)
+		return;
+
+	ret = connect(m_fd, (struct sockaddr*) &sock, sizeof(sock));
+	if (ret < 0)
+		return;
+
+	free(hostport);
+	m_open = true;
+}
+
+void DeviceNetwork::closeDevice()
+{
+	if (m_open == true) {
+		// close file descriptor from network device
+		close(m_fd);
+
+		m_fd = -1;
+		m_open = false;
+	}
+}
+
+
+Port::Port(const std::string deviceName, const DeviceType type)
+{
+	m_deviceName = deviceName;
+	m_device = NULL;
+	setType(type);
+}
+
+void Port::setType(const DeviceType type)
+{
+	if (m_device != NULL)
+		delete m_device;
+	
+	switch (type) {
+	case SERIAL:
+		m_device = new DeviceSerial();
+		break;
+	case NETWORK:
+		m_device = new DeviceNetwork();
+		break;
+	};
+};
 
 
 } //namespace

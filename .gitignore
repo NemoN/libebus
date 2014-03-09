@@ -20,3 +20,4 @@
 *.o
 *.dirstamp
 test_*
+/libebusconfig.hpp

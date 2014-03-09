@@ -25,30 +25,31 @@ using namespace libebus;
 
 int main ()
 {
-	Port port;
+	std::string dev("/dev/ttyUSB0");
+	Port port(dev, SERIAL);
 
-	port.openPort("/dev/ttyUSB0");
+	port.open();
 
 	if(port.isOpen() == true)
 		std::cout << "openPort successful." << std::endl;
 
 	int count = 0;
 
-	while(count < 100) {
+	while (count < 100) {
 		ssize_t bytes_read;
 
-		bytes_read = port.recvBytes();
+		bytes_read = port.recv();
 
 		for (int i = 0; i < bytes_read; i++)
 			std::cout << std::hex << std::setw(2) << std::setfill('0')
-			<< static_cast<unsigned int>(port.getByte()) << std::endl;
+			<< static_cast<unsigned int>(port.byte()) << std::endl;
 		
 		bytes_read = 0;
 
 		count++;
 	} 
 
-	port.closePort();
+	port.close();
 
 	if(port.isOpen() == false)
 		std::cout << "closePort successful." << std::endl;

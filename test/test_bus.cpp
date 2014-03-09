@@ -25,26 +25,26 @@ using namespace libebus;
 
 int main ()
 {
-	Bus bus("/dev/ttyUSB0");
-
-	bus.connectBus();
-
-	if (bus.isConnected() == true)
-		std::cout << "connectBus successful." << std::endl;
-
-
-	int count = 0;
-
-	while (count < 100) {
-		bus.getBytes();
-		count++;
-	} 
-
-	bus.disconnectBus();
-
-	if (bus.isConnected() == false)
-		std::cout << "disconnectBus successful." << std::endl;
-	
-	return 0;
+	//~ Bus bus("/dev/ttyUSB0");
+//~ 
+	//~ bus.connectBus();
+//~ 
+	//~ if (bus.isConnected() == true)
+		//~ std::cout << "connectBus successful." << std::endl;
+//~ 
+//~ 
+	//~ int count = 0;
+//~ 
+	//~ while (count < 100) {
+		//~ bus.getBytes();
+		//~ count++;
+	//~ } 
+//~ 
+	//~ bus.disconnectBus();
+//~ 
+	//~ if (bus.isConnected() == false)
+		//~ std::cout << "disconnectBus successful." << std::endl;
+	//~ 
+	//~ return 0;
 
 }

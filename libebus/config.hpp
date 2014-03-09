@@ -27,7 +27,7 @@
 namespace libebus
 {
 
-enum FileType {CSV, XML};
+enum FileType { CSV, XML };
 
 class ConfigFile
 {
