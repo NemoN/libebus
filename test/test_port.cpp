@@ -26,7 +26,7 @@ using namespace libebus;
 int main ()
 {
 	std::string dev("/dev/ttyUSB0");
-	Port port(dev, SERIAL);
+	Port port(dev);
 
 	port.open();
 

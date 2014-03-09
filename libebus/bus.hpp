@@ -32,15 +32,15 @@ class Bus
 {
 
 public:
-	//~ Bus(const char *device) : m_device(device), m_connected(false) {}
-	//~ ~Bus();
-//~ 
-	//~ void connectBus();
-	//~ void disconnectBus();
-	//~ bool isConnected() { return m_connected; }
-	//~ 
-	//~ void getBytes();
-	//~ void printBytes();
+	Bus(const std::string deviceName);
+	~Bus();
+
+	void connect();
+	void disconnect();
+	bool isConnected() { return m_connected; }
+	
+	void bytes();
+	void printBytes();
 	
 	//~ bool getBus(void);
 	//~ void freeBus(void);
@@ -49,10 +49,10 @@ public:
 	
 	
 private:
-	//~ const char *m_device;
-	//~ Port m_port;
-	//~ bool m_connected;
-	//~ std::queue<unsigned char> m_ByteBuffer;
+	std::string m_deviceName;
+	Port* m_port;
+	bool m_connected;
+	std::queue<unsigned char> m_byteBuffer;
 	
 	//~ bool waitSyn();
 	

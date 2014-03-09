@@ -89,7 +89,7 @@ class Port
 {
 
 public:
-	Port(const std::string deviceName, const DeviceType type);
+	Port(const std::string deviceName);
 	~Port() { delete m_device; }
 
 	void open() { m_device->openDevice(m_deviceName); }

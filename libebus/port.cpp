@@ -208,11 +208,16 @@ void DeviceNetwork::closeDevice()
 }
 
 
-Port::Port(const std::string deviceName, const DeviceType type)
+Port::Port(const std::string deviceName)
 {
 	m_deviceName = deviceName;
 	m_device = NULL;
-	setType(type);
+	
+	if (strchr(deviceName.c_str(), '/') == NULL &&
+	    strchr(deviceName.c_str(), ':') != NULL)
+		setType(NETWORK);
+	else
+		setType(SERIAL);
 }
 
 void Port::setType(const DeviceType type)

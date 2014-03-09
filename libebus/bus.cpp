@@ -25,53 +25,61 @@
 namespace libebus
 {
 
-//~ Bus::~Bus()
-//~ {
-	//~ if (isConnected() == true)
-		//~ disconnectBus();
-//~ }
-//~ 
-//~ void Bus::connectBus()
-//~ {
-	//~ m_port.openPort(m_device);
-	//~ m_connected = m_port.isOpen();
-//~ }
-//~ 
-//~ void Bus::disconnectBus()
-//~ {
-	//~ m_port.closePort();
-	//~ m_connected = m_port.isOpen();
-//~ }
-//~ 
-//~ void Bus::getBytes()
-//~ {
-	//~ unsigned char byte;
-	//~ ssize_t bytes_read;
-	//~ 
-	//~ bytes_read = m_port.recvBytes();
-//~ 
-	//~ for (int i = 0; i < bytes_read; i++) {
-		//~ byte = m_port.getByte();
-		//~ std::cout << std::hex << std::setw(2) << std::setfill('0')
-			  //~ << static_cast<unsigned int>(byte);
-		//~ if (byte == 0xAA)
-			//~ std::cout << std::endl;
-	//~ }
-//~ 
-//~ }
-//~ 
-//~ void Bus::printBytes()
-//~ {
-	//~ unsigned char byte;
-	//~ 
-	//~ while (m_ByteBuffer.empty() == false) {
-		//~ byte = m_ByteBuffer.front();
-		//~ std::cout << std::hex << std::setw(2) << std::setfill('0')
-		//~ << static_cast<unsigned int>(byte) << std::endl;
-		//~ m_ByteBuffer.pop();
-	//~ }
-//~ }
-//~ 
+
+Bus::Bus(const std::string deviceName) : m_deviceName(deviceName), m_connected(false)
+{
+	m_port = new Port(deviceName);
+}
+
+Bus::~Bus()
+{
+	if (isConnected() == true)
+		disconnect();
+
+	delete m_port;
+}
+
+void Bus::connect()
+{
+	m_port->open();
+	m_connected = m_port->isOpen();
+}
+
+void Bus::disconnect()
+{
+	m_port->close();
+	m_connected = m_port->isOpen();
+}
+
+void Bus::bytes()
+{
+	unsigned char byte;
+	ssize_t bytes_read;
+	
+	bytes_read = m_port->recv();
+
+	for (int i = 0; i < bytes_read; i++) {
+		byte = m_port->byte();
+		std::cout << std::hex << std::setw(2) << std::setfill('0')
+			  << static_cast<unsigned int>(byte);
+		if (byte == 0xAA)
+			std::cout << std::endl;
+	}
+
+}
+
+void Bus::printBytes()
+{
+	unsigned char byte;
+	
+	while (m_byteBuffer.empty() == false) {
+		byte = m_byteBuffer.front();
+		std::cout << std::hex << std::setw(2) << std::setfill('0')
+		<< static_cast<unsigned int>(byte) << std::endl;
+		m_byteBuffer.pop();
+	}
+}
+
 
 	
 
