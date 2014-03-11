@@ -28,7 +28,7 @@ namespace libebus
 
 Bus::Bus(const std::string deviceName) : m_deviceName(deviceName), m_connected(false)
 {
-	m_port = new Port(deviceName);
+	m_port = new Port(m_deviceName);
 }
 
 Bus::~Bus()

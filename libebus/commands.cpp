@@ -18,7 +18,7 @@
  */
 
 #include "commands.hpp"
-#include <iostream>
+//~ #include <iostream>
 #include <algorithm>
 #include <sstream>
 #include <vector>
@@ -27,25 +27,25 @@ namespace libebus
 {
 
 
-void Commands::printCommand(const cmd_t& command) const
-{
-	if (command.size() == 0)
-		return;
-	
-	for (cmdCI_t i = command.begin(); i != command.end(); i++)
-		std::cout << *i << ';';
-}
-
-void Commands::printCommands() const
-{
-	if (m_cmdDB.size() == 0)
-		return;
-	
-	for (cmdDBCI_t i = m_cmdDB.begin(); i != m_cmdDB.end(); i++) {
-		printCommand(*i);
-		std::cout << std::endl;
-	}	
-}
+//~ void Commands::printCommand(const cmd_t& command) const
+//~ {
+	//~ if (command.size() == 0)
+		//~ return;
+	//~ 
+	//~ for (cmdCI_t i = command.begin(); i != command.end(); i++)
+		//~ std::cout << *i << ';';
+//~ }
+//~ 
+//~ void Commands::printCommands() const
+//~ {
+	//~ if (m_cmdDB.size() == 0)
+		//~ return;
+	//~ 
+	//~ for (cmdDBCI_t i = m_cmdDB.begin(); i != m_cmdDB.end(); i++) {
+		//~ printCommand(*i);
+		//~ std::cout << std::endl;
+	//~ }	
+//~ }
 
 bool Commands::compareString(const std::string src1, const std::string src2) const
 {

@@ -18,7 +18,7 @@
  */
 
 #include "config.hpp"
-#include <iostream>
+//~ #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <dirent.h>
@@ -83,12 +83,12 @@ void ConfigCommands::setType(const FileType type)
 	};
 };
 
-void ConfigCommands::printFiles() const
-{
-	std::vector<std::string>::const_iterator i = m_files.begin();
-	for(; i != m_files.end(); i++)
-		std::cout << *i << std::endl; 	
-};
+//~ void ConfigCommands::printFiles() const
+//~ {
+	//~ std::vector<std::string>::const_iterator i = m_files.begin();
+	//~ for(; i != m_files.end(); i++)
+		//~ std::cout << *i << std::endl; 	
+//~ };
 
 Commands* ConfigCommands::getCommands()
 {

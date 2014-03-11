@@ -38,7 +38,7 @@ class Commands
 	
 public:
 	void addCommand(const cmd_t& command) { m_cmdDB.push_back(command); }
-	void printCommands() const;
+	//~ void printCommands() const;
 
 	std::size_t size() const { return m_cmdDB.size(); }
 
@@ -49,7 +49,7 @@ public:
 private:
 	cmdDB_t m_cmdDB;
 
-	void printCommand(const cmd_t& command) const;
+	//~ void printCommand(const cmd_t& command) const;
 	bool compareString(const std::string src1, const std::string src2) const;
 };
 

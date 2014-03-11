@@ -63,7 +63,7 @@ int main()
 		readCSV(file, commands);
 		file.close();
 
-		commands.printCommands();
+		//~ commands.printCommands();
 		std::cout << commands[2][9] << std::endl;
 		
 	} else {
