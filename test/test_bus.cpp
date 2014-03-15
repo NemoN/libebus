@@ -30,20 +30,20 @@ int main ()
 	bus.connect();
 
 	if (bus.isConnected() == true)
-		std::cout << "connectBus successful." << std::endl;
+		std::cout << "connect successful." << std::endl;
 
 
 	int count = 0;
 
-	while (count < 100) {
-		bus.bytes();
+	while (1) {
+		bus.printBytes();
 		count++;
 	} 
 
 	bus.disconnect();
 
 	if (bus.isConnected() == false)
-		std::cout << "disconnectBus successful." << std::endl;
+		std::cout << "disconnect successful." << std::endl;
 	
 	return 0;
 

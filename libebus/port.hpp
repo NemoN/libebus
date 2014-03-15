@@ -49,10 +49,9 @@ public:
 protected:
 	int m_fd;
 	bool m_open;
+	std::queue<unsigned char> m_recvBuffer;
 
 private:	
-	std::queue<unsigned char> m_RecvBuffer;
-
 	bool isValid();
 
 };

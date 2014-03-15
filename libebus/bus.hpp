@@ -22,6 +22,7 @@
 
 #include "port.hpp"
 #include <cstring>
+#include <sstream>
 #include <queue>
 
 namespace libebus
@@ -39,20 +40,22 @@ public:
 	void disconnect();
 	bool isConnected() { return m_connected; }
 	
-	void bytes();
 	void printBytes();
+
+	bool waitData();
+	std::string cycData();
 	
 	//~ bool getBus(void);
 	//~ void freeBus(void);
-	//~ sendMsg();
-	//~ recvMsg();
 	
 	
 private:
 	std::string m_deviceName;
 	Port* m_port;
 	bool m_connected;
-	std::queue<unsigned char> m_byteBuffer;
+	std::stringstream m_sstr;
+	std::queue<std::string> m_cycBuffer;
+	
 	
 	//~ bool waitSyn();
 	

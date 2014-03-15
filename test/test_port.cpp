@@ -35,14 +35,15 @@ int main ()
 
 	int count = 0;
 
-	while (count < 100) {
+	while (1) {
 		ssize_t bytes_read;
-
+		unsigned char byte = 0;
 		bytes_read = port.recv();
 
 		for (int i = 0; i < bytes_read; i++)
+			byte = port.byte();
 			std::cout << std::hex << std::setw(2) << std::setfill('0')
-			<< static_cast<unsigned int>(port.byte()) << std::endl;
+			<< static_cast<unsigned>(byte) << std::endl;
 		
 		bytes_read = 0;
 

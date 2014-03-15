@@ -43,12 +43,13 @@ bool Device::isOpen()
 
 bool Device::isValid()
 {
-	int status;
-
-	if (ioctl(m_fd, TIOCMGET, &status) < 0) 
+	if (fcntl(m_fd, F_GETFL) == -1) {
+		closeDevice();
+		m_open = false;
 		return false;
-	else
-		return true;	
+	}
+
+	return true;
 }
 
 ssize_t Device::sendBytes(const unsigned char* buffer, size_t nbytes)
@@ -76,8 +77,8 @@ ssize_t Device::recvBytes()
 	bytes_read = read(m_fd, buffer, nbytes);
 
 	for (int i = 0; i < bytes_read; i++)
-		m_RecvBuffer.push(buffer[i]);
-
+		m_recvBuffer.push(buffer[i]);
+		
 	return bytes_read;
 }
 
@@ -85,9 +86,9 @@ unsigned char Device::getByte()
 {
 	unsigned char byte;
 
-	if (m_RecvBuffer.empty() == false) {
-		byte = m_RecvBuffer.front();
-		m_RecvBuffer.pop();
+	if (m_recvBuffer.empty() == false) {
+		byte = m_recvBuffer.front();
+		m_recvBuffer.pop();
 	
 		return byte;
 	}

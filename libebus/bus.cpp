@@ -18,7 +18,6 @@
  */
 
 #include "bus.hpp"
-#include <unistd.h>
 #include <iostream>
 #include <iomanip>
 
@@ -47,11 +46,13 @@ void Bus::connect()
 
 void Bus::disconnect()
 {
-	m_port->close();
-	m_connected = m_port->isOpen();
+	if (m_connected == true) {
+		m_port->close();
+		m_connected = m_port->isOpen();
+	}
 }
 
-void Bus::bytes()
+void Bus::printBytes()
 {
 	unsigned char byte;
 	ssize_t bytes_read;
@@ -61,27 +62,51 @@ void Bus::bytes()
 	for (int i = 0; i < bytes_read; i++) {
 		byte = m_port->byte();
 		std::cout << std::hex << std::setw(2) << std::setfill('0')
-			  << static_cast<unsigned int>(byte);
+			  << static_cast<unsigned>(byte);
 		if (byte == 0xAA)
 			std::cout << std::endl;
 	}
-
 }
 
-void Bus::printBytes()
+bool Bus::waitData()
 {
 	unsigned char byte;
-	
-	while (m_byteBuffer.empty() == false) {
-		byte = m_byteBuffer.front();
-		std::cout << std::hex << std::setw(2) << std::setfill('0')
-		<< static_cast<unsigned int>(byte) << std::endl;
-		m_byteBuffer.pop();
+	ssize_t bytes_read;
+	bool result = false;
+
+	// wait for new data
+	bytes_read = m_port->recv();
+
+	for (int i = 0; i < bytes_read; i++) {
+		
+		// fetch next byte
+		byte = m_port->byte();
+
+		if (byte != 0xAA)
+			m_sstr << std::hex << std::setw(2) << std::setfill('0')
+			       << static_cast<unsigned>(byte);
+
+		if (byte == 0xAA && m_sstr.str().empty() == false) {
+			m_cycBuffer.push(m_sstr.str());
+			m_sstr.str(std::string());
+			result = true;
+		}
 	}
+
+	return result;
 }
 
+std::string Bus::cycData()
+{
+	std::string data;
 
+	if (m_cycBuffer.empty() == false) {
+		data = m_cycBuffer.front();
+		m_cycBuffer.pop();
+	}
 	
+	return data;
+}
 
 //~ bool getBus(void);
 //~ {
