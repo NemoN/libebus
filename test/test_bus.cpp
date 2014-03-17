@@ -25,7 +25,7 @@ using namespace libebus;
 
 int main ()
 {
-	Bus bus("/dev/ttyUSB0");
+	Bus bus("/dev/ttyUSB20");
 
 	bus.connect();
 

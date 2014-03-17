@@ -18,7 +18,7 @@
  */
 
 #include "commands.hpp"
-//~ #include <iostream>
+#include <iostream>
 #include <algorithm>
 #include <sstream>
 #include <vector>
@@ -63,14 +63,14 @@ bool Commands::compareString(const std::string src1, const std::string src2) con
 		return false;
 }
 
-std::size_t Commands::findCommand(const std::string string) const
+int Commands::findCommand(const std::string data) const
 {
 	if (m_cmdDB.size() == 0)
 		return -1;
 
 	std::string delimiter = " ";
 	std::string token;
-	std::istringstream stream(string);
+	std::istringstream stream(data);
 	std::vector<std::string> cmd;
 	
 	// split stream
@@ -84,9 +84,7 @@ std::size_t Commands::findCommand(const std::string string) const
 
 	// walk through commands
 	for (index = 0; i != m_cmdDB.end(); i++, index++) {
-
-		// const cmd_t command = *i; --> (*i) <-> command
-
+		// empty line
 		if ((*i).size() == 0)
 			continue;
 
@@ -100,6 +98,49 @@ std::size_t Commands::findCommand(const std::string string) const
 	return index;
 }	
 
+int Commands::findData(const std::string data) const
+{
+	// no commands definend
+	if (m_cmdDB.size() == 0)
+		return -2;
+
+	// skip to small search string length
+	if (data.length() < 10)
+		return -3;
+	
+	// preapre string for searching command
+	std::string search(data.substr(2, 8 + atoi(data.substr(8,2).c_str()) * 2));
+	
+	//~ std::cout << "length: " << atoi(data.substr(8,2).c_str())
+		  //~ << " string: " << data.substr(2, 8 + atoi(data.substr(8,2).c_str()) * 2)
+		  //~ << std::endl;
+
+	std::size_t index;
+	cmdDBCI_t i = m_cmdDB.begin();
+
+	// walk through commands
+	for (index = 0; i != m_cmdDB.end(); i++, index++) {
+		// empty line
+		if ((*i).size() == 0)
+			continue;
+
+		// prepare string for defined command
+		std::string command((*i)[5]);
+		command += (*i)[6];
+		command += (*i)[8];
+
+		// skip wrong command string length
+		if (search.length() != command.length())
+			continue;
+
+		if (compareString(search, command))
+			return index;
+
+	}	
+
+	// command not found
+	return -1;
+}
 
 } //namespace
 

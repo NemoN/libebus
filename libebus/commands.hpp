@@ -44,7 +44,8 @@ public:
 
 	cmd_t const& operator[](std::size_t index) const { return m_cmdDB[index]; }
 
-	std::size_t findCommand(const std::string string) const;
+	int findCommand(const std::string data) const;
+	int findData(const std::string data) const;
 
 private:
 	cmdDB_t m_cmdDB;
