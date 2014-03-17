@@ -21,6 +21,7 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <iomanip>
 #include <vector>
 
 namespace libebus
@@ -56,7 +57,7 @@ bool Commands::compareString(const std::string src1, const std::string src2) con
 	std::string tgt2;
 	tgt2.resize(src2.size());
 	std::transform(src2.begin(), src2.end(), tgt2.begin(), toupper);
-	
+
 	if (tgt1 == tgt2)
 		return true;
 	else
@@ -110,10 +111,6 @@ int Commands::findData(const std::string data) const
 	
 	// preapre string for searching command
 	std::string search(data.substr(2, 8 + atoi(data.substr(8,2).c_str()) * 2));
-	
-	//~ std::cout << "length: " << atoi(data.substr(8,2).c_str())
-		  //~ << " string: " << data.substr(2, 8 + atoi(data.substr(8,2).c_str()) * 2)
-		  //~ << std::endl;
 
 	std::size_t index;
 	cmdDBCI_t i = m_cmdDB.begin();
@@ -127,13 +124,16 @@ int Commands::findData(const std::string data) const
 		// prepare string for defined command
 		std::string command((*i)[5]);
 		command += (*i)[6];
+		std::stringstream sstr;
+		sstr << std::setw(2) << std::hex << std::setfill('0') << (*i)[7];
+		command += sstr.str();
 		command += (*i)[8];
 
-		// skip wrong command string length
-		if (search.length() != command.length())
+		// skip wrong search string length
+		if (command.length() > search.length())
 			continue;
 
-		if (compareString(search, command))
+		if (compareString(command, search.substr(0,command.length())))
 			return index;
 
 	}	
