@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 namespace libebus
 {
@@ -32,6 +33,24 @@ typedef cmd_t::const_iterator cmdCI_t;
 
 typedef std::vector<cmd_t> cmdDB_t;
 typedef cmdDB_t::const_iterator cmdDBCI_t;
+
+class Command
+{
+
+public:
+	Command(int index, cmd_t command) : m_index(index), m_command(command) {}
+	Command(int index, cmd_t command, std::string data)
+		: m_index(index), m_command(command), m_data(data) {}
+
+	void setData(std::string data) { m_data = data; }
+	std::string getData() const { return m_data; } 
+
+private:
+	int m_index;
+	cmd_t m_command;
+	std::string m_data;
+
+};
 
 class Commands
 {
@@ -47,11 +66,15 @@ public:
 	int findCommand(const std::string data) const;
 	int findData(const std::string data) const;
 
+	cmd_t const& getCommand(std::size_t index) const { return m_cmdDB[index]; }
+
+
 private:
 	cmdDB_t m_cmdDB;
 
 	//~ void printCommand(const cmd_t& command) const;
 	bool compareString(const std::string src1, const std::string src2) const;
+
 };
 
 
