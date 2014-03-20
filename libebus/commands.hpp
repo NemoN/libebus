@@ -61,19 +61,16 @@ public:
 
 	std::size_t size() const { return m_cmdDB.size(); }
 
-	cmd_t const& operator[](std::size_t index) const { return m_cmdDB[index]; }
+	cmd_t const& operator[](const std::size_t& index) const { return m_cmdDB[index]; }
 
-	int findCommand(const std::string data) const;
-	int findData(const std::string data) const;
-
-	cmd_t const& getCommand(std::size_t index) const { return m_cmdDB[index]; }
-
+	int findCommand(const std::string& data) const;
+	int findData(const std::string& data) const;
 
 private:
 	cmdDB_t m_cmdDB;
 
 	//~ void printCommand(const cmd_t& command) const;
-	bool compareString(const std::string src1, const std::string src2) const;
+	bool compareString(const std::string& src1, const std::string& src2) const;
 
 };
 

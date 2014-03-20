@@ -48,7 +48,7 @@ namespace libebus
 	//~ }	
 //~ }
 
-bool Commands::compareString(const std::string src1, const std::string src2) const
+bool Commands::compareString(const std::string& src1, const std::string& src2) const
 {
 	std::string tgt1;
 	tgt1.resize(src1.size());
@@ -57,34 +57,34 @@ bool Commands::compareString(const std::string src1, const std::string src2) con
 	std::string tgt2;
 	tgt2.resize(src2.size());
 	std::transform(src2.begin(), src2.end(), tgt2.begin(), toupper);
-
+//~ std::cout << "tgt1 :" << tgt1.c_str() << ": tgt2 :" << tgt2.c_str() << ":" << std::endl;
 	if (tgt1 == tgt2)
 		return true;
 	else
 		return false;
 }
 
-int Commands::findCommand(const std::string data) const
+int Commands::findCommand(const std::string& data) const
 {
+	// no commands definend
 	if (m_cmdDB.size() == 0)
-		return -1;
+		return -2;
 
-	std::string delimiter = " ";
+	// preapre string for searching command
 	std::string token;
 	std::istringstream stream(data);
 	std::vector<std::string> cmd;
 	
 	// split stream
-	while (std::getline(stream, token, ' ') != 0) {
-		//~ std::cout << token << std::endl;
+	while (std::getline(stream, token, ' ') != 0)
 		cmd.push_back(token);
-	}
 
 	std::size_t index;
 	cmdDBCI_t i = m_cmdDB.begin();
 
 	// walk through commands
 	for (index = 0; i != m_cmdDB.end(); i++, index++) {
+		
 		// empty line
 		if ((*i).size() == 0)
 			continue;
@@ -96,10 +96,11 @@ int Commands::findCommand(const std::string data) const
 
 	}	
 	
-	return index;
+	// command not found
+	return -1;
 }	
 
-int Commands::findData(const std::string data) const
+int Commands::findData(const std::string& data) const
 {
 	// no commands definend
 	if (m_cmdDB.size() == 0)
@@ -117,6 +118,7 @@ int Commands::findData(const std::string data) const
 
 	// walk through commands
 	for (index = 0; i != m_cmdDB.end(); i++, index++) {
+		
 		// empty line
 		if ((*i).size() == 0)
 			continue;
