@@ -17,34 +17,37 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#include "libebus.hpp"
-#include <iostream>
-#include <iomanip>
+#include "dump.hpp"
+#include <fstream>
+#include <cstdio>
 
-using namespace libebus;
-
-int main ()
+namespace libebus
 {
-	Bus bus("/dev/ttyUSB20", "/tmp/dump_bus.bin", 100, false);
 
-	bus.connect();
-
-	if (bus.isConnected() == true)
-		std::cout << "connect successful." << std::endl;
-
-
-	int count = 0;
-
-	while (1) {
-		bus.printBytes();
-		count++;
-	} 
-
-	bus.disconnect();
-
-	if (bus.isConnected() == false)
-		std::cout << "disconnect successful." << std::endl;
+int Dump::write(const char* byte)
+{
+	int ret = 0;
 	
-	return 0;
+	std::ofstream fs(m_filename.c_str(), std::ios::out | std::ios::binary | std::ios::app);
 
+	if (fs == 0)
+		return -1;
+
+	fs.write(byte, 1);
+
+	if (fs.tellp() >= m_filesize * 1024) {
+		std::string oldfile;
+		oldfile += m_filename;
+		oldfile += ".old";
+		ret = rename(m_filename.c_str(), oldfile.c_str());
+	}
+			
+	fs.close();
+
+	return ret;
 }
+
+
+
+} //namespace
+

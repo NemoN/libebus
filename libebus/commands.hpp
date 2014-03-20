@@ -77,4 +77,4 @@ private:
 
 } //namespace
 
-#endif //LIBEBUS_COMMANDS_HPP_
+#endif // LIBEBUS_COMMANDS_HPP_

@@ -9,7 +9,8 @@ lib_LTLIBRARIES = libebus-@LIBEBUS_API_VERSION@.la
 libebus_@LIBEBUS_API_VERSION@_la_SOURCES = libebus/port.cpp \
 					   libebus/bus.cpp \
 					   libebus/commands.cpp \
-					   libebus/config.cpp
+					   libebus/config.cpp \
+					   libebus/dump.cpp
 
 libebus_@LIBEBUS_API_VERSION@_la_LDFLAGS = -version-info $(LIBEBUS_SO_VERSION)
 
@@ -18,7 +19,8 @@ nobase_libebus_include_HEADERS = libebus.hpp \
                                  libebus/port.hpp \
                                  libebus/bus.hpp \
                                  libebus/commands.hpp \
-                                 libebus/config.hpp
+                                 libebus/config.hpp \
+                                 libebus/dump.hpp
 
 libebus_libincludedir = $(libdir)/libebus-$(LIBEBUS_API_VERSION)/include
 nodist_libebus_libinclude_HEADERS = libebusconfig.hpp

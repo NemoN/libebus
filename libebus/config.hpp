@@ -84,4 +84,4 @@ private:
 
 } //namespace
 
-#endif //LIBEBUS_CONFIG_HPP_
+#endif // LIBEBUS_CONFIG_HPP_

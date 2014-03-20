@@ -17,34 +17,34 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#include "libebus.hpp"
-#include <iostream>
-#include <iomanip>
+#ifndef LIBEBUS_DUMP_HPP_
+#define LIBEBUS_DUMP_HPP_
 
-using namespace libebus;
+#include <string>
 
-int main ()
+namespace libebus
 {
-	Bus bus("/dev/ttyUSB20", "/tmp/dump_bus.bin", 100, false);
-
-	bus.connect();
-
-	if (bus.isConnected() == true)
-		std::cout << "connect successful." << std::endl;
 
 
-	int count = 0;
+class Dump
+{
 
-	while (1) {
-		bus.printBytes();
-		count++;
-	} 
+public:
+	Dump(std::string filename, long filesize)
+		: m_filename(filename), m_filesize(filesize) {}
 
-	bus.disconnect();
-
-	if (bus.isConnected() == false)
-		std::cout << "disconnect successful." << std::endl;
+	int write(const char* byte);
 	
-	return 0;
+	void setFilename(const std::string& filename) { m_filename = filename; }
+	void setFilesize(const long filesize) { m_filesize = filesize; }
+	
+private:
+	std::string m_filename;
+	long m_filesize;
 
-}
+};
+
+
+} //namespace
+
+#endif // LIBEBUS_DUMP_HPP_

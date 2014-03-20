@@ -21,6 +21,7 @@
 #define LIBEBUS_BUS_HPP_
 
 #include "port.hpp"
+#include "dump.hpp"
 #include <cstring>
 #include <sstream>
 #include <queue>
@@ -33,7 +34,7 @@ class Bus
 {
 
 public:
-	Bus(const std::string deviceName);
+	Bus(const std::string deviceName, const std::string dumpFile, const long dumpSize, const bool dumpState);
 	~Bus();
 
 	void connect();
@@ -44,6 +45,8 @@ public:
 
 	bool waitData();
 	std::string cycData();
+
+	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
 	
 	//~ bool getBus(void);
 	//~ void freeBus(void);
@@ -55,7 +58,11 @@ private:
 	bool m_connected;
 	std::stringstream m_sstr;
 	std::queue<std::string> m_cycBuffer;
-	
+
+	Dump* m_dump;
+	std::string m_dumpFile; 
+	long m_dumpSize;
+	bool m_dumpState;
 	
 	//~ bool waitSyn();
 	
@@ -64,4 +71,4 @@ private:
 
 } //namespace
 
-#endif //LIBEBUS_BUS_HPP_
+#endif // LIBEBUS_BUS_HPP_
