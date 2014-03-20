@@ -24,5 +24,6 @@
 #include <libebus/bus.hpp>
 #include <libebus/commands.hpp>
 #include <libebus/config.hpp>
+#include <libebus/dump.hpp>
 
 #endif // LIBEBUS_HPP_

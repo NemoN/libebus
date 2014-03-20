@@ -112,4 +112,4 @@ private:
 
 } //namespace
 
-#endif //LIBEBUS_PORT_HPP_
+#endif // LIBEBUS_PORT_HPP_

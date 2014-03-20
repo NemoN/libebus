@@ -25,9 +25,11 @@ namespace libebus
 {
 
 
-Bus::Bus(const std::string deviceName) : m_deviceName(deviceName), m_connected(false)
+Bus::Bus(const std::string deviceName, const std::string dumpFile, const long dumpSize, const bool dumpState)
+	: m_deviceName(deviceName), m_connected(false), m_dumpFile(dumpFile), m_dumpSize(dumpSize), m_dumpState(dumpState)
 {
 	m_port = new Port(m_deviceName);
+	m_dump = new Dump(m_dumpFile, m_dumpSize);
 }
 
 Bus::~Bus()
@@ -36,6 +38,7 @@ Bus::~Bus()
 		disconnect();
 
 	delete m_port;
+	delete m_dump;
 }
 
 void Bus::connect()
@@ -81,6 +84,9 @@ bool Bus::waitData()
 		
 		// fetch next byte
 		byte = m_port->byte();
+
+		if (m_dumpState == true)
+			m_dump->write((const char*) &byte);
 
 		if (byte != 0xAA)
 			m_sstr << std::hex << std::setw(2) << std::setfill('0')
