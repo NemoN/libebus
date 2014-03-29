@@ -41,16 +41,17 @@ public:
 	void disconnect();
 	bool isConnected() { return m_connected; }
 	
-	void printBytes();
+	void printBytes() const;
 
 	bool waitData();
 	std::string cycData();
 
-	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
-	
-	//~ bool getBus(void);
+	int cycBufferSize() const { return m_cycBuffer.size(); }
+
+	int getBus(unsigned char byte);
 	//~ void freeBus(void);
-	
+
+	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
 	
 private:
 	std::string m_deviceName;
@@ -58,6 +59,7 @@ private:
 	bool m_connected;
 	std::stringstream m_sstr;
 	std::queue<std::string> m_cycBuffer;
+	std::queue<std::string> m_sendBuffer;
 
 	Dump* m_dump;
 	std::string m_dumpFile; 

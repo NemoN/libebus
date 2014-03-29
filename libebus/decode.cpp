@@ -1,6 +1,7 @@
 /*
  * Copyright (C) Roland Jax 2014 <roland.jax@liwest.at>
- *
+ * crc calculations from http://www.mikrocontroller.net/topic/75698
+ * 
  * This file is part of libebus.
  *
  * libebus is free software: you can redistribute it and/or modify
@@ -17,14 +18,38 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef LIBEBUS_HPP_
-#define LIBEBUS_HPP_
+unsigned char calc_crc_byte(unsigned char byte, unsigned char init_crc)
+{
+	unsigned char crc, polynom;
 
-#include <libebus/port.hpp>
-#include <libebus/bus.hpp>
-#include <libebus/commands.hpp>
-#include <libebus/config.hpp>
-#include <libebus/dump.hpp>
-#include <libebus/decode.hpp>
+	crc = init_crc;
 
-#endif // LIBEBUS_HPP_
+	for (int i = 0; i < 8; i++) {
+
+		if (crc & 0x80)
+			polynom = (unsigned char) 0x9B;
+		else
+			polynom = (unsigned char) 0;
+
+		crc = (unsigned char) ((crc & ~0x80) << 1);
+
+		if (byte & 0x80)
+			crc = (unsigned char) (crc | 1);
+
+		crc = (unsigned char) (crc ^ polynom);
+		byte = (unsigned char) (byte << 1);
+	}
+	
+	return crc;
+}
+
+unsigned char calc_crc(const unsigned char *buf, int buflen)
+{
+	unsigned char crc = 0;
+
+	for (int i = 0 ; i < buflen ; i++, buf++)
+		crc = calc_crc_byte(*buf, crc);
+
+	return crc;
+}
+

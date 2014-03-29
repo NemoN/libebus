@@ -55,7 +55,7 @@ void Bus::disconnect()
 	}
 }
 
-void Bus::printBytes()
+void Bus::printBytes() const
 {
 	unsigned char byte;
 	ssize_t bytes_read;
@@ -74,13 +74,13 @@ void Bus::printBytes()
 bool Bus::waitData()
 {
 	unsigned char byte;
-	ssize_t bytes_read;
+	ssize_t bytes_recv;
 	bool result = false;
 
 	// wait for new data
-	bytes_read = m_port->recv();
+	bytes_recv = m_port->recv();
 
-	for (int i = 0; i < bytes_read; i++) {
+	for (int i = 0; i < bytes_recv; i++) {
 		
 		// fetch next byte
 		byte = m_port->byte();
@@ -114,11 +114,49 @@ std::string Bus::cycData()
 	return data;
 }
 
-//~ bool getBus(void);
-//~ {
-	//~ 
-//~ }
-//~ 
+int Bus::getBus(unsigned char byte)
+{
+	ssize_t bytes_sent, bytes_recv;
+	//~ struct timeval tact, tlast, tdiff;
+
+	//~ // start time
+	//~ gettimeofday(&tlast, NULL);
+
+	// send QQ
+	bytes_sent = m_port->send(&byte, 1);
+	if (bytes_sent <= 0)
+		return -1;
+
+	//~ // act time
+	//~ gettimeofday(&tact, NULL);
+	//~ eb_diff_time(&tact, &tlast, &tdiff);
+
+	//~ // wait ~4200 usec
+	//~ if (4000.0 - tdiff.tv_usec > 0.0 && 4000.0 - tdiff.tv_usec <= 4000.0)
+		//~ usleep(4000.0 - tdiff.tv_usec);
+	//~ else 
+		//~ return -2;
+
+	// receive 1 byte - must be QQ
+	bytes_recv = m_port->recv();	
+	
+	for (int i = 0; i < bytes_recv; i++) {
+		
+		// fetch next byte
+		byte = m_port->byte();
+
+		if (m_dumpState == true)
+			m_dump->write((const char*) &byte);
+
+		// compare sent and received byte
+		if (bytes_recv == 1 && byte == 0xFF)
+			return 0;
+
+	}
+
+	return -1;
+}
+
 //~ void freeBus(void);
 //~ {
 	//~ 
