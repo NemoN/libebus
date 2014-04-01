@@ -21,13 +21,17 @@
 #ifndef LIBEBUS_DECODE_HPP_
 #define LIBEBUS_DECODE_HPP_
 
+#include <string>
+
 namespace libebus
 {
 
 
-unsigned char calc_crc_byte(unsigned char byte, unsigned char init_crc);
+std::string esc(std::string data);
+//~ std::string data unesc(std::string data);
 
-unsigned char calc_crc(const unsigned char *bytes, int size);
+unsigned char calc_crc_byte(unsigned char byte, unsigned char init_crc);
+std::string calc_crc(const std::string data);
 
 
 } //namespace

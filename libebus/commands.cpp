@@ -144,5 +144,19 @@ int Commands::findData(const std::string& data) const
 	return -1;
 }
 
+std::string Commands::getCommand(const int index) const
+{
+	cmd_t command = m_cmdDB.at(index);
+	std::string cmd(command[5]);
+	cmd += command[6];
+	std::stringstream sstr;
+	sstr << std::setw(2) << std::hex << std::setfill('0') << command[7];
+	cmd += sstr.str();
+	cmd += command[8];
+	
+	return cmd;
+}
+
+
 } //namespace
 

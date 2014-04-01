@@ -18,11 +18,24 @@
  */
 
 #include "bus.hpp"
+#include "decode.hpp"
 #include <iostream>
 #include <iomanip>
 
 namespace libebus
 {
+
+
+BusCommand::BusCommand(const std::string type, const std::string data) : m_type(type)
+{
+	// esc
+	m_data = esc(data);
+	
+	// crc + esc
+	std::string crc = calc_crc(m_data);
+	//~ const char crc = calc_crc((const unsigned char*)(m_data.c_str()), m_data.size());
+	m_data += esc(crc);
+}
 
 
 Bus::Bus(const std::string deviceName, const std::string dumpFile, const long dumpSize, const bool dumpState)
@@ -71,11 +84,17 @@ void Bus::printBytes() const
 	}
 }
 
-bool Bus::waitData()
+int Bus::proceed()
 {
 	unsigned char byte;
 	ssize_t bytes_recv;
-	bool result = false;
+	int result = 99;
+
+	// fetch new message and get bus
+	if (m_cycBuffer.size() == 0 && m_sendBuffer.size() != 0) {
+		BusCommand* busCommand = m_sendBuffer.front();
+		return getBus(busCommand->getQQ());
+	}
 
 	// wait for new data
 	bytes_recv = m_port->recv();
@@ -95,14 +114,14 @@ bool Bus::waitData()
 		if (byte == 0xAA && m_sstr.str().empty() == false) {
 			m_cycBuffer.push(m_sstr.str());
 			m_sstr.str(std::string());
-			result = true;
+			result = 2;
 		}
 	}
 
 	return result;
 }
 
-std::string Bus::cycData()
+std::string Bus::getCycData()
 {
 	std::string data;
 
@@ -112,6 +131,13 @@ std::string Bus::cycData()
 	}
 	
 	return data;
+}
+
+BusCommand* Bus::recvCommand()
+{
+	BusCommand* busCommand = m_recvBuffer.front();
+	m_recvBuffer.pop();
+	return busCommand;
 }
 
 int Bus::getBus(unsigned char byte)
@@ -150,17 +176,22 @@ int Bus::getBus(unsigned char byte)
 
 		// compare sent and received byte
 		if (bytes_recv == 1 && byte == 0xFF)
-			return 0;
+			return 1;
 
 	}
 
 	return -1;
 }
 
-//~ void freeBus(void);
-//~ {
-	//~ 
-//~ }
+int Bus::sendCommand()
+{
+	BusCommand* busCommand = m_sendBuffer.front();
+	m_sendBuffer.pop();
+
+	busCommand->setResult(busCommand->getData());
+	m_recvBuffer.push(busCommand);
+	return 0;
+}
 
 
 } //namespace

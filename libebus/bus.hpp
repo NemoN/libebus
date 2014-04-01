@@ -23,12 +23,32 @@
 #include "port.hpp"
 #include "dump.hpp"
 #include <cstring>
+#include <cstdlib>
 #include <sstream>
 #include <queue>
 
 namespace libebus
 {
 
+
+class BusCommand
+{
+
+public:
+	BusCommand(const std::string type, const std::string data);
+
+	std::string getType() const { return m_type; }
+	std::string getData() const { return m_data; }
+	unsigned char getQQ() const { return strtol(m_data.substr(0,2).c_str(), NULL, 16); }
+	std::string getResult() const { return m_result; }
+	void setResult(const std::string result) { m_result = result; }
+
+private:
+	std::string m_type;
+	std::string m_data;
+	std::string m_result;
+
+};
 
 class Bus
 {
@@ -43,14 +63,15 @@ public:
 	
 	void printBytes() const;
 
-	bool waitData();
-	std::string cycData();
+	int proceed();
+	std::string getCycData();
 
-	int cycBufferSize() const { return m_cycBuffer.size(); }
+	void addCommand(BusCommand* busCommand) { m_sendBuffer.push(busCommand); }
+	BusCommand* recvCommand();
 
 	int getBus(unsigned char byte);
-	//~ void freeBus(void);
-
+	int sendCommand();
+		
 	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
 	
 private:
@@ -59,15 +80,14 @@ private:
 	bool m_connected;
 	std::stringstream m_sstr;
 	std::queue<std::string> m_cycBuffer;
-	std::queue<std::string> m_sendBuffer;
+	std::queue<BusCommand*> m_sendBuffer;
+	std::queue<BusCommand*> m_recvBuffer;
 
 	Dump* m_dump;
 	std::string m_dumpFile; 
 	long m_dumpSize;
 	bool m_dumpState;
-	
-	//~ bool waitSyn();
-	
+
 };
 
 

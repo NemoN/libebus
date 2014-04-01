@@ -42,7 +42,7 @@ public:
 	Command(int index, cmd_t command, std::string data)
 		: m_index(index), m_command(command), m_data(data) {}
 
-	void setData(std::string data) { m_data = data; }
+	void setData(const std::string& data) { m_data = data; }
 	std::string getData() const { return m_data; } 
 
 private:
@@ -65,6 +65,8 @@ public:
 
 	int findCommand(const std::string& data) const;
 	int findData(const std::string& data) const;
+	std::string getType(const int index) const { return std::string(m_cmdDB.at(index)[4]); }
+	std::string getCommand(const int index) const;
 
 private:
 	cmdDB_t m_cmdDB;
