@@ -32,14 +32,14 @@ std::string esc(std::string data)
 	std::string escaped;
 
 	for (size_t i = 0; i < data.size(); i = i + 2) {
-		long test = strtol(data.substr(i,2).c_str(), NULL, 16);
+		long test = strtol(data.substr(i, 2).c_str(), NULL, 16);
 		
 		if (test == 0xAA)
 			escaped += "A901";
 		else if (test == 0xA9)
 			escaped += "A900";
 		else
-			escaped += data.substr(i,2).c_str();
+			escaped += data.substr(i, 2).c_str();
 	}
 
 	return escaped;
@@ -84,7 +84,7 @@ std::string esc(std::string data)
 	//~ *buflen = tmplen;
 //~ }
 
-unsigned char calc_crc_byte(unsigned char byte, unsigned char init_crc)
+unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc)
 {
 	unsigned char crc, polynom;
 
@@ -113,8 +113,8 @@ std::string calc_crc(const std::string data)
 {
 	unsigned char crc = 0;
 
-	for (size_t i = 0 ; i < data.size() ; i = i +2)
-		crc = calc_crc_byte(strtol(data.substr(i,2).c_str(), NULL, 16), crc);
+	for (size_t i = 0 ; i < data.size() ; i = i + 2)
+		crc = calc_crc_byte(strtol(data.substr(i, 2).c_str(), NULL, 16), crc);
 
 	std::stringstream sstr;
 	sstr << std::setw(2) << std::hex << std::setfill('0') << static_cast<unsigned>(crc);

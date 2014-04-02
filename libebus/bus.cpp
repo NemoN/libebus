@@ -33,13 +33,13 @@ BusCommand::BusCommand(const std::string type, const std::string data) : m_type(
 	
 	// crc + esc
 	std::string crc = calc_crc(m_data);
-	//~ const char crc = calc_crc((const unsigned char*)(m_data.c_str()), m_data.size());
 	m_data += esc(crc);
 }
 
 
 Bus::Bus(const std::string deviceName, const std::string dumpFile, const long dumpSize, const bool dumpState)
-	: m_deviceName(deviceName), m_connected(false), m_dumpFile(dumpFile), m_dumpSize(dumpSize), m_dumpState(dumpState)
+	: m_deviceName(deviceName), m_connected(false), m_getBusWait(false),
+	  m_dumpFile(dumpFile), m_dumpSize(dumpSize), m_dumpState(dumpState)
 {
 	m_port = new Port(m_deviceName);
 	m_dump = new Dump(m_dumpFile, m_dumpSize);
@@ -88,12 +88,18 @@ int Bus::proceed()
 {
 	unsigned char byte;
 	ssize_t bytes_recv;
-	int result = 99;
+	int result = 4;
 
 	// fetch new message and get bus
-	if (m_cycBuffer.size() == 0 && m_sendBuffer.size() != 0) {
+	if (m_cycBuffer.size() == 0 && m_sendBuffer.size() != 0 && m_getBusWait == false) {
 		BusCommand* busCommand = m_sendBuffer.front();
-		return getBus(busCommand->getQQ());
+	
+		result = getBus(busCommand->getByte(0));
+		
+		if (result != 1)
+			m_getBusWait = true;
+
+		return result;
 	}
 
 	// wait for new data
@@ -107,18 +113,29 @@ int Bus::proceed()
 		if (m_dumpState == true)
 			m_dump->write((const char*) &byte);
 
-		if (byte != 0xAA)
-			m_sstr << std::hex << std::setw(2) << std::setfill('0')
-			       << static_cast<unsigned>(byte);
-
-		if (byte == 0xAA && m_sstr.str().empty() == false) {
-			m_cycBuffer.push(m_sstr.str());
-			m_sstr.str(std::string());
-			result = 2;
-		}
+		// store byte
+		result = proceedCycData(byte);
 	}
 
 	return result;
+}
+
+int Bus::proceedCycData(unsigned char byte)
+{
+	if (byte != 0xAA) {
+		m_sstr << std::hex << std::setw(2) << std::setfill('0') << static_cast<unsigned>(byte);
+		m_getBusWait = true;
+		return 3;	
+	}
+	
+	if (byte == 0xAA && m_sstr.str().empty() == false) {
+			m_cycBuffer.push(m_sstr.str());
+			m_sstr.str(std::string());
+			m_getBusWait = false;
+			return 2;
+	}
+
+	return 4;
 }
 
 std::string Bus::getCycData()
@@ -140,8 +157,9 @@ BusCommand* Bus::recvCommand()
 	return busCommand;
 }
 
-int Bus::getBus(unsigned char byte)
+int Bus::getBus(unsigned char byte_sent)
 {
+	unsigned char byte_recv;
 	ssize_t bytes_sent, bytes_recv;
 	//~ struct timeval tact, tlast, tdiff;
 
@@ -149,7 +167,7 @@ int Bus::getBus(unsigned char byte)
 	//~ gettimeofday(&tlast, NULL);
 
 	// send QQ
-	bytes_sent = m_port->send(&byte, 1);
+	bytes_sent = m_port->send(&byte_sent, 1);
 	if (bytes_sent <= 0)
 		return -1;
 
@@ -169,18 +187,20 @@ int Bus::getBus(unsigned char byte)
 	for (int i = 0; i < bytes_recv; i++) {
 		
 		// fetch next byte
-		byte = m_port->byte();
+		byte_recv = m_port->byte();
 
 		if (m_dumpState == true)
-			m_dump->write((const char*) &byte);
+			m_dump->write((const char*) &byte_recv);
 
 		// compare sent and received byte
-		if (bytes_recv == 1 && byte == 0xFF)
+		if (bytes_recv == 1 && byte_sent == byte_recv)
 			return 1;
 
+		// store byte
+		proceedCycData(byte_recv);
 	}
 
-	return -1;
+	return 0;
 }
 
 int Bus::sendCommand()
@@ -188,8 +208,62 @@ int Bus::sendCommand()
 	BusCommand* busCommand = m_sendBuffer.front();
 	m_sendBuffer.pop();
 
+	// send data
+	for (size_t i = 2; i < busCommand->getDataSize(); i = i + 2) {
+		if (sendCheckDump(busCommand->getByte(i)) == -1)
+			return -1;
+	}
+
+	// BC send SYN
+	//~ if (busCommand->getType() == "BC")
+		//~ return sendCheckDump(0xAA);
+
+	// get ACK
+
+	// retry once (full data)
+
+	// get ACK
+
+	// MM send SYN
+	//~ if (busCommand->getType() == "MM")
+		//~ return sendCheckDump(0xAA);
+		
+	// receive answer
+
+	// send ACK
+
+	// retry receive
+
+	// send ACK
+
+	// MS send SYN
+	//~ if (busCommand->getType() == "MS")
+		//~ return sendCheckDump(0xAA);
+
+
+	// send result	
 	busCommand->setResult(busCommand->getData());
 	m_recvBuffer.push(busCommand);
+	return 0;
+}
+
+int Bus::sendCheckDump(unsigned char byte_sent)
+{
+	unsigned char byte_recv;
+	ssize_t bytes_sent, bytes_recv;
+	
+	bytes_sent = m_port->send(&byte_sent, 1);
+
+	// receive 1 byte - must be equal
+	bytes_recv = m_port->recv();
+	byte_recv = m_port->byte();
+
+	if (m_dumpState == true)
+		m_dump->write((const char*) &byte_recv);
+
+	if (bytes_sent != bytes_recv || byte_sent != byte_recv)
+		return -1;
+
 	return 0;
 }
 

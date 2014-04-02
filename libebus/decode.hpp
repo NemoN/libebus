@@ -30,7 +30,7 @@ namespace libebus
 std::string esc(std::string data);
 //~ std::string data unesc(std::string data);
 
-unsigned char calc_crc_byte(unsigned char byte, unsigned char init_crc);
+unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc);
 std::string calc_crc(const std::string data);
 
 

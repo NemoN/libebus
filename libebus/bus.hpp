@@ -39,7 +39,8 @@ public:
 
 	std::string getType() const { return m_type; }
 	std::string getData() const { return m_data; }
-	unsigned char getQQ() const { return strtol(m_data.substr(0,2).c_str(), NULL, 16); }
+	unsigned char getByte(const int index) const { return strtol(m_data.substr(index, 2).c_str(), NULL, 16); }
+	size_t getDataSize() const { return m_data.size(); }
 	std::string getResult() const { return m_result; }
 	void setResult(const std::string result) { m_result = result; }
 
@@ -82,11 +83,15 @@ private:
 	std::queue<std::string> m_cycBuffer;
 	std::queue<BusCommand*> m_sendBuffer;
 	std::queue<BusCommand*> m_recvBuffer;
+	bool m_getBusWait;
 
 	Dump* m_dump;
 	std::string m_dumpFile; 
 	long m_dumpSize;
 	bool m_dumpState;
+
+	int proceedCycData(unsigned char byte);
+	int sendCheckDump(unsigned char byte_sent);
 
 };
 
