@@ -30,6 +30,10 @@
 namespace libebus
 {
 
+const unsigned char SYN = 0xAA;
+const unsigned char ACK = 0x00;
+const unsigned char NAK = 0xFF;
+
 
 class BusCommand
 {
@@ -70,7 +74,7 @@ public:
 	void addCommand(BusCommand* busCommand) { m_sendBuffer.push(busCommand); }
 	BusCommand* recvCommand();
 
-	int getBus(unsigned char byte);
+	int getBus(const unsigned char byte);
 	int sendCommand();
 		
 	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
@@ -90,8 +94,11 @@ private:
 	long m_dumpSize;
 	bool m_dumpState;
 
-	int proceedCycData(unsigned char byte);
-	int sendCheckDump(unsigned char byte_sent);
+	int proceedCycData(const unsigned char byte);
+	int sendByte(const unsigned char byte_sent) const;
+	unsigned char recvByte();
+	std::string recvSlaveData();
+	std::string recvCRC();
 
 };
 

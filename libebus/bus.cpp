@@ -120,7 +120,7 @@ int Bus::proceed()
 	return result;
 }
 
-int Bus::proceedCycData(unsigned char byte)
+int Bus::proceedCycData(const unsigned char byte)
 {
 	if (byte != 0xAA) {
 		m_sstr << std::hex << std::setw(2) << std::setfill('0') << static_cast<unsigned>(byte);
@@ -157,7 +157,7 @@ BusCommand* Bus::recvCommand()
 	return busCommand;
 }
 
-int Bus::getBus(unsigned char byte_sent)
+int Bus::getBus(const unsigned char byte_sent)
 {
 	unsigned char byte_recv;
 	ssize_t bytes_sent, bytes_recv;
@@ -205,49 +205,151 @@ int Bus::getBus(unsigned char byte_sent)
 
 int Bus::sendCommand()
 {
+	unsigned char byte_recv;
+	std::string crc_calc, crc_recv, slaveData, result;
+	int retval = 0;
+	
 	BusCommand* busCommand = m_sendBuffer.front();
 	m_sendBuffer.pop();
 
-	// send data
+	// send ZZ PB SB NN Dx CRC
 	for (size_t i = 2; i < busCommand->getDataSize(); i = i + 2) {
-		if (sendCheckDump(busCommand->getByte(i)) == -1)
-			return -1;
+		if (sendByte(busCommand->getByte(i)) == -1) {
+			sendByte(SYN);
+			retval = -1;
+			goto on_exit;
+		}
 	}
 
-	// BC send SYN
-	//~ if (busCommand->getType() == "BC")
-		//~ return sendCheckDump(0xAA);
-
-	// get ACK
-
-	// retry once (full data)
-
-	// get ACK
-
-	// MM send SYN
-	//~ if (busCommand->getType() == "MM")
-		//~ return sendCheckDump(0xAA);
+	// BC -> send SYN
+	if (busCommand->getType() == "BC") {
+		if (sendByte(SYN) == -1)
+			retval = -1;
 		
-	// receive answer
+		goto on_exit;
+	}
 
-	// send ACK
+	// receive ACK
+	byte_recv = recvByte();	
 
-	// retry receive
+	// is slave ACK negative?
+	if (byte_recv == NAK) {
+		
+		// send data (full)
+		for (size_t i = 0; i < busCommand->getDataSize(); i = i + 2) {
+			if (sendByte(busCommand->getByte(i)) == -1) {
+				sendByte(SYN);
+				retval = -1;
+				goto on_exit;
+			}
+		}
+	
+		// receive ACK
+		byte_recv = recvByte();	
 
-	// send ACK
+		// is slave ACK negative?
+		if (byte_recv == NAK) {
+			if (sendByte(SYN) == -1)
+				retval = -1;
+			else
+				retval = -2;
 
-	// MS send SYN
-	//~ if (busCommand->getType() == "MS")
-		//~ return sendCheckDump(0xAA);
+			goto on_exit;
+		}
+	}	
 
+	// MM -> send SYN
+	if (busCommand->getType() == "MM") {
+		if (sendByte(SYN) == -1) {
+			retval = -1;
+			goto on_exit;
+		}
 
-	// send result	
-	busCommand->setResult(busCommand->getData());
+		if (byte_recv == NAK)
+			retval = -2;
+			
+		goto on_exit;
+	}
+
+	// receive NN
+	slaveData = recvSlaveData();
+
+	// calculate CRC
+	crc_calc = calc_crc(slaveData);
+
+	// receive CRC
+	crc_recv = recvCRC();
+
+	// are calculated and received CRC equal?
+	if (crc_calc != crc_recv) {
+
+		// send NAK
+		if (sendByte(NAK) == -1) {
+			retval = -1;
+			goto on_exit;
+		}
+					
+		// receive NN
+		slaveData = recvSlaveData();
+
+		// calculate CRC
+		crc_calc = calc_crc(slaveData);
+
+		// receive CRC
+		crc_recv = recvCRC();
+	}
+			
+	// are calculated and received CRC equal?
+	if (crc_calc != crc_recv) {
+		// send NAK
+		if (sendByte(NAK) == -1) {
+			retval = -1;
+			goto on_exit;
+		}
+		
+		retval = -3;
+	} else {
+		// send ACK
+		if (sendByte(ACK) == -1) {
+			retval = -1;
+			goto on_exit;
+		}
+	}
+
+	// MS -> send SYN
+	if (sendByte(SYN) == -1)
+		retval = -1;
+
+on_exit:
+	switch (retval) {
+	case -1:
+		result = "send error";
+		break;
+	case -2:
+		result = "NAK received";
+		break;
+	case -3:
+		result = "CRC error";
+		break;
+	case 0:
+	default:
+		if (busCommand->getType() == "MS") {
+			result += unesc(slaveData);
+			result += crc_recv;
+		} else {
+			result = "success";
+		}
+		
+		break;
+	}
+		
+	busCommand->setResult(result.c_str());
 	m_recvBuffer.push(busCommand);
-	return 0;
+	return retval;
+
 }
 
-int Bus::sendCheckDump(unsigned char byte_sent)
+int Bus::sendByte(const unsigned char byte_sent) const
 {
 	unsigned char byte_recv;
 	ssize_t bytes_sent, bytes_recv;
@@ -265,6 +367,60 @@ int Bus::sendCheckDump(unsigned char byte_sent)
 		return -1;
 
 	return 0;
+}
+
+unsigned char Bus::recvByte()
+{
+	unsigned char byte_recv;
+
+	m_port->recv();
+	byte_recv = m_port->byte();
+
+	if (m_dumpState == true)
+		m_dump->write((const char*) &byte_recv);
+		
+	return byte_recv;
+}
+
+std::string Bus::recvSlaveData()
+{
+	unsigned char byte_recv;
+	std::stringstream sstr;
+	
+	// receive NN
+	byte_recv = recvByte();
+	sstr << std::setw(2) << std::hex << std::setfill('0') << static_cast<unsigned>(byte_recv);
+
+	int NN = byte_recv;
+	
+	// receive Dx
+	for (int j = 0; j < NN; j++) {
+		byte_recv = recvByte();
+		sstr << std::setw(2) << std::hex << std::setfill('0') << static_cast<unsigned>(byte_recv);
+
+		// escape sequence increase NN
+		if (byte_recv == 0xA9)
+			NN++;
+	}
+
+	return sstr.str();
+}
+
+std::string Bus::recvCRC()
+{
+	unsigned char byte_recv;
+	std::stringstream sstr;
+
+	// receive CRC
+	byte_recv = recvByte();
+	sstr << std::setw(2) << std::hex << std::setfill('0') << static_cast<unsigned>(byte_recv);
+	
+	if (byte_recv == 0xA9) {
+		byte_recv = recvByte();
+		sstr << std::setw(2) << std::hex << std::setfill('0') << static_cast<unsigned>(byte_recv);
+	}
+
+	return unesc(sstr.str());	
 }
 
 

@@ -45,44 +45,31 @@ std::string esc(std::string data)
 	return escaped;
 }
 
-//~ std::string data unesc(std::string data)
-//~ {
-	//~ unsigned char tmp[SERIAL_BUFSIZE];
-	//~ int tmplen, i, found;
-//~ 
-	//~ memset(tmp, '\0', sizeof(tmp));
-	//~ i = 0;
-	//~ tmplen = 0;
-	//~ found = 0;
-	//~ 
-	//~ while (i < *buflen) {
-		//~ 
-		//~ if (buf[i] == EBUS_SYN_ESC_A9) {
-			//~ found = 1;
-		//~ } else if (found == 1) {
-			//~ if (buf[i] == EBUS_SYN_ESC_01) {
-				//~ tmp[tmplen] = EBUS_SYN;
-				//~ tmplen++;
-			//~ } else {
-				//~ tmp[tmplen] = EBUS_SYN_ESC_A9;
-				//~ tmplen++;
-			//~ }
-			//~ 
-			//~ found = 0;
-		//~ } else {
-			//~ tmp[tmplen] = buf[i];
-			//~ tmplen++;
-		//~ }
-		//~ 
-		//~ i++;
-	//~ }
-//~ 
-	//~ memset(buf, '\0', sizeof(buf));
-	//~ for (i = 0; i < tmplen; i++)
-		//~ buf[i] = tmp[i];
-//~ 
-	//~ *buflen = tmplen;
-//~ }
+std::string unesc(std::string data)
+{
+	std::string unescaped;
+	bool found = false;
+
+	for (size_t i = 0; i < data.size(); i = i + 2) {
+		long test = strtol(data.substr(i,2).c_str(), NULL, 16);
+		
+		if (test == 0xA9) {
+			found = true;
+
+		} else if (found == true) {
+			if (test == 0x01)
+				unescaped += "AA";
+			else
+				unescaped += "A9";
+
+			found = false;
+		} else {
+			unescaped += data.substr(i,2).c_str();
+		}
+	}
+
+	return unescaped;
+}
 
 unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc)
 {
