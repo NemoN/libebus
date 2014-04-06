@@ -43,7 +43,9 @@ bool Device::isOpen()
 
 bool Device::isValid()
 {
-	if (fcntl(m_fd, F_GETFL) == -1) {
+	int port;
+	
+	if (ioctl(m_fd, TIOCMGET, &port) == -1) {
 		closeDevice();
 		m_open = false;
 		return false;

@@ -62,9 +62,9 @@ public:
 	Bus(const std::string deviceName, const std::string dumpFile, const long dumpSize, const bool dumpState);
 	~Bus();
 
-	void connect();
-	void disconnect();
-	bool isConnected() { return m_connected; }
+	void connect() { m_port->open(); }
+	void disconnect() { if (m_port->isOpen() == true) m_port->close(); }
+	bool isConnected() { return m_port->isOpen(); }
 	
 	void printBytes() const;
 
@@ -82,7 +82,6 @@ public:
 private:
 	std::string m_deviceName;
 	Port* m_port;
-	bool m_connected;
 	std::stringstream m_sstr;
 	std::queue<std::string> m_cycBuffer;
 	std::queue<BusCommand*> m_sendBuffer;

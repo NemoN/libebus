@@ -38,7 +38,7 @@ BusCommand::BusCommand(const std::string type, const std::string data) : m_type(
 
 
 Bus::Bus(const std::string deviceName, const std::string dumpFile, const long dumpSize, const bool dumpState)
-	: m_deviceName(deviceName), m_connected(false), m_getBusWait(false),
+	: m_deviceName(deviceName), m_getBusWait(false),
 	  m_dumpFile(dumpFile), m_dumpSize(dumpSize), m_dumpState(dumpState)
 {
 	m_port = new Port(m_deviceName);
@@ -52,20 +52,6 @@ Bus::~Bus()
 
 	delete m_port;
 	delete m_dump;
-}
-
-void Bus::connect()
-{
-	m_port->open();
-	m_connected = m_port->isOpen();
-}
-
-void Bus::disconnect()
-{
-	if (m_connected == true) {
-		m_port->close();
-		m_connected = m_port->isOpen();
-	}
 }
 
 void Bus::printBytes() const
@@ -215,7 +201,6 @@ int Bus::sendCommand()
 	// send ZZ PB SB NN Dx CRC
 	for (size_t i = 2; i < busCommand->getDataSize(); i = i + 2) {
 		if (sendByte(busCommand->getByte(i)) == -1) {
-			sendByte(SYN);
 			retval = -1;
 			goto on_exit;
 		}
@@ -238,7 +223,6 @@ int Bus::sendCommand()
 		// send data (full)
 		for (size_t i = 0; i < busCommand->getDataSize(); i = i + 2) {
 			if (sendByte(busCommand->getByte(i)) == -1) {
-				sendByte(SYN);
 				retval = -1;
 				goto on_exit;
 			}
