@@ -30,10 +30,6 @@
 namespace libebus
 {
 
-const unsigned char SYN = 0xAA;
-const unsigned char ACK = 0x00;
-const unsigned char NAK = 0xFF;
-
 
 class BusCommand
 {

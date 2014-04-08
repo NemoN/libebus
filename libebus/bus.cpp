@@ -191,6 +191,10 @@ int Bus::getBus(const unsigned char byte_sent)
 
 int Bus::sendCommand()
 {
+	const unsigned char SYN = 0xAA;
+	const unsigned char ACK = 0x00;
+	const unsigned char NAK = 0xFF;
+	
 	unsigned char byte_recv;
 	std::string crc_calc, crc_recv, slaveData, result;
 	int retval = 0;
