@@ -36,10 +36,10 @@ void ConfigFileCSV::readFile(std::istream& is, Commands& commands)
 		cmd_t row;
 		std::string column;
 		
-		std::istringstream stream(line);
+		std::istringstream isstr(line);
 		
 		// walk through columns
-		while (std::getline(stream, column, ';') != 0)
+		while (std::getline(isstr, column, ';') != 0)
 			row.push_back(column);
 
 		// skip empty and commented rows

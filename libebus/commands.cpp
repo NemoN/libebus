@@ -72,11 +72,11 @@ int Commands::findCommand(const std::string& data) const
 
 	// preapre string for searching command
 	std::string token;
-	std::istringstream stream(data);
+	std::istringstream isstr(data);
 	std::vector<std::string> cmd;
 	
 	// split stream
-	while (std::getline(stream, token, ' ') != 0)
+	while (std::getline(isstr, token, ' ') != 0)
 		cmd.push_back(token);
 
 	std::size_t index;

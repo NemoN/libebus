@@ -204,17 +204,14 @@ int Bus::sendCommand()
 
 	// send ZZ PB SB NN Dx CRC
 	for (size_t i = 2; i < busCommand->getDataSize(); i = i + 2) {
-		if (sendByte(busCommand->getByte(i)) == -1) {
-			retval = -1;
+		retval = sendByte(busCommand->getByte(i));
+		if (retval < 0)
 			goto on_exit;
-		}
 	}
 
 	// BC -> send SYN
 	if (busCommand->getType() == "BC") {
-		if (sendByte(SYN) == -1)
-			retval = -1;
-		
+		sendByte(SYN);
 		goto on_exit;
 	}
 
@@ -226,10 +223,9 @@ int Bus::sendCommand()
 		
 		// send data (full)
 		for (size_t i = 0; i < busCommand->getDataSize(); i = i + 2) {
-			if (sendByte(busCommand->getByte(i)) == -1) {
-				retval = -1;
+			retval = sendByte(busCommand->getByte(i));
+			if (retval < 0)
 				goto on_exit;
-			}
 		}
 	
 		// receive ACK
@@ -237,10 +233,9 @@ int Bus::sendCommand()
 
 		// is slave ACK negative?
 		if (byte_recv == NAK) {
-			if (sendByte(SYN) == -1)
-				retval = -1;
-			else
-				retval = -2;
+			retval = sendByte(SYN);
+			if (retval == 0)
+				retval = -3;
 
 			goto on_exit;
 		}
@@ -248,14 +243,7 @@ int Bus::sendCommand()
 
 	// MM -> send SYN
 	if (busCommand->getType() == "MM") {
-		if (sendByte(SYN) == -1) {
-			retval = -1;
-			goto on_exit;
-		}
-
-		if (byte_recv == NAK)
-			retval = -2;
-			
+		sendByte(SYN);
 		goto on_exit;
 	}
 
@@ -272,10 +260,9 @@ int Bus::sendCommand()
 	if (crc_calc != crc_recv) {
 
 		// send NAK
-		if (sendByte(NAK) == -1) {
-			retval = -1;
+		retval = sendByte(NAK);
+		if (retval < 0)
 			goto on_exit;
-		}
 					
 		// receive NN
 		slaveData = recvSlaveData();
@@ -290,23 +277,22 @@ int Bus::sendCommand()
 	// are calculated and received CRC equal?
 	if (crc_calc != crc_recv) {
 		// send NAK
-		if (sendByte(NAK) == -1) {
-			retval = -1;
+		retval = sendByte(NAK);
+		if (retval < 0)
 			goto on_exit;
-		}
 		
-		retval = -3;
+		retval = -4;
 	} else {
 		// send ACK
-		if (sendByte(ACK) == -1) {
-			retval = -1;
+		retval = sendByte(ACK);
+		if (retval == -1) {
+			retval = -5;
 			goto on_exit;
 		}
 	}
 
 	// MS -> send SYN
-	if (sendByte(SYN) == -1)
-		retval = -1;
+	sendByte(SYN);
 
 on_exit:
 	switch (retval) {
@@ -314,10 +300,16 @@ on_exit:
 		result = "send error";
 		break;
 	case -2:
-		result = "NAK received";
+		result = "received bytes > sent bytes";
 		break;
 	case -3:
+		result = "NAK received";
+		break;
+	case -4:
 		result = "CRC error";
+		break;
+	case -5:
+		result = "SYN received instead of ACK";
 		break;
 	case 0:
 	default:
@@ -351,7 +343,10 @@ int Bus::sendByte(const unsigned char byte_sent) const
 	if (m_dumpState == true)
 		m_dump->write((const char*) &byte_recv);
 
-	if (bytes_sent != bytes_recv || byte_sent != byte_recv)
+	if (bytes_sent != bytes_recv)
+		return -2;
+
+	if (byte_sent != byte_recv)
 		return -1;
 
 	return 0;
