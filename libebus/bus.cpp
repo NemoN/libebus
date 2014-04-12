@@ -314,19 +314,19 @@ int Bus::sendCommand()
 on_exit:
 	switch (retval) {
 	case -1:
-		result = "send error";
+		result = "-1: send error";
 		break;
 	case -2:
-		result = "received bytes > sent bytes";
+		result = "-2: received bytes > sent bytes";
 		break;
 	case -3:
-		result = "NAK received";
+		result = "-3: NAK received";
 		break;
 	case -4:
-		result = "CRC error";
+		result = "-4: CRC error";
 		break;
 	case -5:
-		result = "SYN received instead of ACK";
+		result = "-5: ACK error";
 		break;
 	case 0:
 	default:
@@ -339,6 +339,10 @@ on_exit:
 		
 		break;
 	}
+
+	// empty receive buffer
+	while (m_port->size() != 0)
+		recvByte();
 		
 	busCommand->setResult(result.c_str());
 	m_recvBuffer.push(busCommand);
@@ -397,7 +401,7 @@ int Bus::recvSlaveData(std::string& result)
 	int NN = byte_recv;
 	
 	// receive Dx
-	for (int j = 0; j < NN; j++) {
+	for (int i = 0; i < NN; i++) {
 		bytes_recv = m_port->recv();
 		if (bytes_recv > 1)
 			return -2;

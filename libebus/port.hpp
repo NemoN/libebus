@@ -45,6 +45,7 @@ public:
 	ssize_t recvBytes();
 
 	unsigned char getByte();
+	ssize_t sizeRecvBuffer() const { return m_recvBuffer.size(); }
 	
 protected:
 	int m_fd;
@@ -100,6 +101,7 @@ public:
 	ssize_t recv() { return m_device->recvBytes(); }
 
 	unsigned char byte() { return m_device->getByte(); }
+	ssize_t size() const { return m_device->sizeRecvBuffer(); }
 
 private:
 	Device* m_device;
