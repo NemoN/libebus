@@ -43,12 +43,14 @@ bool Device::isOpen()
 
 bool Device::isValid()
 {
-	int port;
-	
-	if (ioctl(m_fd, TIOCMGET, &port) == -1) {
-		closeDevice();
-		m_open = false;
-		return false;
+	if (m_noDeviceCheck == false) {
+		int port;
+
+		if (ioctl(m_fd, TIOCMGET, &port) == -1) {
+			closeDevice();
+			m_open = false;
+			return false;
+		}
 	}
 
 	return true;
@@ -99,8 +101,10 @@ unsigned char Device::getByte()
 }
 
 
-void DeviceSerial::openDevice(const std::string deviceName)
+void DeviceSerial::openDevice(const std::string deviceName, const bool noDeviceCheck)
 {
+	m_noDeviceCheck = noDeviceCheck;
+	
 	termios newSettings;
 
 	m_open = false;
@@ -155,8 +159,10 @@ void DeviceSerial::closeDevice()
 }
 
 
-void DeviceNetwork::openDevice(const std::string deviceName)
+void DeviceNetwork::openDevice(const std::string deviceName, const bool noDeviceCheck)
 {
+	m_noDeviceCheck = noDeviceCheck;
+
 	struct sockaddr_in sock;
 	char* hostport;
 	int ret;
@@ -210,9 +216,9 @@ void DeviceNetwork::closeDevice()
 }
 
 
-Port::Port(const std::string deviceName)
+Port::Port(const std::string deviceName, const bool noDeviceCheck)
+	: m_deviceName(deviceName), m_noDeviceCheck(noDeviceCheck)
 {
-	m_deviceName = deviceName;
 	m_device = NULL;
 	
 	if (strchr(deviceName.c_str(), '/') == NULL &&

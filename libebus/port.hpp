@@ -34,10 +34,10 @@ class Device
 {
 
 public:
-	Device() : m_fd(-1), m_open(false) {}
+	Device() : m_fd(-1), m_open(false), m_noDeviceCheck(false) {}
 	virtual ~Device() {}
 
-	virtual void openDevice(const std::string deviceName) = 0;
+	virtual void openDevice(const std::string deviceName, const bool noDeviceCheck) = 0;
 	virtual void closeDevice() = 0;
 	bool isOpen();
 
@@ -50,9 +50,10 @@ public:
 protected:
 	int m_fd;
 	bool m_open;
+	bool m_noDeviceCheck;
 	std::queue<unsigned char> m_recvBuffer;
 
-private:	
+private:
 	bool isValid();
 
 };
@@ -63,7 +64,7 @@ class DeviceSerial : public Device
 public:
 	~DeviceSerial() { closeDevice(); }
 	
-	void openDevice(const std::string deviceName);
+	void openDevice(const std::string deviceName, const bool noDeviceCheck);
 	void closeDevice();
 	
 private:
@@ -77,7 +78,7 @@ class DeviceNetwork : public Device
 public:
 	~DeviceNetwork() { closeDevice(); }
 
-	void openDevice(const std::string deviceName);
+	void openDevice(const std::string deviceName, const bool noDeviceCheck);
 	void closeDevice();
 	
 private:
@@ -89,10 +90,10 @@ class Port
 {
 
 public:
-	Port(const std::string deviceName);
+	Port(const std::string deviceName, const bool noDeviceCheck);
 	~Port() { delete m_device; }
 
-	void open() { m_device->openDevice(m_deviceName); }
+	void open() { m_device->openDevice(m_deviceName, m_noDeviceCheck); }
 	void close() { m_device->closeDevice(); }
 	bool isOpen() { return m_device->isOpen(); }
 
@@ -104,8 +105,10 @@ public:
 	ssize_t size() const { return m_device->sizeRecvBuffer(); }
 
 private:
-	Device* m_device;
 	std::string m_deviceName;
+	Device* m_device;
+	bool m_noDeviceCheck;
+	
 
 	void setType(const DeviceType type);
 	

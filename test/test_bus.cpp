@@ -25,7 +25,7 @@ using namespace libebus;
 
 int main ()
 {
-	Bus bus("/dev/ttyUSB0", "/tmp/dump_bus.bin", 100, false);
+	Bus bus("/dev/ttyUSB0", true, "/tmp/dump_bus.bin", 100, false);
 
 	bus.connect();
 

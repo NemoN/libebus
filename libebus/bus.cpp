@@ -37,11 +37,12 @@ BusCommand::BusCommand(const std::string type, const std::string data) : m_type(
 }
 
 
-Bus::Bus(const std::string deviceName, const std::string dumpFile, const long dumpSize, const bool dumpState)
-	: m_deviceName(deviceName), m_getBusWait(false),
+Bus::Bus(const std::string deviceName, const bool noDeviceCheck,
+	const std::string dumpFile, const long dumpSize, const bool dumpState)
+	: m_getBusWait(false),
 	  m_dumpFile(dumpFile), m_dumpSize(dumpSize), m_dumpState(dumpState)
 {
-	m_port = new Port(m_deviceName);
+	m_port = new Port(deviceName, noDeviceCheck);
 	m_dump = new Dump(m_dumpFile, m_dumpSize);
 }
 
@@ -342,7 +343,7 @@ on_exit:
 
 	// empty receive buffer
 	while (m_port->size() != 0)
-		recvByte();
+		byte_recv = recvByte();
 		
 	busCommand->setResult(result.c_str());
 	m_recvBuffer.push(busCommand);

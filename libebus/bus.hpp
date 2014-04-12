@@ -55,7 +55,8 @@ class Bus
 {
 
 public:
-	Bus(const std::string deviceName, const std::string dumpFile, const long dumpSize, const bool dumpState);
+	Bus(const std::string deviceName, const bool noDeviceCheck,
+		const std::string dumpFile, const long dumpSize, const bool dumpState);
 	~Bus();
 
 	void connect() { m_port->open(); }
@@ -76,7 +77,6 @@ public:
 	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
 	
 private:
-	std::string m_deviceName;
 	Port* m_port;
 	std::stringstream m_sstr;
 	std::queue<std::string> m_cycBuffer;
