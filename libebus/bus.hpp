@@ -90,10 +90,12 @@ private:
 	bool m_dumpState;
 
 	int proceedCycData(const unsigned char byte);
-	int sendByte(const unsigned char byte_sent) const;
+	int sendByte(const unsigned char byte_sent);
 	unsigned char recvByte();
-	std::string recvSlaveData();
-	std::string recvCRC();
+	int recvSlaveData(std::string& result);
+	int recvCRC(std::string& result);
+
+	//~ std::string recvBytes2();
 
 };
 

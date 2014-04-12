@@ -27,11 +27,11 @@ namespace libebus
 {
 
 
-std::string esc(std::string data);
-std::string unesc(std::string data);
+std::string esc(const std::string& data);
+std::string unesc(const std::string& data);
 
 unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc);
-std::string calc_crc(const std::string data);
+std::string calc_crc(const std::string& data);
 
 
 } //namespace
