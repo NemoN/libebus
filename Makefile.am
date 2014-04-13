@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
-AM_CPPFLAGS = -Wall -Wextra
+AM_CXXFLAGS = -fpic -Wall -Wextra
 
 lib_LTLIBRARIES = libebus-@LIBEBUS_API_VERSION@.la
 
