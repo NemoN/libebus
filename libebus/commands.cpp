@@ -17,7 +17,7 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#include "commands.hpp"
+#include "commands.h"
 #include <iostream>
 #include <algorithm>
 #include <sstream>

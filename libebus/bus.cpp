@@ -17,8 +17,8 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#include "bus.hpp"
-#include "decode.hpp"
+#include "bus.h"
+#include "decode.h"
 #include <iostream>
 #include <iomanip>
 

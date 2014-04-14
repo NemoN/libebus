@@ -17,11 +17,11 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef LIBEBUS_BUS_HPP_
-#define LIBEBUS_BUS_HPP_
+#ifndef LIBEBUS_BUS_H_
+#define LIBEBUS_BUS_H_
 
-#include "port.hpp"
-#include "dump.hpp"
+#include "port.h"
+#include "dump.h"
 #include <cstring>
 #include <cstdlib>
 #include <sstream>

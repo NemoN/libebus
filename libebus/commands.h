@@ -17,8 +17,8 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef LIBEBUS_COMMANDS_HPP_
-#define LIBEBUS_COMMANDS_HPP_
+#ifndef LIBEBUS_COMMANDS_H_
+#define LIBEBUS_COMMANDS_H_
 
 #include <string>
 #include <vector>
@@ -79,4 +79,4 @@ private:
 
 } //namespace
 
-#endif // LIBEBUS_COMMANDS_HPP_
+#endif // LIBEBUS_COMMANDS_H_

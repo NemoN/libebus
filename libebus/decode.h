@@ -1,6 +1,7 @@
 /*
  * Copyright (C) Roland Jax 2014 <roland.jax@liwest.at>
- *
+ * crc calculations from http://www.mikrocontroller.net/topic/75698
+ * 
  * This file is part of libebus.
  *
  * libebus is free software: you can redistribute it and/or modify
@@ -17,14 +18,22 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef LIBEBUS_HPP_
-#define LIBEBUS_HPP_
+#ifndef LIBEBUS_DECODE_H_
+#define LIBEBUS_DECODE_H_
 
-#include <libebus/port.hpp>
-#include <libebus/bus.hpp>
-#include <libebus/commands.hpp>
-#include <libebus/config.hpp>
-#include <libebus/dump.hpp>
-#include <libebus/decode.hpp>
+#include <string>
 
-#endif // LIBEBUS_HPP_
+namespace libebus
+{
+
+
+std::string esc(const std::string& data);
+std::string unesc(const std::string& data);
+
+unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc);
+std::string calc_crc(const std::string& data);
+
+
+} //namespace
+
+#endif // LIBEBUS_DECODE_H_

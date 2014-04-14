@@ -17,34 +17,14 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef LIBEBUS_DUMP_HPP_
-#define LIBEBUS_DUMP_HPP_
+#ifndef LIBEBUS_H_
+#define LIBEBUS_H_
 
-#include <string>
+#include <libebus/port.h>
+#include <libebus/bus.h>
+#include <libebus/commands.h>
+#include <libebus/config.h>
+#include <libebus/dump.h>
+#include <libebus/decode.h>
 
-namespace libebus
-{
-
-
-class Dump
-{
-
-public:
-	Dump(std::string filename, long filesize)
-		: m_filename(filename), m_filesize(filesize) {}
-
-	int write(const char* byte);
-	
-	void setFilename(const std::string& filename) { m_filename = filename; }
-	void setFilesize(const long filesize) { m_filesize = filesize; }
-	
-private:
-	std::string m_filename;
-	long m_filesize;
-
-};
-
-
-} //namespace
-
-#endif // LIBEBUS_DUMP_HPP_
+#endif // LIBEBUS_H_

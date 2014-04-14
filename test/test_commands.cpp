@@ -17,7 +17,7 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#include "libebus.hpp"
+#include "libebus.h"
 #include <iostream>
 #include <string>
 #include <fstream>

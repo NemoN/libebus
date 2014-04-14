@@ -17,8 +17,8 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef LIBEBUS_PORT_HPP_
-#define LIBEBUS_PORT_HPP_
+#ifndef LIBEBUS_PORT_H_
+#define LIBEBUS_PORT_H_
 
 #include <termios.h>
 #include <unistd.h>
@@ -117,4 +117,4 @@ private:
 
 } //namespace
 
-#endif // LIBEBUS_PORT_HPP_
+#endif // LIBEBUS_PORT_H_

@@ -1,3 +1,4 @@
+/* libebusconfig.h.  Generated from libebusconfig.h.in by configure.  */
 /*
  * Copyright (C) Roland Jax 2014 <roland.jax@liwest.at>
  *
@@ -16,38 +17,3 @@
  * You should have received a copy of the GNU General Public License
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
-
-#include "dump.h"
-#include <fstream>
-#include <cstdio>
-
-namespace libebus
-{
-
-int Dump::write(const char* byte)
-{
-	int ret = 0;
-	
-	std::ofstream fs(m_filename.c_str(), std::ios::out | std::ios::binary | std::ios::app);
-
-	if (fs == 0)
-		return -1;
-
-	fs.write(byte, 1);
-
-	if (fs.tellp() >= m_filesize * 1024) {
-		std::string oldfile;
-		oldfile += m_filename;
-		oldfile += ".old";
-		ret = rename(m_filename.c_str(), oldfile.c_str());
-	}
-			
-	fs.close();
-
-	return ret;
-}
-
-
-
-} //namespace
-

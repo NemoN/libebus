@@ -16,16 +16,16 @@ libebus_@LIBEBUS_API_VERSION@_la_SOURCES = libebus/port.cpp \
 libebus_@LIBEBUS_API_VERSION@_la_LDFLAGS = -version-info $(LIBEBUS_SO_VERSION)
 
 libebus_includedir = $(includedir)/libebus-$(LIBEBUS_API_VERSION)
-nobase_libebus_include_HEADERS = libebus.hpp \
-                                 libebus/port.hpp \
-                                 libebus/bus.hpp \
-                                 libebus/commands.hpp \
-                                 libebus/config.hpp \
-                                 libebus/dump.hpp \
-                                 libebus/decode.hpp
+nobase_libebus_include_HEADERS = libebus.h \
+                                 libebus/port.h \
+                                 libebus/bus.h \
+                                 libebus/commands.h \
+                                 libebus/config.h \
+                                 libebus/dump.h \
+                                 libebus/decode.h
 
 libebus_libincludedir = $(libdir)/libebus-$(LIBEBUS_API_VERSION)/include
-nodist_libebus_libinclude_HEADERS = libebusconfig.hpp
+nodist_libebus_libinclude_HEADERS = libebusconfig.h
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libebus-$(LIBEBUS_API_VERSION).pc

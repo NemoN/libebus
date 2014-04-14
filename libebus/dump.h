@@ -1,7 +1,6 @@
 /*
  * Copyright (C) Roland Jax 2014 <roland.jax@liwest.at>
- * crc calculations from http://www.mikrocontroller.net/topic/75698
- * 
+ *
  * This file is part of libebus.
  *
  * libebus is free software: you can redistribute it and/or modify
@@ -18,8 +17,8 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef LIBEBUS_DECODE_HPP_
-#define LIBEBUS_DECODE_HPP_
+#ifndef LIBEBUS_DUMP_H_
+#define LIBEBUS_DUMP_H_
 
 #include <string>
 
@@ -27,13 +26,25 @@ namespace libebus
 {
 
 
-std::string esc(const std::string& data);
-std::string unesc(const std::string& data);
+class Dump
+{
 
-unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc);
-std::string calc_crc(const std::string& data);
+public:
+	Dump(std::string filename, long filesize)
+		: m_filename(filename), m_filesize(filesize) {}
+
+	int write(const char* byte);
+	
+	void setFilename(const std::string& filename) { m_filename = filename; }
+	void setFilesize(const long filesize) { m_filesize = filesize; }
+	
+private:
+	std::string m_filename;
+	long m_filesize;
+
+};
 
 
 } //namespace
 
-#endif // LIBEBUS_DECODE_HPP_
+#endif // LIBEBUS_DUMP_H_

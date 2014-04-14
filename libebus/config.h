@@ -17,10 +17,10 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef LIBEBUS_CONFIG_HPP_
-#define LIBEBUS_CONFIG_HPP_
+#ifndef LIBEBUS_CONFIG_H_
+#define LIBEBUS_CONFIG_H_
 
-#include "commands.hpp"
+#include "commands.h"
 #include <string>
 #include <vector>
 
@@ -84,4 +84,4 @@ private:
 
 } //namespace
 
-#endif // LIBEBUS_CONFIG_HPP_
+#endif // LIBEBUS_CONFIG_H_

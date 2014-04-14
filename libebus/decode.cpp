@@ -18,14 +18,14 @@
  * along with libebus. If not, see http://www.gnu.org/licenses/.
  */
 
-#include "decode.hpp"
+#include "decode.h"
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>
 
 namespace libebus
 {
-	
+
 
 std::string esc(const std::string& data)
 {
