@@ -39,11 +39,10 @@ BusCommand::BusCommand(const std::string type, const std::string data) : m_type(
 
 Bus::Bus(const std::string deviceName, const bool noDeviceCheck,
 	const std::string dumpFile, const long dumpSize, const bool dumpState)
-	: m_getBusWait(false),
-	  m_dumpFile(dumpFile), m_dumpSize(dumpSize), m_dumpState(dumpState)
+	: m_getBusWait(false), m_dumpState(dumpState)
 {
 	m_port = new Port(deviceName, noDeviceCheck);
-	m_dump = new Dump(m_dumpFile, m_dumpSize);
+	m_dump = new Dump(dumpFile, dumpSize);
 }
 
 Bus::~Bus()
@@ -64,8 +63,8 @@ void Bus::printBytes() const
 
 	for (int i = 0; i < bytes_read; i++) {
 		byte = m_port->byte();
-		std::cout << std::hex << std::setw(2) << std::setfill('0')
-			  << static_cast<unsigned>(byte);
+		std::cout << std::nouppercase << std::hex << std::setw(2)
+		          << std::setfill('0') << static_cast<unsigned>(byte);
 		if (byte == 0xAA)
 			std::cout << std::endl;
 	}
@@ -78,7 +77,7 @@ int Bus::proceed()
 	int result = 4;
 
 	// fetch new message and get bus
-	if (m_cycBuffer.size() == 0 && m_sendBuffer.size() != 0 && m_getBusWait == false) {
+	if (m_sendBuffer.size() != 0 && m_cycBuffer.size() == 0 && m_getBusWait == false) {
 		BusCommand* busCommand = m_sendBuffer.front();
 	
 		result = getBus(busCommand->getByte(0));

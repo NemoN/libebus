@@ -85,8 +85,6 @@ private:
 	bool m_getBusWait;
 
 	Dump* m_dump;
-	std::string m_dumpFile; 
-	long m_dumpSize;
 	bool m_dumpState;
 
 	int proceedCycData(const unsigned char byte);

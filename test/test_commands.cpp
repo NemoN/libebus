@@ -54,26 +54,17 @@ void readCSV(std::istream& is, Commands& commands){
 
 int main()
 {
-	Commands commands;
+	Commands* commands = ConfigCommands("test", CSV).getCommands();
+	std::cout << "Commandlines: " << commands->size() << std::endl;
 	
-	//~ std::fstream file("test/command.csv", std::ios::in);
-	std::fstream file("test/vr903.csv", std::ios::in);
+	commands->printCommands();
 
-	if(file.is_open() == true) {
-		readCSV(file, commands);
-		file.close();
+		//~ std::cout << commands[2][9] << std::endl;
 
-		//~ commands.printCommands();
-		std::cout << commands[2][9] << std::endl;
-		
-	} else {
-		std::cout << "File not found!\n";
-		return -1;
-		
-	}
-
-	std::size_t index = commands.findCommand("get vr903 RaumTempSelfHeatingOffset");
+	std::size_t index = commands->findCommand("get vr903 RaumTempSelfHeatingOffset");
 	std::cout << "found at index: " << index << std::endl;
+
+	//~ commands->printCommand();
 
 	return 0;
 }

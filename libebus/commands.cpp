@@ -23,45 +23,26 @@
 #include <sstream>
 #include <iomanip>
 #include <vector>
+#include <cstring>
 
 namespace libebus
 {
 
 
-//~ void Commands::printCommand(const cmd_t& command) const
-//~ {
-	//~ if (command.size() == 0)
-		//~ return;
-	//~ 
-	//~ for (cmdCI_t i = command.begin(); i != command.end(); i++)
-		//~ std::cout << *i << ';';
-//~ }
-//~ 
-//~ void Commands::printCommands() const
-//~ {
-	//~ if (m_cmdDB.size() == 0)
-		//~ return;
-	//~ 
-	//~ for (cmdDBCI_t i = m_cmdDB.begin(); i != m_cmdDB.end(); i++) {
-		//~ printCommand(*i);
-		//~ std::cout << std::endl;
-	//~ }	
-//~ }
-
-bool Commands::compareString(const std::string& src1, const std::string& src2) const
+std::string Command::calcResult(const cmd_t& cmd)
 {
-	std::string tgt1;
-	tgt1.resize(src1.size());
-	std::transform(src1.begin(), src1.end(), tgt1.begin(), toupper);
+	return "";
+}
 
-	std::string tgt2;
-	tgt2.resize(src2.size());
-	std::transform(src2.begin(), src2.end(), tgt2.begin(), toupper);
-//~ std::cout << "tgt1 :" << tgt1.c_str() << ": tgt2 :" << tgt2.c_str() << ":" << std::endl;
-	if (tgt1 == tgt2)
-		return true;
-	else
-		return false;
+void Commands::printCommands() const
+{
+	if (m_cmdDB.size() == 0)
+		return;
+	
+	for (cmdDBCI_t i = m_cmdDB.begin(); i != m_cmdDB.end(); i++) {
+		printCommand(*i);
+		std::cout << std::endl;
+	}	
 }
 
 int Commands::findCommand(const std::string& data) const
@@ -89,9 +70,9 @@ int Commands::findCommand(const std::string& data) const
 		if ((*i).size() == 0)
 			continue;
 
-		if (compareString((*i)[0], cmd[0]) &&
-		    compareString((*i)[1], cmd[1]) &&
-		    compareString((*i)[2], cmd[2]))
+		if (strcasecmp((*i)[0].c_str(), cmd[0].c_str()) == 0 &&
+		    strcasecmp((*i)[1].c_str(), cmd[1].c_str()) == 0 &&
+		    strcasecmp((*i)[2].c_str(), cmd[2].c_str()) == 0)
 			return index;
 
 	}	
@@ -135,7 +116,8 @@ int Commands::findData(const std::string& data) const
 		if (command.length() > search.length())
 			continue;
 
-		if (compareString(command, search.substr(0,command.length())))
+		//~ if (compareString(command, search.substr(0,command.length())))
+		if (strcasecmp(command.c_str(), search.substr(0,command.length()).c_str()) == 0)
 			return index;
 
 	}	
@@ -144,7 +126,7 @@ int Commands::findData(const std::string& data) const
 	return -1;
 }
 
-std::string Commands::getCommand(const int index) const
+std::string Commands::getEbusCommand(const int index) const
 {
 	cmd_t command = m_cmdDB.at(index);
 	std::string cmd(command[5]);
@@ -155,6 +137,16 @@ std::string Commands::getCommand(const int index) const
 	cmd += command[8];
 	
 	return cmd;
+}
+
+
+void Commands::printCommand(const cmd_t& command) const
+{
+	if (command.size() == 0)
+		return;
+	
+	for (cmdCI_t i = command.begin(); i != command.end(); i++)
+		std::cout << *i << ';';
 }
 
 
