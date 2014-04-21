@@ -26,14 +26,14 @@ namespace libebus
 {
 
 
-BusCommand::BusCommand(const std::string type, const std::string data) : m_type(type)
+BusCommand::BusCommand(const std::string type, const std::string command) : m_type(type)
 {
 	// esc
-	m_data = esc(data);
+	m_command = esc(command);
 	
 	// crc + esc
-	std::string crc = calc_crc(m_data);
-	m_data += esc(crc);
+	std::string crc = calc_crc(m_command);
+	m_command += esc(crc);
 }
 
 
@@ -112,11 +112,11 @@ int Bus::proceedCycData(const unsigned char byte)
 		return 3;	
 	}
 	
-	if (byte == 0xAA && m_sstr.str().empty() == false) {
-			m_cycBuffer.push(m_sstr.str());
-			m_sstr.str(std::string());
-			m_getBusWait = false;
-			return 2;
+	if (byte == 0xAA && m_sstr.str().size() != 0) {	
+		m_cycBuffer.push(m_sstr.str());
+		m_sstr.str(std::string());
+		m_getBusWait = false;
+		return 2;
 	}
 
 	return 4;
@@ -199,7 +199,7 @@ int Bus::sendCommand()
 	m_sendBuffer.pop();
 
 	// send ZZ PB SB NN Dx CRC
-	for (size_t i = 2; i < busCommand->getDataSize(); i = i + 2) {
+	for (size_t i = 2; i < busCommand->getCommandSize(); i = i + 2) {
 		retval = sendByte(busCommand->getByte(i));
 		if (retval < 0)
 			goto on_exit;
@@ -224,7 +224,7 @@ int Bus::sendCommand()
 	if (byte_recv == NAK) {
 		
 		// send data (full)
-		for (size_t i = 0; i < busCommand->getDataSize(); i = i + 2) {
+		for (size_t i = 0; i < busCommand->getCommandSize(); i = i + 2) {
 			retval = sendByte(busCommand->getByte(i));
 			if (retval < 0)
 				goto on_exit;
@@ -331,8 +331,11 @@ on_exit:
 	case 0:
 	default:
 		if (busCommand->getType() == "MS") {
+			result = busCommand->getCommand();
+			result += "00";
 			result += unesc(slaveData);
 			result += crc_recv;
+			result += "00";
 		} else {
 			result = "success";
 		}
@@ -344,6 +347,7 @@ on_exit:
 	while (m_port->size() != 0)
 		byte_recv = recvByte();
 		
+	//~ busCommand->setResult(result.c_str());
 	busCommand->setResult(result.c_str());
 	m_recvBuffer.push(busCommand);
 	return retval;

@@ -31,7 +31,30 @@ namespace libebus
 
 std::string Command::calcResult(const cmd_t& cmd)
 {
-	return "";
+	// if (type class cmd sub) --> find sub
+	// else go through all subs
+		
+	
+	for (cmdCI_t i = m_command.begin(); i != m_command.end(); i++)
+		std::cout << *i << ';';
+
+	std::cout << std::endl;
+	
+	int elements = atoi(m_command[9].c_str());
+	std::cout << "elements: " << elements << std::endl;
+	for (int i = 0; i < elements; i++)
+		std::cout << m_command[10 + i*8] << ";"
+			  << m_command[11 + i*8] << ";"
+			  << m_command[12 + i*8] << ";"
+			  << m_command[13 + i*8] << ";"
+			  << m_command[14 + i*8] << ";"
+			  << m_command[15 + i*8] << ";"
+			  << m_command[16 + i*8] << ";"
+			  << m_command[17 + i*8]
+			  << std::endl;
+
+	std::cout << std::endl;
+	return m_data;
 }
 
 void Commands::printCommands() const

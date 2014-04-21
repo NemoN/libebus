@@ -3,4 +3,5 @@ cyc;broad;date_time_temp;Datum, Uhrzeit und Aussentempertur;BR;FE;0700;9;-;4;tem
 cyc;broad;date_time_temp;Datum, Uhrzeit und Aussentempertur;BR;FE;0700;9;-;3;temp;md;1,2;d2b;1.0;°C;-;Temperatur;day;md;8;bdy;-;-;-;Wochentag;date;md;6,7,9;bda;-;-;-;Datum;
 cyc;broad;date_time_temp;Datum, Uhrzeit und Aussentempertur;BR;FE;0700;9;-;2;temp;md;1,2;d2b;1.0;°C;-;Temperatur;day;md;8;bdy;-;-;-;Wochentag;
 cyc;broad;date_time_temp;Datum, Uhrzeit und Aussentempertur;BR;FE;0700;9;-;1;temp;md;1,2;d2b;1.0;°C;-;Temperatur;
+get;ci;Password;Kennwort;MS;15;B509;3;0D2C00;4;pin1;sd;1;uch;-;-;-;Pin 1;pin2;sd;2;uch;-;-;-;Pin 2;pin3;sd;3;uch;-;-;-;Pin 3;pin4;sd;4;uch;-;-;-;Pin 4;50;0;9999;1000;2;4;4;4;11
 

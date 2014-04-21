@@ -55,16 +55,26 @@ void readCSV(std::istream& is, Commands& commands){
 int main()
 {
 	Commands* commands = ConfigCommands("test", CSV).getCommands();
-	std::cout << "Commandlines: " << commands->size() << std::endl;
+	std::cout << "Commands: " << commands->size() << std::endl;
 	
-	commands->printCommands();
+	//~ commands->printCommands();
 
-		//~ std::cout << commands[2][9] << std::endl;
+	//~ std::cout << commands[2][9] << std::endl;
 
-	std::size_t index = commands->findCommand("get vr903 RaumTempSelfHeatingOffset");
+	int index = commands->findCommand("get ci password");
 	std::cout << "found at index: " << index << std::endl;
 
-	//~ commands->printCommand();
+	Command* command = new Command(index, (*commands)[index], "ff15b509030d2c0035000401000000cf00");
+
+	std::vector<std::string> cmd;
+	cmd.push_back("get");
+	cmd.push_back("ci");
+	cmd.push_back("password");
+	
+	std::string result = command->calcResult(cmd);
+	
+	std::cout << "result: " << result.c_str() << std::endl;
+	delete command;
 
 	return 0;
 }
