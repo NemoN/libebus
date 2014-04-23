@@ -61,19 +61,29 @@ int main()
 
 	//~ std::cout << commands[2][9] << std::endl;
 
-	int index = commands->findCommand("get ci password");
+	//~ std::string data("get ci password");
+	//~ std::string data("get ci password pin1 pin2");
+	//~ std::string data("get ci password pin1 pin1 pin1 pin1");
+	//~ std::string data("get ci password pin2 pin3");
+	std::string data("get ci password pin4 pin2 pin1 pin3");
+
+	int index = commands->findCommand(data);
 	std::cout << "found at index: " << index << std::endl;
+
+	// prepare data
+	std::string token;
+	std::istringstream stream(data);
+	std::vector<std::string> cmd;
+	
+	// split stream
+	while (std::getline(stream, token, ' ') != 0)
+		cmd.push_back(token);
 
 	Command* command = new Command(index, (*commands)[index], "ff15b509030d2c0035000401000000cf00");
 
-	std::vector<std::string> cmd;
-	cmd.push_back("get");
-	cmd.push_back("ci");
-	cmd.push_back("password");
-	
-	std::string result = command->calcResult(cmd);
-	
+	std::string result = command->getResult(cmd);
 	std::cout << "result: " << result.c_str() << std::endl;
+
 	delete command;
 
 	return 0;

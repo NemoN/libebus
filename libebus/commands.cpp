@@ -29,33 +29,150 @@ namespace libebus
 {
 
 
-std::string Command::calcResult(const cmd_t& cmd)
+std::string Command::getResult(const cmd_t& cmd)
 {
-	// if (type class cmd sub) --> find sub
-	// else go through all subs
-		
-	
-	for (cmdCI_t i = m_command.begin(); i != m_command.end(); i++)
-		std::cout << *i << ';';
-
-	std::cout << std::endl;
-	
 	int elements = atoi(m_command[9].c_str());
-	std::cout << "elements: " << elements << std::endl;
-	for (int i = 0; i < elements; i++)
-		std::cout << m_command[10 + i*8] << ";"
-			  << m_command[11 + i*8] << ";"
-			  << m_command[12 + i*8] << ";"
-			  << m_command[13 + i*8] << ";"
-			  << m_command[14 + i*8] << ";"
-			  << m_command[15 + i*8] << ";"
-			  << m_command[16 + i*8] << ";"
-			  << m_command[17 + i*8]
-			  << std::endl;
+	
+	if (cmd.size() > 3) {
+		bool found = false;
+		
+		for (size_t i = 3; i < cmd.size(); i++) {
+			int j;
+			
+			for (j = 0; j < elements; j++) {
+				if (m_command[10 + j*8] == cmd[i]) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (found == true) {
+				found = false;
+std::cout << "1 decode: " << m_command[10 + j*8] << std::endl;
+				// decode
+				calcResult(m_command[11 + j*8], m_command[12 + j*8],
+					   m_command[13 + j*8], m_command[14 + j*8]);
+			}
+			
+		}
+		
+	} else {
+		for (int j = 0; j < elements; j++) {
+std::cout << "2 decode: " << m_command[10 + j*8] << std::endl;
+			// decode
+			calcResult(m_command[11 + j*8], m_command[12 + j*8],
+				   m_command[13 + j*8], m_command[14 + j*8]);
+		}
+	}
 
-	std::cout << std::endl;
-	return m_data;
+	return m_result;
 }
+
+void Command::calcResult(const std::string& part, const std::string& position,
+			 const std::string& type, const std::string& factor)
+{
+	std::string data;
+	
+	// Master Data
+	if (strcasecmp(part.c_str(), "MD") == 0) {
+		
+		// QQ ZZ PB SB NN
+		int md_pos = 10;
+		int md_len = atoi(m_command[7].c_str())*2;
+		data = m_data.substr(md_pos, md_len);
+std::cout << "MD: " << data.c_str() << std::endl;
+	}
+	
+	// Slave Acknowledge
+	else if (strcasecmp(part.c_str(), "SA") == 0) {
+		// QQ ZZ PB SB NN + Dx + CRC
+		int sa_pos = 10 + (atoi(m_command[7].c_str())*2) + 2;
+		int sa_len = 2;
+		data = m_data.substr(sa_pos, sa_len);
+std::cout << "SA: " << data.c_str() << std::endl;
+	}
+
+	// Slave Data
+	else if (strcasecmp(part.c_str(), "SD") == 0) {
+		// QQ ZZ PB SB NN + Dx + CRC ACK NN
+		int sd_pos = 10 + (atoi(m_command[7].c_str())*2) + 6;
+		int sd_len = m_data.length() - (10 + (atoi(m_command[7].c_str())*2) + 6) - 4;
+		data = m_data.substr(sd_pos, sd_len);
+std::cout << "SD: " << data.c_str() << std::endl;
+	}
+
+	// Master Acknowledge
+	else if (strcasecmp(part.c_str(), "MA") == 0) {
+		// QQ ZZ PB SB NN + Dx + CRC ACK NN + Dx
+		int ma_pos = m_data.length() - 2;
+		int ma_len = 2;
+		data = m_data.substr(ma_pos, ma_len);
+std::cout << "MA: " << data.c_str() << std::endl;
+	}
+
+	decode(data, position, type, factor);
+}
+
+void Command::decode(const std::string& data, const std::string& position,
+		     const std::string& type, const std::string& factor)
+{
+	std::ostringstream result;
+	
+	// prepare position
+	std::string token;
+	std::istringstream stream(position);
+	std::vector<int> pos;
+	
+	while (std::getline(stream, token, ',') != 0)
+		pos.push_back(atoi(token.c_str()));
+
+	if (strcasecmp(type.c_str(), "HEX") == 0) {
+		std::cout << "HEX" << std::endl;
+		result << data;
+	}
+	//~ else if (strcasecmp(type.c_str(), "UCH") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "SCH") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "UIN") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "SIN") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "ULG") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "SLG") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "FLT") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "STR") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "D1B") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "D1C") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "D2B") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "D2C") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "BDA") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "HDA") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "BTI") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "HTI") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "BDY") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "HDY") == 0) {
+	//~ }
+	else {
+		result << "type '" << type.c_str() << "' not implemented."; 
+	}
+
+	m_result = result.str();
+}
+
 
 void Commands::printCommands() const
 {
