@@ -4,7 +4,8 @@
 /aclocal.m4
 /ar-lib
 /autom4te.cache/
-/config*
+/config.*
+/configure
 /depcomp
 /libebus-*.pc
 /libebus-*.tar.*
