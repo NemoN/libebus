@@ -22,9 +22,81 @@
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 
 namespace libebus
 {
+
+
+std::string DecodeHEX::decode()
+{
+	std::ostringstream result;
+	
+	for (size_t i = 0; i < m_data.length()/2; i++)
+		result << m_data.substr(i*2, 2) << " ";
+		
+	return result.str().substr(0, result.str().length()-1);
+}
+
+std::string DecodeUCH::decode()
+{
+	std::ostringstream result;
+	result << strtoul(m_data.c_str(), NULL, 16);
+
+	return result.str();
+}
+
+std::string DecodeSCH::decode()
+{
+	std::ostringstream result;
+	short number = strtol(m_data.c_str(), NULL, 16);
+	if (number > 0x7F)
+		result << (number - 0x100);
+	else
+		result << number;
+
+	return result.str();
+}
+
+std::string DecodeUIN::decode()
+{
+	std::ostringstream result;
+	result << static_cast<unsigned short>(strtoul(m_data.c_str(), NULL, 16));
+
+	return result.str();
+}
+
+std::string DecodeSIN::decode()
+{
+	std::ostringstream result;
+	result << static_cast<short>(strtol(m_data.c_str(), NULL, 16));
+
+	return result.str();
+}
+
+std::string DecodeULG::decode()
+{
+	std::ostringstream result;
+	result << static_cast<unsigned int>(strtoul(m_data.c_str(), NULL, 16));
+
+	return result.str();
+}
+
+std::string DecodeSLG::decode()
+{
+	std::ostringstream result;
+	result << static_cast<int>(strtol(m_data.c_str(), NULL, 16));
+
+	return result.str();
+}
+
+std::string DecodeFLT::decode()
+{
+	std::ostringstream result;
+	result << static_cast<float>(strtod(m_data.c_str(), NULL));
+
+	return result.str();
+}
 
 
 std::string esc(const std::string& data)
@@ -70,6 +142,7 @@ std::string unesc(const std::string& data)
 
 	return unescaped;
 }
+
 
 unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc)
 {

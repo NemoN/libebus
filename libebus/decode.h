@@ -27,6 +27,109 @@ namespace libebus
 {
 
 
+class Decode
+{
+
+public:
+	Decode(std::string data) : m_data(data) {}
+	virtual ~Decode() {}
+
+	virtual std::string decode() = 0;
+
+protected:
+	std::string m_data;
+
+};
+
+class DecodeHEX : public Decode
+{
+
+public:
+	DecodeHEX(std::string data) : Decode(data) {}
+	~DecodeHEX() {}
+
+	std::string decode();
+
+};
+
+class DecodeUCH : public Decode
+{
+
+public:
+	DecodeUCH(std::string data) : Decode(data) {}
+	~DecodeUCH() {}
+
+	std::string decode();
+
+};
+
+class DecodeSCH : public Decode
+{
+
+public:
+	DecodeSCH(std::string data) : Decode(data) {}
+	~DecodeSCH() {}
+
+	std::string decode();
+
+};
+
+class DecodeUIN : public Decode
+{
+
+public:
+	DecodeUIN(std::string data) : Decode(data) {}
+	~DecodeUIN() {}
+
+	std::string decode();
+
+};
+
+class DecodeSIN : public Decode
+{
+
+public:
+	DecodeSIN(std::string data) : Decode(data) {}
+	~DecodeSIN() {}
+
+	std::string decode();
+
+};
+
+class DecodeULG : public Decode
+{
+
+public:
+	DecodeULG(std::string data) : Decode(data) {}
+	~DecodeULG() {}
+
+	std::string decode();
+
+};
+
+class DecodeSLG : public Decode
+{
+
+public:
+	DecodeSLG(std::string data) : Decode(data) {}
+	~DecodeSLG() {}
+
+	std::string decode();
+
+};
+
+class DecodeFLT : public Decode
+{
+
+public:
+	DecodeFLT(std::string data) : Decode(data) {}
+	~DecodeFLT() {}
+
+	std::string decode();
+
+};
+
+
 std::string esc(const std::string& data);
 std::string unesc(const std::string& data);
 

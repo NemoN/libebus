@@ -39,7 +39,7 @@ public:
 
 	std::string getType() const { return m_type; }
 	std::string getCommand() const { return m_command; }
-	unsigned char getByte(const int index) const { return strtol(m_command.substr(index, 2).c_str(), NULL, 16); }
+	unsigned char getByte(const int index) const { return strtoul(m_command.substr(index, 2).c_str(), NULL, 16); }
 	size_t getCommandSize() const { return m_command.size(); }
 	std::string getResult() const { return m_result; }
 	void setResult(const std::string result) { m_result = result; }

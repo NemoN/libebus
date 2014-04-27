@@ -46,16 +46,17 @@ public:
 	void setData(const std::string& data) { m_data = data; }
 	std::string getData() const { return m_data; }
 
-	std::string getResult(const cmd_t& cmd);
+	std::string calcResult(const cmd_t& cmd);
 
 private:
 	int m_index;
 	cmd_t m_command;
 	std::string m_data;
 	std::string m_result;
+	std::string m_error;
 
-	void calcResult(const std::string& part, const std::string& position,
-			const std::string& type, const std::string& factor);
+	void calcSub(const std::string& part, const std::string& position,
+		     const std::string& type, const std::string& factor);
 
 	void decode(const std::string& data, const std::string& position,
 		    const std::string& type, const std::string& factor);

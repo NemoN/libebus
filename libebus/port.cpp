@@ -190,7 +190,7 @@ void DeviceNetwork::openDevice(const std::string deviceName, const bool noDevice
 	}
 
 	sock.sin_family = AF_INET;
-	sock.sin_port = htons(atoi(port));
+	sock.sin_port = htons(strtol(port, NULL, 10));
 
 	m_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (m_fd < 0)
