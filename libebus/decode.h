@@ -129,6 +129,17 @@ public:
 
 };
 
+class DecodeSTR : public Decode
+{
+
+public:
+	DecodeSTR(std::string data) : Decode(data) {}
+	~DecodeSTR() {}
+
+	std::string decode();
+
+};
+
 
 std::string esc(const std::string& data);
 std::string unesc(const std::string& data);

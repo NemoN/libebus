@@ -178,8 +178,14 @@ std::cout << "type: " << type.c_str() << std::endl;
 //~ std::cout << "FLT value: " << value.str() << std::endl;
 		help = new DecodeFLT(value.str());			
 	}
-	//~ else if (strcasecmp(type.c_str(), "STR") == 0) {
-	//~ }
+	else if (strcasecmp(type.c_str(), "STR") == 0) {
+		if (pos.size() <= 1 || pos[1] < pos[0])
+			pos[1] = pos[0];
+
+		value << data.substr((pos[0]-1)*2, (pos[1]-pos[0]+1)*2);
+std::cout << "STR value: " << value.str() << std::endl;
+		help = new DecodeSTR(value.str());
+	}
 	//~ else if (strcasecmp(type.c_str(), "D1B") == 0) {
 	//~ }
 	//~ else if (strcasecmp(type.c_str(), "D1C") == 0) {
