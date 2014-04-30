@@ -129,7 +129,7 @@ void Command::decode(const std::string& data, const std::string& position,
 	std::vector<int> pos;
 	
 	while (std::getline(stream, token, ',') != 0)
-		pos.push_back(strtol(token.c_str(), NULL, 16));
+		pos.push_back(strtol(token.c_str(), NULL, 10));
 
 //~ std::cout << "type: " << type.c_str() << std::endl;
 
