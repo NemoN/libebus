@@ -27,6 +27,16 @@ namespace libebus
 {
 
 
+Decode::Decode(const std::string& data, const std::string& factor)
+	: m_data(data)
+{
+	if ((factor.find_first_not_of("0123456789") == std::string::npos) == true)
+		m_factor = strtol(factor.c_str(), NULL, 10);
+	else
+		m_factor = 1.0;
+}
+
+
 std::string DecodeHEX::decode()
 {
 	std::ostringstream result;
@@ -49,6 +59,7 @@ std::string DecodeSCH::decode()
 {
 	std::ostringstream result;
 	unsigned char src = strtol(m_data.c_str(), NULL, 16);
+
 	if (src > 0x7F)
 		result << (src - 0x100);
 	else
@@ -60,7 +71,7 @@ std::string DecodeSCH::decode()
 std::string DecodeUIN::decode()
 {
 	std::ostringstream result;
-	result << static_cast<unsigned short>(strtoul(m_data.c_str(), NULL, 16));
+	result << static_cast<unsigned short>(strtoul(m_data.c_str(), NULL, 16) * m_factor);
 
 	return result.str();
 }
@@ -68,7 +79,7 @@ std::string DecodeUIN::decode()
 std::string DecodeSIN::decode()
 {
 	std::ostringstream result;
-	result << static_cast<short>(strtol(m_data.c_str(), NULL, 16));
+	result << static_cast<short>(strtol(m_data.c_str(), NULL, 16) * m_factor);
 
 	return result.str();
 }
@@ -76,7 +87,7 @@ std::string DecodeSIN::decode()
 std::string DecodeULG::decode()
 {
 	std::ostringstream result;
-	result << static_cast<unsigned int>(strtoul(m_data.c_str(), NULL, 16));
+	result << static_cast<unsigned int>(strtoul(m_data.c_str(), NULL, 16) * m_factor);
 
 	return result.str();
 }
@@ -84,7 +95,7 @@ std::string DecodeULG::decode()
 std::string DecodeSLG::decode()
 {
 	std::ostringstream result;
-	result << static_cast<int>(strtol(m_data.c_str(), NULL, 16));
+	result << static_cast<int>(strtol(m_data.c_str(), NULL, 16) * m_factor);
 
 	return result.str();
 }
@@ -92,7 +103,7 @@ std::string DecodeSLG::decode()
 std::string DecodeFLT::decode()
 {
 	std::ostringstream result;
-	result << static_cast<float>(strtod(m_data.c_str(), NULL));
+	result << static_cast<float>(strtod(m_data.c_str(), NULL) * m_factor);
 
 	return result.str();
 }
@@ -116,9 +127,9 @@ std::string DecodeBCD::decode()
 	unsigned char src = strtol(m_data.c_str(), NULL, 16);
 
 	if ((src & 0x0F) > 0x09 || ((src >> 4) & 0x0F) > 0x09)
-		result << static_cast<short>(0xFF);
+		result << static_cast<short>(0xFF * m_factor);
 	else
-		result << static_cast<short>( ( ((src & 0xF0) >> 4) * 10) + (src & 0x0F) );
+		result << static_cast<short>(( ( ((src & 0xF0) >> 4) * 10) + (src & 0x0F) ) * m_factor);
 
 	return result.str();
 }
@@ -129,9 +140,9 @@ std::string DecodeD1B::decode()
 	unsigned char src = strtol(m_data.c_str(), NULL, 16);
 
 	if ((src & 0x80) == 0x80)
-		result << static_cast<short>(- ( ((unsigned char) (~ src)) + 1) );
+		result << static_cast<short>((- ( ((unsigned char) (~ src)) + 1) ) * m_factor);
 	else
-		result << static_cast<short>(src);
+		result << static_cast<short>(src * m_factor);
 
 	return result.str();
 }
@@ -142,9 +153,9 @@ std::string DecodeD1C::decode()
 	unsigned char src = strtol(m_data.c_str(), NULL, 16);
 
 	if (src > 0xC8)
-		result << static_cast<float>(0xFF);
+		result << static_cast<float>(0xFF * m_factor);
 	else
-		result << static_cast<float>(src / 2.0);
+		result << static_cast<float>((src / 2.0) * m_factor);
 
 	return result.str();
 }
@@ -157,11 +168,11 @@ std::string DecodeD2B::decode()
 
 	if ((src_msb & 0x80) == 0x80)
 		result << static_cast<float>
-			(- ( ((unsigned char) (~ src_msb)) +
-			(  ( ((unsigned char) (~ src_lsb)) + 1) / 256.0) ) );
+			((- ( ((unsigned char) (~ src_msb)) +
+			 (  ( ((unsigned char) (~ src_lsb)) + 1) / 256.0) ) ) * m_factor);
 
 	else
-		result << static_cast<float>(src_msb + (src_lsb / 256.0));
+		result << static_cast<float>((src_msb + (src_lsb / 256.0)) * m_factor);
 
 	return result.str();
 }
@@ -174,13 +185,13 @@ std::string DecodeD2C::decode()
 
 	if ((src_msb & 0x80) == 0x80)
 		result << static_cast<float>
-		(- ( ( ( ((unsigned char) (~ src_msb)) * 16.0) ) +
-		     ( ( ((unsigned char) (~ src_lsb)) & 0xF0) >> 4) +
-		   ( ( ( ((unsigned char) (~ src_lsb)) & 0x0F) +1 ) / 16.0) ) );
+		((- ( ( ( ((unsigned char) (~ src_msb)) * 16.0) ) +
+		      ( ( ((unsigned char) (~ src_lsb)) & 0xF0) >> 4) +
+		    ( ( ( ((unsigned char) (~ src_lsb)) & 0x0F) +1 ) / 16.0) ) ) * m_factor);
 
 	else
-		result << static_cast<float>( (src_msb * 16.0) + ((src_lsb & 0xF0) >> 4) +
-					     ((src_lsb & 0x0F) / 16.0) );
+		result << static_cast<float>(( (src_msb * 16.0) + ((src_lsb & 0xF0) >> 4) +
+					      ((src_lsb & 0x0F) / 16.0) ) * m_factor);
 
 	return result.str();
 }
@@ -212,10 +223,6 @@ std::string DecodeHTI::decode()
 
 	return result.str();
 }
-
-
-
-
 
 
 std::string esc(const std::string& data)

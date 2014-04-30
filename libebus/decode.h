@@ -31,17 +31,17 @@ class Decode
 {
 
 public:
-	Decode(const std::string& data, const std::string& factor = "")
-		: m_data(data), m_factor(factor) {}
+	Decode(const std::string& data, const std::string& factor = "");
 	virtual ~Decode() {}
 
 	virtual std::string decode() = 0;
 
 protected:
 	std::string m_data;
-	std::string m_factor;
+	float m_factor;
 
 };
+
 
 class DecodeHEX : public Decode
 {
