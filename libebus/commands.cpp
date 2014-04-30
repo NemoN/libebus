@@ -131,7 +131,7 @@ void Command::decode(const std::string& data, const std::string& position,
 	while (std::getline(stream, token, ',') != 0)
 		pos.push_back(strtol(token.c_str(), NULL, 16));
 
-std::cout << "type: " << type.c_str() << std::endl;
+//~ std::cout << "type: " << type.c_str() << std::endl;
 
 	if (strcasecmp(type.c_str(), "HEX") == 0) {
 		if (pos.size() <= 1 || pos[1] < pos[0])
@@ -144,56 +144,73 @@ std::cout << "type: " << type.c_str() << std::endl;
 	else if (strcasecmp(type.c_str(), "UCH") == 0) {
 		value << data.substr((pos[0]-1)*2, 2);
 //~ std::cout << "UCH value: " << value.str() << std::endl;
-		help = new DecodeUCH(value.str());
+		help = new DecodeUCH(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "SCH") == 0) {
 		value << data.substr((pos[0]-1)*2, 2);
 //~ std::cout << "SCH value: " << value.str() << std::endl;
-		help = new DecodeSCH(value.str());
+		help = new DecodeSCH(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "UIN") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
 //~ std::cout << "UIN value: " << value.str() << std::endl;
-		help = new DecodeUIN(value.str());
+		help = new DecodeUIN(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "SIN") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
 //~ std::cout << "SIN value: " << value.str() << std::endl;
-		help = new DecodeSIN(value.str());
+		help = new DecodeSIN(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "ULG") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2)
 		      << data.substr((pos[2]-1)*2, 2) << data.substr((pos[3]-1)*2, 2);
 //~ std::cout << "ULG value: " << value.str() << std::endl;
-		help = new DecodeULG(value.str());		
+		help = new DecodeULG(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "SLG") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2)
 		      << data.substr((pos[2]-1)*2, 2) << data.substr((pos[3]-1)*2, 2);
 //~ std::cout << "SLG value: " << value.str() << std::endl;
-		help = new DecodeSLG(value.str());		
+		help = new DecodeSLG(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "FLT") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
 //~ std::cout << "FLT value: " << value.str() << std::endl;
-		help = new DecodeFLT(value.str());			
+		help = new DecodeFLT(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "STR") == 0) {
 		if (pos.size() <= 1 || pos[1] < pos[0])
 			pos[1] = pos[0];
 
 		value << data.substr((pos[0]-1)*2, (pos[1]-pos[0]+1)*2);
-std::cout << "STR value: " << value.str() << std::endl;
+//~ std::cout << "STR value: " << value.str() << std::endl;
 		help = new DecodeSTR(value.str());
 	}
-	//~ else if (strcasecmp(type.c_str(), "D1B") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "D1C") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "D2B") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "D2C") == 0) {
-	//~ }
+	else if (strcasecmp(type.c_str(), "BCD") == 0) {
+		value << data.substr((pos[0]-1)*2, 2);
+//~ std::cout << "BCD value: " << value.str() << std::endl;
+		help = new DecodeBCD(value.str(), factor);
+	}
+	else if (strcasecmp(type.c_str(), "D1B") == 0) {
+		value << data.substr((pos[0]-1)*2, 2);
+//~ std::cout << "D1B value: " << value.str() << std::endl;
+		help = new DecodeD1B(value.str(), factor);
+	}
+	else if (strcasecmp(type.c_str(), "D1C") == 0) {
+		value << data.substr((pos[0]-1)*2, 2);
+//~ std::cout << "D1C value: " << value.str() << std::endl;
+		help = new DecodeD1C(value.str(), factor);
+	}
+	else if (strcasecmp(type.c_str(), "D2B") == 0) {
+		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
+//~ std::cout << "D2B value: " << value.str() << std::endl;
+		help = new DecodeD2B(value.str(), factor);
+	}
+	else if (strcasecmp(type.c_str(), "D2C") == 0) {
+		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
+//~ std::cout << "D2C value: " << value.str() << std::endl;
+		help = new DecodeD2C(value.str(), factor);
+	}
 	//~ else if (strcasecmp(type.c_str(), "BDA") == 0) {
 	//~ }
 	//~ else if (strcasecmp(type.c_str(), "HDA") == 0) {

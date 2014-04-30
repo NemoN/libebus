@@ -22,7 +22,6 @@
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>
-#include <iostream>
 
 namespace libebus
 {
@@ -49,11 +48,11 @@ std::string DecodeUCH::decode()
 std::string DecodeSCH::decode()
 {
 	std::ostringstream result;
-	short number = strtol(m_data.c_str(), NULL, 16);
-	if (number > 0x7F)
-		result << (number - 0x100);
+	unsigned char src = strtol(m_data.c_str(), NULL, 16);
+	if (src > 0x7F)
+		result << (src - 0x100);
 	else
-		result << number;
+		result << src;
 
 	return result.str();
 }
@@ -110,6 +109,82 @@ std::string DecodeSTR::decode()
 	
 	return result.str().substr(0, result.str().length()-1);
 }
+
+std::string DecodeBCD::decode()
+{
+	std::ostringstream result;
+	unsigned char src = strtol(m_data.c_str(), NULL, 16);
+
+	if ((src & 0x0F) > 0x09 || ((src >> 4) & 0x0F) > 0x09)
+		result << static_cast<short>(0xFF);
+	else
+		result << static_cast<short>( ( ((src & 0xF0) >> 4) * 10) + (src & 0x0F) );
+
+	return result.str();
+}
+
+std::string DecodeD1B::decode()
+{
+	std::ostringstream result;
+	unsigned char src = strtol(m_data.c_str(), NULL, 16);
+
+	if ((src & 0x80) == 0x80)
+		result << static_cast<short>(- ( ((unsigned char) (~ src)) + 1) );
+	else
+		result << static_cast<short>(src);
+
+	return result.str();
+}
+
+std::string DecodeD1C::decode()
+{
+	std::ostringstream result;
+	unsigned char src = strtol(m_data.c_str(), NULL, 16);
+
+	if (src > 0xC8)
+		result << static_cast<float>(0xFF);
+	else
+		result << static_cast<float>(src / 2.0);
+
+	return result.str();
+}
+
+std::string DecodeD2B::decode()
+{
+	std::ostringstream result;
+	unsigned char src_lsb = static_cast<char>(strtol(m_data.substr(0, 2).c_str(), NULL, 16));
+	unsigned char src_msb = static_cast<char>(strtol(m_data.substr(2, 2).c_str(), NULL, 16));
+
+	if ((src_msb & 0x80) == 0x80)
+		result << static_cast<float>
+			(- ( ((unsigned char) (~ src_msb)) +
+			(  ( ((unsigned char) (~ src_lsb)) + 1) / 256.0) ) );
+
+	else
+		result << static_cast<float>(src_msb + (src_lsb / 256.0));
+
+	return result.str();
+}
+
+std::string DecodeD2C::decode()
+{
+	std::ostringstream result;
+	unsigned char src_lsb = static_cast<char>(strtol(m_data.substr(0, 2).c_str(), NULL, 16));
+	unsigned char src_msb = static_cast<char>(strtol(m_data.substr(2, 2).c_str(), NULL, 16));
+
+	if ((src_msb & 0x80) == 0x80)
+		result << static_cast<float>
+		(- ( ( ( ((unsigned char) (~ src_msb)) * 16.0) ) +
+		     ( ( ((unsigned char) (~ src_lsb)) & 0xF0) >> 4) +
+		   ( ( ( ((unsigned char) (~ src_lsb)) & 0x0F) +1 ) / 16.0) ) );
+
+	else
+		result << static_cast<float>( (src_msb * 16.0) + ((src_lsb & 0xF0) >> 4) +
+					     ((src_lsb & 0x0F) / 16.0) );
+
+	return result.str();
+}
+
 
 
 std::string esc(const std::string& data)
