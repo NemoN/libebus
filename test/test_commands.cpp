@@ -82,7 +82,7 @@ int main()
 		cmd.push_back(token);
 
 	//~ Command* command = new Command(index, (*commands)[index], "ff15b509030d2c0035000401000000cf00");
-	Command* command = new Command(index, (*commands)[index], "ff15b509030d2c0035000400ff0304cf00");
+	Command* command = new Command(index, (*commands)[index], "ff15b509030d2c00350004173b3b04cf00");
 
 	std::string result = command->calcResult(cmd);
 	std::cout << "result: " << result.c_str() << std::endl;

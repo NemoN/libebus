@@ -209,6 +209,27 @@ public:
 
 };
 
+class DecodeHDA : public Decode
+{
+
+public:
+	DecodeHDA(const std::string& data) : Decode(data) {}
+	~DecodeHDA() {}
+
+	std::string decode();
+
+};
+
+class DecodeHTI : public Decode
+{
+
+public:
+	DecodeHTI(const std::string& data) : Decode(data) {}
+	~DecodeHTI() {}
+
+	std::string decode();
+
+};
 
 std::string esc(const std::string& data);
 std::string unesc(const std::string& data);

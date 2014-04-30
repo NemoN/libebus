@@ -185,6 +185,37 @@ std::string DecodeD2C::decode()
 	return result.str();
 }
 
+std::string DecodeHDA::decode()
+{
+	std::ostringstream result;
+	short dd = static_cast<short>(strtol(m_data.substr(0, 2).c_str(), NULL, 16));
+	short mm = static_cast<short>(strtol(m_data.substr(2, 2).c_str(), NULL, 16));
+	short yy = static_cast<short>(strtol(m_data.substr(4, 2).c_str(), NULL, 16));
+
+	result << std::setw(2) << std::setfill('0') << dd << "."
+	       << std::setw(2) << std::setfill('0') << mm << "."
+	       << yy+2000;
+
+	return result.str();
+}
+
+std::string DecodeHTI::decode()
+{
+	std::ostringstream result;
+	short hh = static_cast<short>(strtol(m_data.substr(0, 2).c_str(), NULL, 16));
+	short mm = static_cast<short>(strtol(m_data.substr(2, 2).c_str(), NULL, 16));
+	short ss = static_cast<short>(strtol(m_data.substr(4, 2).c_str(), NULL, 16));
+
+	result << std::setw(2) << std::setfill('0') << hh << ":"
+	       << std::setw(2) << std::setfill('0') << mm << ":"
+	       << std::setw(2) << std::setfill('0') << ss;
+
+	return result.str();
+}
+
+
+
+
 
 
 std::string esc(const std::string& data)

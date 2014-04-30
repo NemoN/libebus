@@ -213,12 +213,22 @@ void Command::decode(const std::string& data, const std::string& position,
 	}
 	//~ else if (strcasecmp(type.c_str(), "BDA") == 0) {
 	//~ }
-	//~ else if (strcasecmp(type.c_str(), "HDA") == 0) {
-	//~ }
+	else if (strcasecmp(type.c_str(), "HDA") == 0) {
+		value << data.substr((pos[0]-1)*2, 2)
+		      << data.substr((pos[1]-1)*2, 2)
+		      << data.substr((pos[2]-1)*2, 2);
+//~ std::cout << "HDA value: " << value.str() << std::endl;
+		help = new DecodeHDA(value.str());
+	}
 	//~ else if (strcasecmp(type.c_str(), "BTI") == 0) {
 	//~ }
-	//~ else if (strcasecmp(type.c_str(), "HTI") == 0) {
-	//~ }
+	else if (strcasecmp(type.c_str(), "HTI") == 0) {
+		value << data.substr((pos[0]-1)*2, 2)
+		      << data.substr((pos[1]-1)*2, 2)
+		      << data.substr((pos[2]-1)*2, 2);
+//~ std::cout << "HTI value: " << value.str() << std::endl;
+		help = new DecodeHTI(value.str());
+	}
 	//~ else if (strcasecmp(type.c_str(), "BDY") == 0) {
 	//~ }
 	//~ else if (strcasecmp(type.c_str(), "HDY") == 0) {
