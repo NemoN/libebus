@@ -30,7 +30,7 @@ namespace libebus
 Decode::Decode(const std::string& data, const std::string& factor)
 	: m_data(data)
 {
-	if ((factor.find_first_not_of("0123456789") == std::string::npos) == true)
+	if ((factor.find_first_not_of("0123456789.,") == std::string::npos) == true)
 		m_factor = strtol(factor.c_str(), NULL, 10);
 	else
 		m_factor = 1.0;

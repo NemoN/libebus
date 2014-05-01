@@ -32,7 +32,7 @@ namespace libebus
 
 std::string Command::calcResult(const cmd_t& cmd)
 {
-	int elements = strtol(m_command[9].c_str(), NULL, 16);
+	int elements = strtol(m_command[9].c_str(), NULL, 10);
 	
 	if (cmd.size() > 3) {
 		bool found = false;
@@ -82,7 +82,7 @@ void Command::calcSub(const std::string& part, const std::string& position,
 		
 		// QQ ZZ PB SB NN
 		int md_pos = 10;
-		int md_len = strtol(m_command[7].c_str(), NULL, 16)*2;
+		int md_len = strtol(m_command[7].c_str(), NULL, 10)*2;
 		data = m_data.substr(md_pos, md_len);
 //~ std::cout << "MD: " << data.c_str() << std::endl;
 	}
@@ -90,7 +90,7 @@ void Command::calcSub(const std::string& part, const std::string& position,
 	// Slave Acknowledge
 	else if (strcasecmp(part.c_str(), "SA") == 0) {
 		// QQ ZZ PB SB NN + Dx + CRC
-		int sa_pos = 10 + (strtol(m_command[7].c_str(), NULL, 16)*2) + 2;
+		int sa_pos = 10 + (strtol(m_command[7].c_str(), NULL, 10)*2) + 2;
 		int sa_len = 2;
 		data = m_data.substr(sa_pos, sa_len);
 //~ std::cout << "SA: " << data.c_str() << std::endl;
@@ -99,8 +99,8 @@ void Command::calcSub(const std::string& part, const std::string& position,
 	// Slave Data
 	else if (strcasecmp(part.c_str(), "SD") == 0) {
 		// QQ ZZ PB SB NN + Dx + CRC ACK NN
-		int sd_pos = 10 + (strtol(m_command[7].c_str(), NULL, 16)*2) + 6;
-		int sd_len = m_data.length() - (10 + (strtol(m_command[7].c_str(), NULL, 16)*2) + 6) - 4;
+		int sd_pos = 10 + (strtol(m_command[7].c_str(), NULL, 10)*2) + 6;
+		int sd_len = m_data.length() - (10 + (strtol(m_command[7].c_str(), NULL, 10)*2) + 6) - 4;
 		data = m_data.substr(sd_pos, sd_len);
 //~ std::cout << "SD: " << data.c_str() << std::endl;
 	}
