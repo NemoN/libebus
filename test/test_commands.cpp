@@ -57,17 +57,7 @@ int main()
 	Commands* commands = ConfigCommands("test", CSV).getCommands();
 	std::cout << "Commands: " << commands->size() << std::endl;
 	
-	//~ commands->printCommands();
-
-	//~ std::cout << commands[2][9] << std::endl;
-
-	//~ std::string data("get ci password");
 	std::string data("get ci password pin1");
-	//~ std::string data("get ci password pin2");
-	//~ std::string data("get ci password pin1 pin2");
-	//~ std::string data("get ci password pin1 pin1 pin1 pin1");
-	//~ std::string data("get ci password pin2 pin3");
-	//~ std::string data("get ci password pin4 pin2 pin1 pin3");
 
 	int index = commands->findCommand(data);
 	std::cout << "found at index: " << index << std::endl;
@@ -81,8 +71,7 @@ int main()
 	while (std::getline(stream, token, ' ') != 0)
 		cmd.push_back(token);
 
-	//~ Command* command = new Command(index, (*commands)[index], "ff15b509030d2c0035000401000000cf00");
-	Command* command = new Command(index, (*commands)[index], "ff15b509030d2c00350004173b3b04cf00");
+	Command* command = new Command(index, (*commands)[index], "ff15b509030d2c0035000401000000cf00");
 
 	std::string result = command->calcResult(cmd);
 	std::cout << "result: " << result.c_str() << std::endl;

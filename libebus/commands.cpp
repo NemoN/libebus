@@ -49,7 +49,7 @@ std::string Command::calcResult(const cmd_t& cmd)
 			
 			if (found == true) {
 				found = false;
-//~ std::cout << "1 decode: " << m_command[10 + j*8] << std::endl;
+
 				// decode
 				calcSub(m_command[11 + j*8], m_command[12 + j*8],
 					m_command[13 + j*8], m_command[14 + j*8]);
@@ -59,7 +59,7 @@ std::string Command::calcResult(const cmd_t& cmd)
 		
 	} else {
 		for (int j = 0; j < elements; j++) {
-//~ std::cout << "2 decode: " << m_command[10 + j*8] << std::endl;
+
 			// decode
 			calcSub(m_command[11 + j*8], m_command[12 + j*8],
 				m_command[13 + j*8], m_command[14 + j*8]);
@@ -79,12 +79,10 @@ void Command::calcSub(const std::string& part, const std::string& position,
 	
 	// Master Data
 	if (strcasecmp(part.c_str(), "MD") == 0) {
-		
 		// QQ ZZ PB SB NN
 		int md_pos = 10;
 		int md_len = strtol(m_command[7].c_str(), NULL, 10)*2;
 		data = m_data.substr(md_pos, md_len);
-//~ std::cout << "MD: " << data.c_str() << std::endl;
 	}
 	
 	// Slave Acknowledge
@@ -93,7 +91,6 @@ void Command::calcSub(const std::string& part, const std::string& position,
 		int sa_pos = 10 + (strtol(m_command[7].c_str(), NULL, 10)*2) + 2;
 		int sa_len = 2;
 		data = m_data.substr(sa_pos, sa_len);
-//~ std::cout << "SA: " << data.c_str() << std::endl;
 	}
 
 	// Slave Data
@@ -102,7 +99,6 @@ void Command::calcSub(const std::string& part, const std::string& position,
 		int sd_pos = 10 + (strtol(m_command[7].c_str(), NULL, 10)*2) + 6;
 		int sd_len = m_data.length() - (10 + (strtol(m_command[7].c_str(), NULL, 10)*2) + 6) - 4;
 		data = m_data.substr(sd_pos, sd_len);
-//~ std::cout << "SD: " << data.c_str() << std::endl;
 	}
 
 	// Master Acknowledge
@@ -111,7 +107,6 @@ void Command::calcSub(const std::string& part, const std::string& position,
 		int ma_pos = m_data.length() - 2;
 		int ma_len = 2;
 		data = m_data.substr(ma_pos, ma_len);
-//~ std::cout << "MA: " << data.c_str() << std::endl;
 	}
 
 	decode(data, position, type, factor);
@@ -131,51 +126,41 @@ void Command::decode(const std::string& data, const std::string& position,
 	while (std::getline(stream, token, ',') != 0)
 		pos.push_back(strtol(token.c_str(), NULL, 10));
 
-//~ std::cout << "type: " << type.c_str() << std::endl;
-
 	if (strcasecmp(type.c_str(), "HEX") == 0) {
 		if (pos.size() <= 1 || pos[1] < pos[0])
 			pos[1] = pos[0];
 
 		value << data.substr((pos[0]-1)*2, (pos[1]-pos[0]+1)*2);
-//~ std::cout << "HEX value: " << value.str() << " pos[0]: " << pos[0] << " pos[1]: " << pos[1] << std::endl;		
 		help = new DecodeHEX(value.str());
 	}
 	else if (strcasecmp(type.c_str(), "UCH") == 0) {
 		value << data.substr((pos[0]-1)*2, 2);
-//~ std::cout << "UCH value: " << value.str() << std::endl;
 		help = new DecodeUCH(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "SCH") == 0) {
 		value << data.substr((pos[0]-1)*2, 2);
-//~ std::cout << "SCH value: " << value.str() << std::endl;
 		help = new DecodeSCH(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "UIN") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
-//~ std::cout << "UIN value: " << value.str() << std::endl;
 		help = new DecodeUIN(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "SIN") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
-//~ std::cout << "SIN value: " << value.str() << std::endl;
 		help = new DecodeSIN(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "ULG") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2)
 		      << data.substr((pos[2]-1)*2, 2) << data.substr((pos[3]-1)*2, 2);
-//~ std::cout << "ULG value: " << value.str() << std::endl;
 		help = new DecodeULG(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "SLG") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2)
 		      << data.substr((pos[2]-1)*2, 2) << data.substr((pos[3]-1)*2, 2);
-//~ std::cout << "SLG value: " << value.str() << std::endl;
 		help = new DecodeSLG(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "FLT") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
-//~ std::cout << "FLT value: " << value.str() << std::endl;
 		help = new DecodeFLT(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "STR") == 0) {
@@ -183,62 +168,46 @@ void Command::decode(const std::string& data, const std::string& position,
 			pos[1] = pos[0];
 
 		value << data.substr((pos[0]-1)*2, (pos[1]-pos[0]+1)*2);
-//~ std::cout << "STR value: " << value.str() << std::endl;
 		help = new DecodeSTR(value.str());
 	}
 	else if (strcasecmp(type.c_str(), "BCD") == 0) {
 		value << data.substr((pos[0]-1)*2, 2);
-//~ std::cout << "BCD value: " << value.str() << std::endl;
 		help = new DecodeBCD(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "D1B") == 0) {
 		value << data.substr((pos[0]-1)*2, 2);
-//~ std::cout << "D1B value: " << value.str() << std::endl;
 		help = new DecodeD1B(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "D1C") == 0) {
 		value << data.substr((pos[0]-1)*2, 2);
-//~ std::cout << "D1C value: " << value.str() << std::endl;
 		help = new DecodeD1C(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "D2B") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
-//~ std::cout << "D2B value: " << value.str() << std::endl;
 		help = new DecodeD2B(value.str(), factor);
 	}
 	else if (strcasecmp(type.c_str(), "D2C") == 0) {
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
-//~ std::cout << "D2C value: " << value.str() << std::endl;
 		help = new DecodeD2C(value.str(), factor);
 	}
-	//~ else if (strcasecmp(type.c_str(), "BDA") == 0) {
-	//~ }
 	else if (strcasecmp(type.c_str(), "HDA") == 0) {
 		value << data.substr((pos[0]-1)*2, 2)
 		      << data.substr((pos[1]-1)*2, 2)
 		      << data.substr((pos[2]-1)*2, 2);
-//~ std::cout << "HDA value: " << value.str() << std::endl;
 		help = new DecodeHDA(value.str());
 	}
-	//~ else if (strcasecmp(type.c_str(), "BTI") == 0) {
-	//~ }
 	else if (strcasecmp(type.c_str(), "HTI") == 0) {
 		value << data.substr((pos[0]-1)*2, 2)
 		      << data.substr((pos[1]-1)*2, 2)
 		      << data.substr((pos[2]-1)*2, 2);
-//~ std::cout << "HTI value: " << value.str() << std::endl;
 		help = new DecodeHTI(value.str());
 	}
-	//~ else if (strcasecmp(type.c_str(), "BDY") == 0) {
-	//~ }
 	else if (strcasecmp(type.c_str(), "HDY") == 0) {
 		value << data.substr((pos[0]-1)*2, 2);
-//~ std::cout << "HDY value: " << value.str() << std::endl;
 		help = new DecodeHDY(value.str());
 	}
 	else if (strcasecmp(type.c_str(), "TTM") == 0) {
 		value << data.substr((pos[0]-1)*2, 2);
-//~ std::cout << "TTM value: " << value.str() << std::endl;
 		help = new DecodeTTM(value.str());
 	}
 
@@ -340,7 +309,6 @@ int Commands::findData(const std::string& data) const
 		if (command.length() > search.length())
 			continue;
 
-		//~ if (compareString(command, search.substr(0,command.length())))
 		if (strcasecmp(command.c_str(), search.substr(0,command.length()).c_str()) == 0)
 			return index;
 

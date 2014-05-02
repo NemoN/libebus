@@ -145,25 +145,11 @@ int Bus::getBus(const unsigned char byte_sent)
 {
 	unsigned char byte_recv;
 	ssize_t bytes_sent, bytes_recv;
-	//~ struct timeval tact, tlast, tdiff;
-
-	//~ // start time
-	//~ gettimeofday(&tlast, NULL);
 
 	// send QQ
 	bytes_sent = m_port->send(&byte_sent, 1);
 	if (bytes_sent <= 0)
 		return -1;
-
-	//~ // act time
-	//~ gettimeofday(&tact, NULL);
-	//~ eb_diff_time(&tact, &tlast, &tdiff);
-
-	//~ // wait ~4200 usec
-	//~ if (4000.0 - tdiff.tv_usec > 0.0 && 4000.0 - tdiff.tv_usec <= 4000.0)
-		//~ usleep(4000.0 - tdiff.tv_usec);
-	//~ else 
-		//~ return -2;
 
 	// receive 1 byte - must be QQ
 	bytes_recv = m_port->recv();	
@@ -346,8 +332,7 @@ on_exit:
 	// empty receive buffer
 	while (m_port->size() != 0)
 		byte_recv = recvByte();
-		
-	//~ busCommand->setResult(result.c_str());
+
 	busCommand->setResult(result.c_str());
 	m_recvBuffer.push(busCommand);
 	return retval;

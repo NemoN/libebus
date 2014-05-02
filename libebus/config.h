@@ -68,7 +68,6 @@ public:
 	~ConfigCommands() { delete m_configfile; }
 	
 	void setType(const FileType type);
-	//~ void printFiles() const;
 	Commands* getCommands();
 	
 private:
