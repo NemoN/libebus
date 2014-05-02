@@ -1,7 +1,6 @@
 /INSTALL
 /Makefile
 /Makefile.in
-/aclocal.m4
 /ar-lib
 /autom4te.cache/
 /config.*
@@ -12,7 +11,7 @@
 /install-sh
 /libtool
 /ltmain.sh
-/m4/
+*.m4
 /missing
 /stamp-h?
 .deps/
