@@ -31,7 +31,7 @@ Decode::Decode(const std::string& data, const std::string& factor)
 	: m_data(data)
 {
 	if ((factor.find_first_not_of("0123456789.,") == std::string::npos) == true)
-		m_factor = strtol(factor.c_str(), NULL, 10);
+		m_factor = static_cast<float>(strtod(factor.c_str(), NULL));
 	else
 		m_factor = 1.0;
 }
@@ -103,7 +103,7 @@ std::string DecodeSLG::decode()
 std::string DecodeFLT::decode()
 {
 	std::ostringstream result;
-	result << static_cast<float>(strtod(m_data.c_str(), NULL) * m_factor);
+	result << static_cast<float>(strtol(m_data.c_str(), NULL, 16) * m_factor);
 
 	return result.str();
 }
