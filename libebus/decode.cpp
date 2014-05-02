@@ -30,7 +30,7 @@ namespace libebus
 Decode::Decode(const std::string& data, const std::string& factor)
 	: m_data(data)
 {
-	if ((factor.find_first_not_of("0123456789.,") == std::string::npos) == true)
+	if ((factor.find_first_not_of("0123456789.") == std::string::npos) == true)
 		m_factor = static_cast<float>(strtod(factor.c_str(), NULL));
 	else
 		m_factor = 1.0;
@@ -220,6 +220,33 @@ std::string DecodeHTI::decode()
 	result << std::setw(2) << std::setfill('0') << hh << ":"
 	       << std::setw(2) << std::setfill('0') << mm << ":"
 	       << std::setw(2) << std::setfill('0') << ss;
+
+	return result.str();
+}
+
+std::string DecodeHDY::decode()
+{
+	const char *days[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Err"};
+
+	std::ostringstream result;
+	short day = static_cast<short>(strtol(m_data.c_str(), NULL, 16));
+
+	if (day < 0 || day > 6)
+		day = 7;
+
+	result << days[day];
+
+	return result.str();
+}
+
+std::string DecodeTTM::decode()
+{
+	std::ostringstream result;
+	short hh = static_cast<short>(strtol(m_data.c_str(), NULL, 16)) / 6;
+	short mm = static_cast<short>(strtol(m_data.c_str(), NULL, 16)) % 6 * 10;
+
+	result << std::setw(2) << std::setfill('0') << hh << ":"
+	       << std::setw(2) << std::setfill('0') << mm;
 
 	return result.str();
 }

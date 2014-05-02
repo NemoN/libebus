@@ -231,8 +231,16 @@ void Command::decode(const std::string& data, const std::string& position,
 	}
 	//~ else if (strcasecmp(type.c_str(), "BDY") == 0) {
 	//~ }
-	//~ else if (strcasecmp(type.c_str(), "HDY") == 0) {
-	//~ }
+	else if (strcasecmp(type.c_str(), "HDY") == 0) {
+		value << data.substr((pos[0]-1)*2, 2);
+//~ std::cout << "HDY value: " << value.str() << std::endl;
+		help = new DecodeHDY(value.str());
+	}
+	else if (strcasecmp(type.c_str(), "TTM") == 0) {
+		value << data.substr((pos[0]-1)*2, 2);
+//~ std::cout << "TTM value: " << value.str() << std::endl;
+		help = new DecodeTTM(value.str());
+	}
 
 	if (help == NULL) {
 		result << "type '" << type.c_str() << "' not implemented!";
