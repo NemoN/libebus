@@ -18,6 +18,8 @@
  */
 
 #include "port.h"
+#include <cstdlib>
+#include <cstring>
 #include <termios.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -26,8 +28,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <cstdlib>
-#include <cstring>
+
 
 namespace libebus
 {

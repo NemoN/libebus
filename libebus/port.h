@@ -20,10 +20,10 @@
 #ifndef LIBEBUS_PORT_H_
 #define LIBEBUS_PORT_H_
 
-#include <termios.h>
-#include <unistd.h>
 #include <string>
 #include <queue>
+#include <termios.h>
+#include <unistd.h>
 
 namespace libebus
 {

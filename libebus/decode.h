@@ -1,7 +1,7 @@
 /*
  * Copyright (C) Roland Jax 2014 <roland.jax@liwest.at>
  * crc calculations from http://www.mikrocontroller.net/topic/75698
- * 
+ *
  * This file is part of libebus.
  *
  * libebus is free software: you can redistribute it and/or modify
@@ -250,6 +250,35 @@ public:
 	~DecodeTTM() {}
 
 	std::string decode();
+
+};
+
+
+class Encode
+{
+
+public:
+	Encode(const std::string& data, const std::string& factor = "");
+	virtual ~Encode() {}
+
+	virtual std::string encode() = 0;
+
+protected:
+	std::string m_data;
+	float m_factor;
+
+};
+
+
+class EncodeD1C : public Encode
+{
+
+public:
+	EncodeD1C(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeD1C() {}
+
+	std::string encode();
 
 };
 

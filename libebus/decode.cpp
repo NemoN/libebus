@@ -1,7 +1,7 @@
 /*
  * Copyright (C) Roland Jax 2014 <roland.jax@liwest.at>
  * crc calculations from http://www.mikrocontroller.net/topic/75698
- * 
+ *
  * This file is part of libebus.
  *
  * libebus is free software: you can redistribute it and/or modify
@@ -40,10 +40,10 @@ Decode::Decode(const std::string& data, const std::string& factor)
 std::string DecodeHEX::decode()
 {
 	std::ostringstream result;
-	
+
 	for (size_t i = 0; i < m_data.length()/2; i++)
 		result << m_data.substr(i*2, 2) << " ";
-		
+
 	return result.str().substr(0, result.str().length()-1);
 }
 
@@ -111,13 +111,13 @@ std::string DecodeFLT::decode()
 std::string DecodeSTR::decode()
 {
 	std::ostringstream result;
-	
+
 	for (size_t i = 0; i < m_data.length()/2; i++) {
 		char tmp = static_cast<char>(strtol(m_data.substr(i*2, 2).c_str(), NULL, 16));
 		if (tmp == 0x00) tmp = 0x20;
 		result << tmp;
 	}
-	
+
 	return result.str().substr(0, result.str().length()-1);
 }
 
@@ -252,13 +252,39 @@ std::string DecodeTTM::decode()
 }
 
 
+Encode::Encode(const std::string& data, const std::string& factor)
+	: m_data(data)
+{
+	if ((factor.find_first_not_of("0123456789.") == std::string::npos) == true)
+		m_factor = static_cast<float>(strtod(factor.c_str(), NULL));
+	else
+		m_factor = 1.0;
+}
+
+
+std::string EncodeD1C::encode()
+{
+	std::ostringstream result;
+	float src = static_cast<float>(strtod(m_data.c_str(), NULL) / m_factor);
+
+	if (src < 0.0 || src > 100.0)
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(0xFF);
+	else
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(src * 2.0);
+
+	return result.str();
+}
+
+
 std::string esc(const std::string& data)
 {
 	std::string escaped;
 
 	for (size_t i = 0; i < data.size(); i = i + 2) {
 		long test = strtol(data.substr(i, 2).c_str(), NULL, 16);
-		
+
 		if (test == 0xAA)
 			escaped += "A901";
 		else if (test == 0xA9)
@@ -277,7 +303,7 @@ std::string unesc(const std::string& data)
 
 	for (size_t i = 0; i < data.size(); i = i + 2) {
 		long test = strtol(data.substr(i,2).c_str(), NULL, 16);
-		
+
 		if (test == 0xA9) {
 			found = true;
 
@@ -318,7 +344,7 @@ unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc)
 		crc = (unsigned char) (crc ^ polynom);
 		byte = (unsigned char) (byte << 1);
 	}
-	
+
 	return crc;
 }
 
@@ -331,7 +357,7 @@ std::string calc_crc(const std::string& data)
 
 	std::stringstream sstr;
 	sstr << std::setw(2) << std::hex << std::setfill('0') << static_cast<unsigned>(crc);
-	
+
 	return sstr.str();
 }
 

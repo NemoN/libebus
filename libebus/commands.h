@@ -45,6 +45,7 @@ public:
 	cmd_t getCommand() const { return m_command; }
 	void setData(const std::string& data) { m_data = data; }
 	std::string getData() const { return m_data; }
+	std::string calcData();
 
 	std::string calcResult(const cmd_t& cmd);
 
@@ -61,11 +62,14 @@ private:
 	void decode(const std::string& data, const std::string& position,
 		    const std::string& type, const std::string& factor);
 
+	void encode(const std::string& data, const std::string& type,
+		    const std::string& factor);
+
 };
 
 class Commands
 {
-	
+
 public:
 	void addCommand(const cmd_t& command) { m_cmdDB.push_back(command); }
 	void printCommands() const;

@@ -30,23 +30,35 @@ namespace libebus
 {
 
 
+std::string Command::calcData()
+{
+	// encode - only first entry will be encoded
+	// if more parts are needed, they will be implemented
+	encode(m_data, m_command[13], m_command[14]);
+
+	if (m_error.length() > 0)
+		m_result = m_error;
+
+	return m_result;
+}
+
 std::string Command::calcResult(const cmd_t& cmd)
 {
 	int elements = strtol(m_command[9].c_str(), NULL, 10);
-	
+
 	if (cmd.size() > 3) {
 		bool found = false;
-		
+
 		for (size_t i = 3; i < cmd.size(); i++) {
 			int j;
-			
+
 			for (j = 0; j < elements; j++) {
 				if (m_command[10 + j*8] == cmd[i]) {
 					found = true;
 					break;
 				}
 			}
-			
+
 			if (found == true) {
 				found = false;
 
@@ -54,9 +66,9 @@ std::string Command::calcResult(const cmd_t& cmd)
 				calcSub(m_command[11 + j*8], m_command[12 + j*8],
 					m_command[13 + j*8], m_command[14 + j*8]);
 			}
-			
+
 		}
-		
+
 	} else {
 		for (int j = 0; j < elements; j++) {
 
@@ -68,7 +80,7 @@ std::string Command::calcResult(const cmd_t& cmd)
 
 	if (m_error.length() > 0)
 		m_result = m_error;
-	
+
 	return m_result;
 }
 
@@ -76,7 +88,7 @@ void Command::calcSub(const std::string& part, const std::string& position,
 		      const std::string& type, const std::string& factor)
 {
 	std::string data;
-	
+
 	// Master Data
 	if (strcasecmp(part.c_str(), "MD") == 0) {
 		// QQ ZZ PB SB NN
@@ -84,7 +96,7 @@ void Command::calcSub(const std::string& part, const std::string& position,
 		int md_len = strtol(m_command[7].c_str(), NULL, 10)*2;
 		data = m_data.substr(md_pos, md_len);
 	}
-	
+
 	// Slave Acknowledge
 	else if (strcasecmp(part.c_str(), "SA") == 0) {
 		// QQ ZZ PB SB NN + Dx + CRC
@@ -117,12 +129,12 @@ void Command::decode(const std::string& data, const std::string& position,
 {
 	std::ostringstream result, value;
 	Decode* help = NULL;
-	
+
 	// prepare position
 	std::string token;
 	std::istringstream stream(position);
 	std::vector<int> pos;
-	
+
 	while (std::getline(stream, token, ',') != 0)
 		pos.push_back(strtol(token.c_str(), NULL, 10));
 
@@ -216,10 +228,70 @@ void Command::decode(const std::string& data, const std::string& position,
 		m_error = result.str();
 	} else {
 		result << help->decode();
-		
+
 		if (m_result.length() > 0)
 			m_result += " ";
-			
+
+		m_result += result.str();
+	}
+
+	delete help;
+}
+
+void Command::encode(const std::string& data, const std::string& type,
+		     const std::string& factor)
+{
+	std::ostringstream result;
+	Encode* help = NULL;
+
+	//~ if (strcasecmp(type.c_str(), "HEX") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "UCH") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "SCH") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "UIN") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "SIN") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "ULG") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "SLG") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "FLT") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "STR") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "BCD") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "D1B") == 0) {
+	//~ }
+	if (strcasecmp(type.c_str(), "D1C") == 0) {
+//~ std::cout << "D1C: " << data << " " << type << " " << factor << std::endl;
+		help = new EncodeD1C(data, factor);
+	}
+	//~ else if (strcasecmp(type.c_str(), "D2B") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "D2C") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "HDA") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "HTI") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "HDY") == 0) {
+	//~ }
+	//~ else if (strcasecmp(type.c_str(), "TTM") == 0) {
+	//~ }
+
+	if (help == NULL) {
+		result << "type '" << type.c_str() << "' not implemented!";
+		m_error = result.str();
+	} else {
+		result << help->encode();
+
+		if (m_result.length() > 0)
+			m_result += " ";
+
 		m_result += result.str();
 	}
 
@@ -231,11 +303,11 @@ void Commands::printCommands() const
 {
 	if (m_cmdDB.size() == 0)
 		return;
-	
+
 	for (cmdDBCI_t i = m_cmdDB.begin(); i != m_cmdDB.end(); i++) {
 		printCommand(*i);
 		std::cout << std::endl;
-	}	
+	}
 }
 
 int Commands::findCommand(const std::string& data) const
@@ -248,7 +320,7 @@ int Commands::findCommand(const std::string& data) const
 	std::string token;
 	std::istringstream isstr(data);
 	std::vector<std::string> cmd;
-	
+
 	// split stream
 	while (std::getline(isstr, token, ' ') != 0)
 		cmd.push_back(token);
@@ -258,7 +330,7 @@ int Commands::findCommand(const std::string& data) const
 
 	// walk through commands
 	for (index = 0; i != m_cmdDB.end(); i++, index++) {
-		
+
 		// empty line
 		if ((*i).size() == 0)
 			continue;
@@ -268,11 +340,11 @@ int Commands::findCommand(const std::string& data) const
 		    strcasecmp((*i)[2].c_str(), cmd[2].c_str()) == 0)
 			return index;
 
-	}	
-	
+	}
+
 	// command not found
 	return -1;
-}	
+}
 
 int Commands::findData(const std::string& data) const
 {
@@ -283,7 +355,7 @@ int Commands::findData(const std::string& data) const
 	// skip to small search string length
 	if (data.length() < 10)
 		return -3;
-	
+
 	// preapre string for searching command
 	std::string search(data.substr(2, 8 + strtol(data.substr(8,2).c_str(), NULL, 16) * 2));
 
@@ -292,7 +364,7 @@ int Commands::findData(const std::string& data) const
 
 	// walk through commands
 	for (index = 0; i != m_cmdDB.end(); i++, index++) {
-		
+
 		// empty line
 		if ((*i).size() == 0)
 			continue;
@@ -312,7 +384,7 @@ int Commands::findData(const std::string& data) const
 		if (strcasecmp(command.c_str(), search.substr(0,command.length()).c_str()) == 0)
 			return index;
 
-	}	
+	}
 
 	// command not found
 	return -1;
@@ -327,7 +399,7 @@ std::string Commands::getEbusCommand(const int index) const
 	sstr << std::setw(2) << std::hex << std::setfill('0') << command[7];
 	cmd += sstr.str();
 	cmd += command[8];
-	
+
 	return cmd;
 }
 
@@ -336,7 +408,7 @@ void Commands::printCommand(const cmd_t& command) const
 {
 	if (command.size() == 0)
 		return;
-	
+
 	for (cmdCI_t i = command.begin(); i != command.end(); i++)
 		std::cout << *i << ';';
 }
