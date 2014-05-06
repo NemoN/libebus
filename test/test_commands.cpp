@@ -50,8 +50,6 @@ void readCSV(std::istream& is, Commands& commands){
 	}
 }
 
-
-
 int main()
 {
 	Commands* commands = ConfigCommands("test", CSV).getCommands();

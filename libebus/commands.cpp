@@ -262,18 +262,21 @@ void Command::encode(const std::string& data, const std::string& type,
 	//~ }
 	//~ else if (strcasecmp(type.c_str(), "STR") == 0) {
 	//~ }
-	//~ else if (strcasecmp(type.c_str(), "BCD") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "D1B") == 0) {
-	//~ }
-	if (strcasecmp(type.c_str(), "D1C") == 0) {
-//~ std::cout << "D1C: " << data << " " << type << " " << factor << std::endl;
+	if (strcasecmp(type.c_str(), "BCD") == 0) {
+		help = new EncodeBCD(data, factor);
+	}
+	else if (strcasecmp(type.c_str(), "D1B") == 0) {
+		help = new EncodeD1B(data, factor);
+	}
+	else if (strcasecmp(type.c_str(), "D1C") == 0) {
 		help = new EncodeD1C(data, factor);
 	}
-	//~ else if (strcasecmp(type.c_str(), "D2B") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "D2C") == 0) {
-	//~ }
+	else if (strcasecmp(type.c_str(), "D2B") == 0) {
+		help = new EncodeD2B(data, factor);
+	}
+	else if (strcasecmp(type.c_str(), "D2C") == 0) {
+		help = new EncodeD2C(data, factor);
+	}
 	//~ else if (strcasecmp(type.c_str(), "HDA") == 0) {
 	//~ }
 	//~ else if (strcasecmp(type.c_str(), "HTI") == 0) {

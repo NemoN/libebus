@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 
 namespace libebus
 {
@@ -127,7 +128,7 @@ std::string DecodeBCD::decode()
 	unsigned char src = strtol(m_data.c_str(), NULL, 16);
 
 	if ((src & 0x0F) > 0x09 || ((src >> 4) & 0x0F) > 0x09)
-		result << static_cast<short>(0xFF * m_factor);
+		result << static_cast<short>(0xFF);
 	else
 		result << static_cast<short>(( ( ((src & 0xF0) >> 4) * 10) + (src & 0x0F) ) * m_factor);
 
@@ -153,7 +154,7 @@ std::string DecodeD1C::decode()
 	unsigned char src = strtol(m_data.c_str(), NULL, 16);
 
 	if (src > 0xC8)
-		result << static_cast<float>(0xFF * m_factor);
+		result << static_cast<float>(0xFF);
 	else
 		result << static_cast<float>((src / 2.0) * m_factor);
 
@@ -262,6 +263,36 @@ Encode::Encode(const std::string& data, const std::string& factor)
 }
 
 
+std::string EncodeBCD::encode()
+{
+	std::ostringstream result;
+	short src = static_cast<short>(strtod(m_data.c_str(), NULL) / m_factor);
+
+	if (src > 99)
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(0xFF);
+	else
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>( ((src / 10) << 4) | (src % 10) );
+
+	return result.str().substr(result.str().length()-2,2);
+}
+
+std::string EncodeD1B::encode()
+{
+	std::ostringstream result;
+	short src = static_cast<short>(strtod(m_data.c_str(), NULL) / m_factor);
+
+	if (src < -127 || src > 127)
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(0x80);
+	else
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(src);
+
+	return result.str().substr(result.str().length()-2,2);
+}
+
 std::string EncodeD1C::encode()
 {
 	std::ostringstream result;
@@ -273,6 +304,65 @@ std::string EncodeD1C::encode()
 	else
 		result << std::setw(2) << std::hex << std::setfill('0')
 		       << static_cast<unsigned>(src * 2.0);
+
+	return result.str();
+}
+
+std::string EncodeD2B::encode()
+{
+	std::ostringstream result;
+	float src = static_cast<float>(strtod(m_data.c_str(), NULL) / m_factor);
+
+	if (src < -127.999 || src > 127.999) {
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(0x80)
+		       << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(0x00);
+	} else {
+		unsigned char tgt_lsb = static_cast<unsigned>((src - ((short) src)) * 256.0);
+		unsigned char tgt_msb;
+
+		if (src < 0.0 && tgt_lsb != 0x00)
+			tgt_msb = static_cast<unsigned>((short) src - 1);
+		else
+			tgt_msb = static_cast<unsigned>((short) src);
+
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(tgt_msb)
+		       << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(tgt_lsb);
+	}
+
+	return result.str();
+}
+
+std::string EncodeD2C::encode()
+{
+	std::ostringstream result;
+	float src = static_cast<float>(strtod(m_data.c_str(), NULL) / m_factor);
+
+	if (src < -2047.999 || src > 2047.999) {
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(0x80)
+		       << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(0x00);
+	} else {
+		unsigned char tgt_lsb = static_cast<unsigned>(
+			((unsigned char) ( ((short) src) % 16) << 4) +
+			((unsigned char) ( (src - ((short) src)) * 16.0)) );
+
+		unsigned char tgt_msb;
+
+		if (src < 0.0 && tgt_lsb != 0x00)
+			tgt_msb = static_cast<unsigned>((short) (src / 16.0) - 1);
+		else
+			tgt_msb = static_cast<unsigned>((short) src / 16.0);
+
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(tgt_msb)
+		       << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(tgt_lsb);
+	}
 
 	return result.str();
 }

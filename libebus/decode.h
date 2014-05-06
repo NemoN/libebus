@@ -270,6 +270,30 @@ protected:
 };
 
 
+class EncodeBCD : public Encode
+{
+
+public:
+	EncodeBCD(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeBCD() {}
+
+	std::string encode();
+
+};
+
+class EncodeD1B : public Encode
+{
+
+public:
+	EncodeD1B(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeD1B() {}
+
+	std::string encode();
+
+};
+
 class EncodeD1C : public Encode
 {
 
@@ -277,6 +301,30 @@ public:
 	EncodeD1C(const std::string& data, const std::string& factor)
 		: Encode(data, factor) {}
 	~EncodeD1C() {}
+
+	std::string encode();
+
+};
+
+class EncodeD2B : public Encode
+{
+
+public:
+	EncodeD2B(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeD2B() {}
+
+	std::string encode();
+
+};
+
+class EncodeD2C : public Encode
+{
+
+public:
+	EncodeD2C(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeD2C() {}
 
 	std::string encode();
 

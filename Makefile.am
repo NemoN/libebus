@@ -36,7 +36,8 @@ dist_noinst_SCRIPTS = autogen.sh
 noinst_PROGRAMS = test_port \
 		  test_bus \
 		  test_commands \
-		  test_config
+		  test_config \
+		  test_decode
 
 test_port_SOURCES = test/test_port.cpp
 test_port_LDADD = libebus-$(LIBEBUS_API_VERSION).la
@@ -49,3 +50,6 @@ test_commands_LDADD = libebus-$(LIBEBUS_API_VERSION).la
 
 test_config_SOURCES = test/test_config.cpp
 test_config_LDADD = libebus-$(LIBEBUS_API_VERSION).la
+
+test_decode_SOURCES = test/test_decode.cpp
+test_decode_LDADD = libebus-$(LIBEBUS_API_VERSION).la
