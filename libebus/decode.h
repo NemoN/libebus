@@ -281,6 +281,30 @@ public:
 
 };
 
+class EncodeUCH : public Encode
+{
+
+public:
+	EncodeUCH(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeUCH() {}
+
+	std::string encode();
+
+};
+
+class EncodeSCH : public Encode
+{
+
+public:
+	EncodeSCH(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeSCH() {}
+
+	std::string encode();
+
+};
+
 class EncodeSTR : public Encode
 {
 

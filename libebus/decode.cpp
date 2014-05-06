@@ -62,10 +62,10 @@ std::string DecodeSCH::decode()
 	std::ostringstream result;
 	unsigned char src = strtol(m_data.c_str(), NULL, 16);
 
-	if (src > 0x7F)
-		result << (src - 0x100);
+	if ((src & 0x80) == 0x80)
+		result << static_cast<short>((- ( ((unsigned char) (~ src)) + 1) ) * m_factor);
 	else
-		result << src;
+		result << static_cast<short>(src * m_factor);
 
 	return result.str();
 }
@@ -271,6 +271,29 @@ std::string EncodeHEX::encode()
 	return m_data;
 }
 
+std::string EncodeUCH::encode()
+{
+	std::ostringstream result;
+	unsigned short src = static_cast<unsigned short>(strtoul(m_data.c_str(), NULL, 10) / m_factor);
+	result << std::setw(2) << std::hex << std::setfill('0') << src;
+
+	return result.str().substr(result.str().length()-2,2);
+}
+
+std::string EncodeSCH::encode()
+{
+	std::ostringstream result;
+	short src = static_cast<short>(strtod(m_data.c_str(), NULL) / m_factor);
+
+	if (src < -127 || src > 127)
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(0x80);
+	else
+		result << std::setw(2) << std::hex << std::setfill('0')
+		       << static_cast<unsigned>(src);
+
+	return result.str().substr(result.str().length()-2,2);
+}
 
 std::string EncodeSTR::encode()
 {

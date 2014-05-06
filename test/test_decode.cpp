@@ -31,7 +31,7 @@ int main()
 	Encode* help_enc = NULL;
 
 	std::cout << std::endl;
-
+/*
 	// HEX
 	{
 		const char* hex[] = {"53706569636865722020"};
@@ -49,6 +49,54 @@ int main()
 		for (size_t i = 0; i < sizeof(hex)/sizeof(hex[0]); i++) {
 			help_enc = new EncodeHEX(hex[i]);
 			std::cout << "EncodeHEX: " << std::setw(20) << hex[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+
+	// UCH
+	{
+		const char* uch[] = {"00", "01", "32", "ce", "aa", "ff"};
+		for (size_t i = 0; i < sizeof(uch)/sizeof(uch[0]); i++) {
+			help_dec = new DecodeUCH(uch[i], "1.0");
+			std::cout << "DecodeUCH: " << std::setw(20) << uch[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* uch[] = {"0", "1", "50", "206", "170", "255"};
+		for (size_t i = 0; i < sizeof(uch)/sizeof(uch[0]); i++) {
+			help_enc = new EncodeUCH(uch[i], "1.0");
+			std::cout << "EncodeUCH: " << std::setw(20) << uch[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+*/
+	// SCH
+	{
+		const char* sch[] = {"00", "01", "32", "80", "aa", "ff"};
+		for (size_t i = 0; i < sizeof(sch)/sizeof(sch[0]); i++) {
+			help_dec = new DecodeSCH(sch[i], "1.0");
+			std::cout << "DecodeSCH: " << std::setw(20) << sch[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* sch[] = {"0", "1", "50", "-128", "-86", "-1"};
+		for (size_t i = 0; i < sizeof(sch)/sizeof(sch[0]); i++) {
+			help_enc = new EncodeSCH(sch[i], "1.0");
+			std::cout << "EncodeSCH: " << std::setw(20) << sch[i] << " = " << help_enc->encode() << std::endl;
 
 			delete help_enc;
 		}

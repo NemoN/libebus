@@ -247,10 +247,12 @@ void Command::encode(const std::string& data, const std::string& type,
 	if (strcasecmp(type.c_str(), "HEX") == 0) {
 		help = new EncodeHEX(data);
 	}
-	//~ else if (strcasecmp(type.c_str(), "UCH") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "SCH") == 0) {
-	//~ }
+	else if (strcasecmp(type.c_str(), "UCH") == 0) {
+		help = new EncodeUCH(data, factor);
+	}
+	else if (strcasecmp(type.c_str(), "SCH") == 0) {
+		help = new EncodeSCH(data, factor);
+	}
 	//~ else if (strcasecmp(type.c_str(), "UIN") == 0) {
 	//~ }
 	//~ else if (strcasecmp(type.c_str(), "SIN") == 0) {
