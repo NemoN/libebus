@@ -27,65 +27,179 @@ using namespace libebus;
 
 int main()
 {
-	// Test decode
 	Decode* help_dec = NULL;
-
-	// Test encode
 	Encode* help_enc = NULL;
 
-	// BCD
-	const char* bcd[] = {"00", "01", "02", "12", "99", "100", "-1"};
-	for (size_t i = 0; i < sizeof(bcd)/sizeof(bcd[0]); i++) {
-		help_enc = new EncodeBCD(bcd[i], "1.0");
-		std::cout << "BCD: " << std::setw(14) << bcd[i] << " = " << help_enc->encode() << std::endl;
+	std::cout << std::endl;
 
-		delete help_enc;
+	// HEX
+	{
+		const char* hex[] = {"53706569636865722020"};
+		for (size_t i = 0; i < sizeof(hex)/sizeof(hex[0]); i++) {
+			help_dec = new DecodeHEX(hex[i]);
+			std::cout << "DecodeHEX: " << std::setw(20) << hex[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* hex[] = {"53 70 65 69 63 68 65 72 20 20"};
+		for (size_t i = 0; i < sizeof(hex)/sizeof(hex[0]); i++) {
+			help_enc = new EncodeHEX(hex[i]);
+			std::cout << "EncodeHEX: " << std::setw(20) << hex[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+/*
+	// STR
+	{
+		const char* str[] = {"53706569636865722020"};
+		for (size_t i = 0; i < sizeof(str)/sizeof(str[0]); i++) {
+			help_dec = new DecodeSTR(str[i]);
+			std::cout << "DecodeSTR: " << std::setw(20) << str[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* str[] = {"Speicher  "};
+		for (size_t i = 0; i < sizeof(str)/sizeof(str[0]); i++) {
+			help_enc = new EncodeSTR(str[i]);
+			std::cout << "EncodeSTR: " << std::setw(20) << str[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
 	}
 
-	std::cout << std::endl;
+	// BCD
+	{
+		const char* bcd[] = {"00", "01", "02", "03", "12", "99"};
+		for (size_t i = 0; i < sizeof(bcd)/sizeof(bcd[0]); i++) {
+			help_dec = new DecodeBCD(bcd[i], "1.0");
+			std::cout << "DecodeBCD: " << std::setw(20) << bcd[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* bcd[] = {"0", "1", "2", "3", "12", "99"};
+		for (size_t i = 0; i < sizeof(bcd)/sizeof(bcd[0]); i++) {
+			help_enc = new EncodeBCD(bcd[i], "1.0");
+			std::cout << "EncodeBCD: " << std::setw(20) << bcd[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
 
 	// D1B
-	const char* d1b[] = {"00", "01", "127", "-127", "-128"};
-	for (size_t i = 0; i < sizeof(d1b)/sizeof(d1b[0]); i++) {
-		help_enc = new EncodeD1B(d1b[i], "1.0");
-		std::cout << "D1B: " << std::setw(14) << d1b[i] << " = " << help_enc->encode() << std::endl;
+	{
+		const char* d1b[] = {"00", "01", "7f", "81", "80"};
+		for (size_t i = 0; i < sizeof(d1b)/sizeof(d1b[0]); i++) {
+			help_dec = new DecodeD1B(d1b[i], "1.0");
+			std::cout << "DecodeD1B: " << std::setw(20) << d1b[i] << " = " << help_dec->decode() << std::endl;
 
-		delete help_enc;
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
 	}
+	{
+		const char* d1b[] = {"00", "01", "127", "-127", "-128"};
+		for (size_t i = 0; i < sizeof(d1b)/sizeof(d1b[0]); i++) {
+			help_enc = new EncodeD1B(d1b[i], "1.0");
+			std::cout << "EncodeD1B: " << std::setw(20) << d1b[i] << " = " << help_enc->encode() << std::endl;
 
-	std::cout << std::endl;
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
 
 	// D1C
-	const char* d1c[] = {"00", "50", "100", "127", "-127"};
-	for (size_t i = 0; i < sizeof(d1c)/sizeof(d1c[0]); i++) {
-		help_enc = new EncodeD1C(d1c[i], "1.0");
-		std::cout << "D1C: " << std::setw(14) << d1c[i] << " = " << help_enc->encode() << std::endl;
+	{
+		const char* d1c[] = {"00", "64", "c8"};
+		for (size_t i = 0; i < sizeof(d1c)/sizeof(d1c[0]); i++) {
+			help_dec = new DecodeD1C(d1c[i], "1.0");
+			std::cout << "DecodeD1C: " << std::setw(20) << d1c[i] << " = " << help_dec->decode() << std::endl;
 
-		delete help_enc;
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
 	}
+	{
+		const char* d1c[] = {"0", "50", "100"};
+		for (size_t i = 0; i < sizeof(d1c)/sizeof(d1c[0]); i++) {
+			help_enc = new EncodeD1C(d1c[i], "1.0");
+			std::cout << "EncodeD1C: " << std::setw(20) << d1c[i] << " = " << help_enc->encode() << std::endl;
 
-	std::cout << std::endl;
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
 
 	// D2B
-	const char* d2b[] = {"0", "0.00390625", "-0.00390625", "-1.0", "-128.0", "-127.99609375", "127.99609375"};
-	for (size_t i = 0; i < sizeof(d2b)/sizeof(d2b[0]); i++) {
-		help_enc = new EncodeD2B(d2b[i], "1.0");
-		std::cout << "D2B: " << std::setw(14) << d2b[i] << " = " << help_enc->encode() << std::endl;
+	{
+		const char* d2b[] = {"0000", "0100", "ffff", "00ff", "0080", "0180", "ff7f"};
+		for (size_t i = 0; i < sizeof(d2b)/sizeof(d2b[0]); i++) {
+			help_dec = new DecodeD2B(d2b[i], "1.0");
+			std::cout << "DecodeD2B: " << std::setw(20) << d2b[i] << " = " << help_dec->decode() << std::endl;
 
-		delete help_enc;
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
 	}
+	{
+		const char* d2b[] = {"0", "0.00390625", "-0.00390625", "-1", "-128", "-127.99609375", "127.99609375"};
+		for (size_t i = 0; i < sizeof(d2b)/sizeof(d2b[0]); i++) {
+			help_enc = new EncodeD2B(d2b[i], "1.0");
+			std::cout << "EncodeD2B: " << std::setw(20) << d2b[i] << " = " << help_enc->encode() << std::endl;
 
-	std::cout << std::endl;
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
 
 	// D2C
-	const char* d2c[] = {"0", "0.0625", "-0.0625", "-1.0", "-2048.0", "-2047.9375", "2047.9375"};
-	for (size_t i = 0; i < sizeof(d2c)/sizeof(d2c[0]); i++) {
-		help_enc = new EncodeD2C(d2c[i], "1.0");
-		std::cout << "D2C: " << std::setw(14) << d2c[i] << " = " << help_enc->encode() << std::endl;
+	{
+		const char* d2c[] = {"0000", "0100", "ffff", "f0ff", "0080", "0180", "ff7f"};
+		for (size_t i = 0; i < sizeof(d2c)/sizeof(d2c[0]); i++) {
+			help_dec = new DecodeD2C(d2c[i], "1.0");
+			std::cout << "DecodeD2C: " << std::setw(20) << d2c[i] << " = " << help_dec->decode() << std::endl;
 
-		delete help_enc;
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
 	}
+	{
+		const char* d2c[] = {"0", "0.0625", "-0.0625", "-1", "-2048", "-2047.9375", "2047.9375"};
+		for (size_t i = 0; i < sizeof(d2c)/sizeof(d2c[0]); i++) {
+			help_enc = new EncodeD2C(d2c[i], "1.0");
+			std::cout << "EncodeD2C: " << std::setw(20) << d2c[i] << " = " << help_enc->encode() << std::endl;
 
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+*/
 	return 0;
 }
 

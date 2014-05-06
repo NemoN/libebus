@@ -244,8 +244,9 @@ void Command::encode(const std::string& data, const std::string& type,
 	std::ostringstream result;
 	Encode* help = NULL;
 
-	//~ if (strcasecmp(type.c_str(), "HEX") == 0) {
-	//~ }
+	if (strcasecmp(type.c_str(), "HEX") == 0) {
+		help = new EncodeHEX(data);
+	}
 	//~ else if (strcasecmp(type.c_str(), "UCH") == 0) {
 	//~ }
 	//~ else if (strcasecmp(type.c_str(), "SCH") == 0) {
@@ -260,9 +261,10 @@ void Command::encode(const std::string& data, const std::string& type,
 	//~ }
 	//~ else if (strcasecmp(type.c_str(), "FLT") == 0) {
 	//~ }
-	//~ else if (strcasecmp(type.c_str(), "STR") == 0) {
-	//~ }
-	if (strcasecmp(type.c_str(), "BCD") == 0) {
+	else if (strcasecmp(type.c_str(), "STR") == 0) {
+		help = new EncodeSTR(data);
+	}
+	else if (strcasecmp(type.c_str(), "BCD") == 0) {
 		help = new EncodeBCD(data, factor);
 	}
 	else if (strcasecmp(type.c_str(), "D1B") == 0) {

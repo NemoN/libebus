@@ -270,6 +270,28 @@ protected:
 };
 
 
+class EncodeHEX : public Encode
+{
+
+public:
+	EncodeHEX(const std::string& data) : Encode(data) {}
+	~EncodeHEX() {}
+
+	std::string encode();
+
+};
+
+class EncodeSTR : public Encode
+{
+
+public:
+	EncodeSTR(const std::string& data) : Encode(data) {}
+	~EncodeSTR() {}
+
+	std::string encode();
+
+};
+
 class EncodeBCD : public Encode
 {
 

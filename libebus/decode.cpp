@@ -23,6 +23,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <algorithm>
 
 namespace libebus
 {
@@ -262,6 +263,24 @@ Encode::Encode(const std::string& data, const std::string& factor)
 		m_factor = 1.0;
 }
 
+
+std::string EncodeHEX::encode()
+{
+	m_data.erase(std::remove_if(m_data.begin(), m_data.end(), isspace), m_data.end());
+
+	return m_data;
+}
+
+
+std::string EncodeSTR::encode()
+{
+	std::ostringstream result;
+
+	for (size_t i = 0; i < m_data.length(); i++)
+		result << std::setw(2) << std::hex << std::setfill('0') << static_cast<short>(m_data[i]);
+
+	return result.str();
+}
 
 std::string EncodeBCD::encode()
 {
