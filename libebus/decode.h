@@ -305,6 +305,54 @@ public:
 
 };
 
+class EncodeUIN : public Encode
+{
+
+public:
+	EncodeUIN(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeUIN() {}
+
+	std::string encode();
+
+};
+
+class EncodeSIN : public Encode
+{
+
+public:
+	EncodeSIN(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeSIN() {}
+
+	std::string encode();
+
+};
+
+class EncodeULG : public Encode
+{
+
+public:
+	EncodeULG(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeULG() {}
+
+	std::string encode();
+
+};
+
+class EncodeSLG : public Encode
+{
+
+public:
+	EncodeSLG(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeSLG() {}
+
+	std::string encode();
+
+};
+
 class EncodeSTR : public Encode
 {
 

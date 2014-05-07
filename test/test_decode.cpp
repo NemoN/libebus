@@ -55,10 +55,10 @@ int main()
 
 		std::cout << std::endl;
 	}
-
+*/
 	// UCH
 	{
-		const char* uch[] = {"00", "01", "32", "ce", "aa", "ff"};
+		const char* uch[] = {"00", "01", "7f", "80", "fe", "ff", "a1"};
 		for (size_t i = 0; i < sizeof(uch)/sizeof(uch[0]); i++) {
 			help_dec = new DecodeUCH(uch[i], "1.0");
 			std::cout << "DecodeUCH: " << std::setw(20) << uch[i] << " = " << help_dec->decode() << std::endl;
@@ -69,7 +69,7 @@ int main()
 		std::cout << std::endl;
 	}
 	{
-		const char* uch[] = {"0", "1", "50", "206", "170", "255"};
+		const char* uch[] = {"0", "1", "127", "128", "254", "255", "161"};
 		for (size_t i = 0; i < sizeof(uch)/sizeof(uch[0]); i++) {
 			help_enc = new EncodeUCH(uch[i], "1.0");
 			std::cout << "EncodeUCH: " << std::setw(20) << uch[i] << " = " << help_enc->encode() << std::endl;
@@ -79,10 +79,10 @@ int main()
 
 		std::cout << std::endl;
 	}
-*/
+
 	// SCH
 	{
-		const char* sch[] = {"00", "01", "32", "80", "aa", "ff"};
+		const char* sch[] = {"00", "01", "7f", "80", "fe", "ff", "a1"};
 		for (size_t i = 0; i < sizeof(sch)/sizeof(sch[0]); i++) {
 			help_dec = new DecodeSCH(sch[i], "1.0");
 			std::cout << "DecodeSCH: " << std::setw(20) << sch[i] << " = " << help_dec->decode() << std::endl;
@@ -93,7 +93,7 @@ int main()
 		std::cout << std::endl;
 	}
 	{
-		const char* sch[] = {"0", "1", "50", "-128", "-86", "-1"};
+		const char* sch[] = {"0", "1", "127", "-128", "-2", "-1", "-95"};
 		for (size_t i = 0; i < sizeof(sch)/sizeof(sch[0]); i++) {
 			help_enc = new EncodeSCH(sch[i], "1.0");
 			std::cout << "EncodeSCH: " << std::setw(20) << sch[i] << " = " << help_enc->encode() << std::endl;
@@ -104,6 +104,102 @@ int main()
 		std::cout << std::endl;
 	}
 /*
+	// UIN
+	{
+		const char* uin[] = {"0000", "0001", "7fff", "8000", "fffe", "ffff", "a1b2"};
+		for (size_t i = 0; i < sizeof(uin)/sizeof(uin[0]); i++) {
+			help_dec = new DecodeUIN(uin[i], "1.0");
+			std::cout << "DecodeUIN: " << std::setw(20) << uin[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* uin[] = {"0", "1", "32767", "32768", "65534", "65535", "41394"};
+		for (size_t i = 0; i < sizeof(uin)/sizeof(uin[0]); i++) {
+			help_enc = new EncodeUIN(uin[i], "1.0");
+			std::cout << "EncodeUIN: " << std::setw(20) << uin[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+
+	// SIN
+	{
+		const char* sin[] = {"0000", "0001", "7fff", "8000", "fffe", "ffff", "a1b2"};
+		for (size_t i = 0; i < sizeof(sin)/sizeof(sin[0]); i++) {
+			help_dec = new DecodeSIN(sin[i], "1.0");
+			std::cout << "DecodeSIN: " << std::setw(20) << sin[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* sin[] = {"0", "1", "32767", "-32768", "-2", "-1", "-24142"};
+		for (size_t i = 0; i < sizeof(sin)/sizeof(sin[0]); i++) {
+			help_enc = new EncodeSIN(sin[i], "1.0");
+			std::cout << "EncodeSIN: " << std::setw(20) << sin[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+
+	// ULG
+	{
+		const char* ulg[] = {"00000000", "00000001", "7fffffff", "80000000", "fffffffe", "ffffffff", "a1b2c3d4"};
+		for (size_t i = 0; i < sizeof(ulg)/sizeof(ulg[0]); i++) {
+			help_dec = new DecodeULG(ulg[i], "1.0");
+			std::cout << "DecodeULG: " << std::setw(20) << ulg[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* ulg[] = {"0", "1", "2147483647", "2147483648", "4294967294", "4294967295", "2712847316"};
+		for (size_t i = 0; i < sizeof(ulg)/sizeof(ulg[0]); i++) {
+			help_enc = new EncodeULG(ulg[i], "1.0");
+			std::cout << "EncodeULG: " << std::setw(20) << ulg[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+
+	// SLG
+	{
+		const char* slg[] = {"00000000", "00000001", "7fffffff", "80000000", "fffffffe", "ffffffff", "a1b2c3d4"};
+		for (size_t i = 0; i < sizeof(slg)/sizeof(slg[0]); i++) {
+			help_dec = new DecodeSLG(slg[i], "1.0");
+			std::cout << "DecodeSLG: " << std::setw(20) << slg[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* slg[] = {"0", "1", "2147483647", "-2147483648", "-2", "-1", "-1582119980"};
+		for (size_t i = 0; i < sizeof(slg)/sizeof(slg[0]); i++) {
+			help_enc = new EncodeSLG(slg[i], "1.0");
+			std::cout << "EncodeSLG: " << std::setw(20) << slg[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+
 	// STR
 	{
 		const char* str[] = {"53706569636865722020"};

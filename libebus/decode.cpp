@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 
 namespace libebus
 {
@@ -51,53 +52,87 @@ std::string DecodeHEX::decode()
 
 std::string DecodeUCH::decode()
 {
+	std::stringstream ss;
+	ss << std::hex << m_data;
+
+	unsigned short x;
+	ss >> x;
+
 	std::ostringstream result;
-	result << strtoul(m_data.c_str(), NULL, 16);
+	result << x * static_cast<unsigned short>(m_factor);
 
 	return result.str();
 }
 
 std::string DecodeSCH::decode()
 {
-	std::ostringstream result;
-	unsigned char src = strtol(m_data.c_str(), NULL, 16);
+	std::stringstream ss;
+	ss << std::hex << m_data;
 
-	if ((src & 0x80) == 0x80)
-		result << static_cast<short>((- ( ((unsigned char) (~ src)) + 1) ) * m_factor);
+	unsigned short x;
+	ss >> x;
+
+	std::ostringstream result;
+	if ((x & 0x80) == 0x80)
+		result << static_cast<short>((- ( ((unsigned char) (~ x)) + 1) ) * static_cast<short>(m_factor));
 	else
-		result << static_cast<short>(src * m_factor);
+		result << static_cast<short>(x) * static_cast<short>(m_factor);
 
 	return result.str();
 }
 
 std::string DecodeUIN::decode()
 {
+	std::stringstream ss;
+	ss << std::hex << m_data;
+
+	unsigned short x;
+	ss >> x;
+
 	std::ostringstream result;
-	result << static_cast<unsigned short>(strtoul(m_data.c_str(), NULL, 16) * m_factor);
+	result << x * static_cast<unsigned short>(m_factor);
 
 	return result.str();
 }
 
 std::string DecodeSIN::decode()
 {
+	std::stringstream ss;
+	ss << std::hex << m_data;
+
+	unsigned short x;
+	ss >> x;
+
 	std::ostringstream result;
-	result << static_cast<short>(strtol(m_data.c_str(), NULL, 16) * m_factor);
+	result << static_cast<short>(x) * static_cast<short>(m_factor);
 
 	return result.str();
 }
 
 std::string DecodeULG::decode()
 {
+	std::stringstream ss;
+	ss << std::hex << m_data;
+
+	unsigned int x;
+	ss >> x;
+
 	std::ostringstream result;
-	result << static_cast<unsigned int>(strtoul(m_data.c_str(), NULL, 16) * m_factor);
+	result << x * static_cast<unsigned short>(m_factor);
 
 	return result.str();
 }
 
 std::string DecodeSLG::decode()
 {
+	std::stringstream ss;
+	ss << std::hex << m_data;
+
+	unsigned int x;
+	ss >> x;
+
 	std::ostringstream result;
-	result << static_cast<int>(strtol(m_data.c_str(), NULL, 16) * m_factor);
+	result << static_cast<int>(x) * static_cast<short>(m_factor);
 
 	return result.str();
 }
@@ -274,7 +309,7 @@ std::string EncodeHEX::encode()
 std::string EncodeUCH::encode()
 {
 	std::ostringstream result;
-	unsigned short src = static_cast<unsigned short>(strtoul(m_data.c_str(), NULL, 10) / m_factor);
+	unsigned short src = static_cast<unsigned short>(strtod(m_data.c_str(), NULL) / m_factor);
 	result << std::setw(2) << std::hex << std::setfill('0') << src;
 
 	return result.str().substr(result.str().length()-2,2);
@@ -293,6 +328,44 @@ std::string EncodeSCH::encode()
 		       << static_cast<unsigned>(src);
 
 	return result.str().substr(result.str().length()-2,2);
+}
+
+std::string EncodeUIN::encode()
+{
+	std::ostringstream result;
+	unsigned short src = static_cast<unsigned short>(strtod(m_data.c_str(), NULL) / m_factor);
+	result << std::setw(4) << std::hex << std::setfill('0') << src;
+
+	return result.str().substr(2,2) + result.str().substr(0,2);
+}
+
+std::string EncodeSIN::encode()
+{
+	std::ostringstream result;
+	short src = static_cast<short>(strtod(m_data.c_str(), NULL) / m_factor);
+	result << std::setw(4) << std::hex << std::setfill('0') << src;
+
+	return result.str().substr(2,2) + result.str().substr(0,2);
+}
+
+std::string EncodeULG::encode()
+{
+	std::ostringstream result;
+	unsigned long src = static_cast<unsigned long>(strtod(m_data.c_str(), NULL) / m_factor);
+	result << std::setw(8) << std::hex << std::setfill('0') << src;
+
+	return result.str().substr(6,2) + result.str().substr(4,2) +
+	       result.str().substr(2,2) + result.str().substr(0,2);
+}
+
+std::string EncodeSLG::encode()
+{
+	std::ostringstream result;
+	int src = static_cast<int>(strtod(m_data.c_str(), NULL) / m_factor);
+	result << std::setw(8) << std::hex << std::setfill('0') << src;
+
+	return result.str().substr(6,2) + result.str().substr(4,2) +
+	       result.str().substr(2,2) + result.str().substr(0,2);
 }
 
 std::string EncodeSTR::encode()

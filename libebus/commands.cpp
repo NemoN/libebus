@@ -253,14 +253,18 @@ void Command::encode(const std::string& data, const std::string& type,
 	else if (strcasecmp(type.c_str(), "SCH") == 0) {
 		help = new EncodeSCH(data, factor);
 	}
-	//~ else if (strcasecmp(type.c_str(), "UIN") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "SIN") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "ULG") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "SLG") == 0) {
-	//~ }
+	else if (strcasecmp(type.c_str(), "UIN") == 0) {
+		help = new EncodeUIN(data, factor);
+	}
+	else if (strcasecmp(type.c_str(), "SIN") == 0) {
+		help = new EncodeSIN(data, factor);
+	}
+	else if (strcasecmp(type.c_str(), "ULG") == 0) {
+		help = new EncodeULG(data, factor);
+	}
+	else if (strcasecmp(type.c_str(), "SLG") == 0) {
+		help = new EncodeSLG(data, factor);
+	}
 	//~ else if (strcasecmp(type.c_str(), "FLT") == 0) {
 	//~ }
 	else if (strcasecmp(type.c_str(), "STR") == 0) {
