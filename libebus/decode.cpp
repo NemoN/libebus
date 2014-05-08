@@ -24,7 +24,8 @@
 #include <iomanip>
 #include <iostream>
 #include <algorithm>
-#include <cmath>
+#include <vector>
+#include <cstring>
 
 namespace libebus
 {
@@ -252,7 +253,7 @@ std::string DecodeHDA::decode()
 
 	result << std::setw(2) << std::setfill('0') << dd << "."
 	       << std::setw(2) << std::setfill('0') << mm << "."
-	       << yy+2000;
+	       << yy + 2000;
 
 	return result.str();
 }
@@ -504,6 +505,81 @@ std::string EncodeD2C::encode()
 		       << std::setw(2) << std::hex << std::setfill('0')
 		       << static_cast<unsigned>(tgt_lsb);
 	}
+
+	return result.str();
+}
+
+std::string EncodeHDA::encode()
+{
+	// prepare data
+	std::string token;
+	std::istringstream stream(m_data);
+	std::vector<std::string> data;
+
+	while (std::getline(stream, token, '.') != 0)
+		data.push_back(token);
+
+	std::ostringstream result;
+	result << std::setw(2) << std::hex << std::setfill('0')
+	       << static_cast<short>(strtod(data[0].c_str(), NULL))
+	       << std::setw(2) << std::hex << std::setfill('0')
+	       << static_cast<short>(strtod(data[1].c_str(), NULL))
+	       << std::setw(2) << std::hex << std::setfill('0')
+	       << static_cast<short>(strtod(data[2].c_str(), NULL) - 2000);
+
+	return result.str();
+}
+
+std::string EncodeHTI::encode()
+{
+	// prepare data
+	std::string token;
+	std::istringstream stream(m_data);
+	std::vector<std::string> data;
+
+	while (std::getline(stream, token, ':') != 0)
+		data.push_back(token);
+
+	std::ostringstream result;
+	result << std::setw(2) << std::hex << std::setfill('0')
+	       << static_cast<short>(strtod(data[0].c_str(), NULL))
+	       << std::setw(2) << std::hex << std::setfill('0')
+	       << static_cast<short>(strtod(data[1].c_str(), NULL))
+	       << std::setw(2) << std::hex << std::setfill('0')
+	       << static_cast<short>(strtod(data[2].c_str(), NULL));
+
+	return result.str();
+}
+
+std::string EncodeHDY::encode()
+{
+	const char *days[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Err"};
+	short day = 7;
+
+	for (short i = 0; i < 7; i++)
+		if (strcasecmp(days[i], m_data.c_str()) == 0)
+			day = i;
+
+	std::ostringstream result;
+	result << std::setw(2) << std::hex << std::setfill('0') << day;
+
+	return result.str();
+}
+
+std::string EncodeTTM::encode()
+{
+	// prepare data
+	std::string token;
+	std::istringstream stream(m_data);
+	std::vector<std::string> data;
+
+	while (std::getline(stream, token, ':') != 0)
+		data.push_back(token);
+
+	std::ostringstream result;
+	result << std::setw(2) << std::hex << std::setfill('0')
+	       << static_cast<short>( (strtod(data[0].c_str(), NULL) * 6)
+				    + (strtod(data[1].c_str(), NULL) / 10) );
 
 	return result.str();
 }

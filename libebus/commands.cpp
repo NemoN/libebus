@@ -286,14 +286,18 @@ void Command::encode(const std::string& data, const std::string& type,
 	else if (strcasecmp(type.c_str(), "D2C") == 0) {
 		help = new EncodeD2C(data, factor);
 	}
-	//~ else if (strcasecmp(type.c_str(), "HDA") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "HTI") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "HDY") == 0) {
-	//~ }
-	//~ else if (strcasecmp(type.c_str(), "TTM") == 0) {
-	//~ }
+	else if (strcasecmp(type.c_str(), "HDA") == 0) {
+		help = new EncodeHDA(data);
+	}
+	else if (strcasecmp(type.c_str(), "HTI") == 0) {
+		help = new EncodeHTI(data);
+	}
+	else if (strcasecmp(type.c_str(), "HDY") == 0) {
+		help = new EncodeHDY(data);
+	}
+	else if (strcasecmp(type.c_str(), "TTM") == 0) {
+		help = new EncodeTTM(data);
+	}
 
 	if (help == NULL) {
 		result << "type '" << type.c_str() << "' not implemented!";

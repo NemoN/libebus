@@ -436,6 +436,49 @@ public:
 
 };
 
+class EncodeHDA : public Encode
+{
+
+public:
+	EncodeHDA(const std::string& data) : Encode(data) {}
+	~EncodeHDA() {}
+
+	std::string encode();
+
+};
+
+class EncodeHTI : public Encode
+{
+
+public:
+	EncodeHTI(const std::string& data) : Encode(data) {}
+	~EncodeHTI() {}
+
+	std::string encode();
+
+};
+
+class EncodeHDY : public Encode
+{
+
+public:
+	EncodeHDY(const std::string& data) : Encode(data) {}
+	~EncodeHDY() {}
+
+	std::string encode();
+
+};
+
+class EncodeTTM : public Encode
+{
+
+public:
+	EncodeTTM(const std::string& data) : Encode(data) {}
+	~EncodeTTM() {}
+
+	std::string encode();
+
+};
 
 std::string esc(const std::string& data);
 std::string unesc(const std::string& data);
