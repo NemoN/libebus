@@ -265,8 +265,9 @@ void Command::encode(const std::string& data, const std::string& type,
 	else if (strcasecmp(type.c_str(), "SLG") == 0) {
 		help = new EncodeSLG(data, factor);
 	}
-	//~ else if (strcasecmp(type.c_str(), "FLT") == 0) {
-	//~ }
+	else if (strcasecmp(type.c_str(), "FLT") == 0) {
+		help = new EncodeSLG(data, factor);
+	}
 	else if (strcasecmp(type.c_str(), "STR") == 0) {
 		help = new EncodeSTR(data);
 	}

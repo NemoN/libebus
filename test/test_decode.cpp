@@ -55,7 +55,7 @@ int main()
 
 		std::cout << std::endl;
 	}
-*/
+
 	// UCH
 	{
 		const char* uch[] = {"00", "01", "7f", "80", "fe", "ff", "a1"};
@@ -103,7 +103,7 @@ int main()
 
 		std::cout << std::endl;
 	}
-/*
+
 	// UIN
 	{
 		const char* uin[] = {"0000", "0001", "7fff", "8000", "fffe", "ffff", "a1b2"};
@@ -199,7 +199,31 @@ int main()
 
 		std::cout << std::endl;
 	}
+*/
+	// FLT
+	{
+		const char* flt[] = {"00000000", "3f9d70a4", "c1ca06f7", "db3ffd6f"};
+		for (size_t i = 0; i < sizeof(flt)/sizeof(flt[0]); i++) {
+			help_dec = new DecodeFLT(flt[i], "1.0");
+			std::cout << "DecodeFLT: " << std::setw(20) << flt[i] << " = " << help_dec->decode() << std::endl;
 
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* flt[] = {"0", "1.23", "-25.2534", "-54040373734932480.0"};
+		for (size_t i = 0; i < sizeof(flt)/sizeof(flt[0]); i++) {
+			help_enc = new EncodeFLT(flt[i], "1.0");
+			std::cout << "EncodeFLT: " << std::setw(20) << flt[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+/*
 	// STR
 	{
 		const char* str[] = {"53706569636865722020"};

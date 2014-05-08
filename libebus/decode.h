@@ -353,6 +353,18 @@ public:
 
 };
 
+class EncodeFLT : public Encode
+{
+
+public:
+	EncodeFLT(const std::string& data, const std::string& factor)
+		: Encode(data, factor) {}
+	~EncodeFLT() {}
+
+	std::string encode();
+
+};
+
 class EncodeSTR : public Encode
 {
 
