@@ -202,7 +202,7 @@ int main()
 
 	// FLT
 	{
-		const char* flt[] = {"00000000", "3f9d70a4", "c1ca06f7", "db3ffd6f"};
+		const char* flt[] = {"0000", "081b", "2532", "2689", "0851"};
 		for (size_t i = 0; i < sizeof(flt)/sizeof(flt[0]); i++) {
 			help_dec = new DecodeFLT(flt[i], "1.0");
 			std::cout << "DecodeFLT: " << std::setw(20) << flt[i] << " = " << help_dec->decode() << std::endl;
@@ -213,7 +213,7 @@ int main()
 		std::cout << std::endl;
 	}
 	{
-		const char* flt[] = {"0", "1.23", "-25.2534", "-54040373734932480.0"};
+		const char* flt[] = {"0.000", "2.075", "9.522", "9.865", "2.129"};
 		for (size_t i = 0; i < sizeof(flt)/sizeof(flt[0]); i++) {
 			help_enc = new EncodeFLT(flt[i], "1.0");
 			std::cout << "EncodeFLT: " << std::setw(20) << flt[i] << " = " << help_enc->encode() << std::endl;

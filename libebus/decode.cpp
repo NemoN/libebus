@@ -140,18 +140,14 @@ std::string DecodeSLG::decode()
 
 std::string DecodeFLT::decode()
 {
-	union {
-		float fval;
-		unsigned int ival;
-	};
-
 	std::stringstream ss;
 	ss << std::hex << m_data;
 
-	ss >> ival;
+	short x;
+	ss >> x;
 
 	std::ostringstream result;
-	result << std::setprecision(3) << std::fixed << static_cast<float>(fval * m_factor);
+	result << std::setprecision(3) << std::fixed << static_cast<float>(x / 1000.0 * m_factor);
 
 	return result.str();
 }
@@ -381,18 +377,11 @@ std::string EncodeSLG::encode()
 
 std::string EncodeFLT::encode()
 {
-	union {
-		float fval;
-		unsigned int ival;
-	};
-
-	fval = static_cast<float>(strtof(m_data.c_str(), NULL) / m_factor);
-
 	std::ostringstream result;
-	result << std::setw(8) << std::hex << std::setfill('0') << ival;
+	short src = static_cast<short>(strtod(m_data.c_str(), NULL) * 1000.0 / m_factor);
+	result << std::setw(4) << std::hex << std::setfill('0') << src;
 
-	return result.str().substr(6,2) + result.str().substr(4,2) +
-	       result.str().substr(2,2) + result.str().substr(0,2);
+	return result.str().substr(2,2) + result.str().substr(0,2);
 }
 
 std::string EncodeSTR::encode()
