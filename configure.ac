@@ -1,4 +1,4 @@
-AC_PREREQ([2.69])
+AC_PREREQ([2.65])
 AC_INIT([libebus], [0.1], [roland.jax@liwest.at], [libebus], [https://github.com/yuhu-/libebus])
 
 AM_INIT_AUTOMAKE([1.11 -Wall no-define])
