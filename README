@@ -1,4 +1,15 @@
 libebus
 -------
 
-Library to communicate with ebus based heating systems.
+This library provides base classes to communicate with ebus.
+
+
+Build
+-----
+
+$ ./autogen.sh [--prefix=/usr]
+$ make
+$ make install
+
+
+The author can be contacted at roland.jax@liwest.at.
