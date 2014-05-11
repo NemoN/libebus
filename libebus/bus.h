@@ -62,7 +62,7 @@ public:
 	void connect() { m_port->open(); }
 	void disconnect() { if (m_port->isOpen() == true) m_port->close(); }
 	bool isConnected() { return m_port->isOpen(); }
-	
+
 	void printBytes() const;
 
 	int proceed();
@@ -73,16 +73,15 @@ public:
 
 	int getBus(const unsigned char byte);
 	int sendCommand();
-		
+
 	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
-	
+
 private:
 	Port* m_port;
 	std::stringstream m_sstr;
 	std::queue<std::string> m_cycBuffer;
 	std::queue<BusCommand*> m_sendBuffer;
 	std::queue<BusCommand*> m_recvBuffer;
-	bool m_getBusWait;
 
 	Dump* m_dump;
 	bool m_dumpState;
