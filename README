@@ -4,6 +4,11 @@ libebus
 This library provides base classes to communicate with ebus.
 
 
+Dependency
+----------
+ * glibc
+
+
 Build
 -----
 

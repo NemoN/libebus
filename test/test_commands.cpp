@@ -75,7 +75,7 @@ int main()
 
 	//~ std::string result = command->calcResult(cmd);
 	std::string result = command->calcData();
-	std::cout << "result: " << result.c_str() << std::endl;
+	std::cout << "result: " << result << std::endl;
 
 	delete command;
 
