@@ -582,9 +582,9 @@ std::string esc(const std::string& data)
 		long test = strtol(data.substr(i, 2).c_str(), NULL, 16);
 
 		if (test == 0xAA)
-			escaped += "A901";
+			escaped += "a901";
 		else if (test == 0xA9)
-			escaped += "A900";
+			escaped += "a900";
 		else
 			escaped += data.substr(i, 2).c_str();
 	}
@@ -605,9 +605,9 @@ std::string unesc(const std::string& data)
 
 		} else if (found == true) {
 			if (test == 0x01)
-				unescaped += "AA";
+				unescaped += "aa";
 			else
-				unescaped += "A9";
+				unescaped += "a9";
 
 			found = false;
 		} else {
@@ -652,7 +652,8 @@ std::string calc_crc(const std::string& data)
 		crc = calc_crc_byte(strtol(data.substr(i, 2).c_str(), NULL, 16), crc);
 
 	std::stringstream sstr;
-	sstr << std::setw(2) << std::hex << std::setfill('0') << static_cast<unsigned>(crc);
+	sstr << std::nouppercase << std::setw(2) << std::hex
+	     << std::setfill('0') << static_cast<unsigned>(crc);
 
 	return sstr.str();
 }
