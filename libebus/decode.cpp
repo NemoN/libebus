@@ -60,7 +60,7 @@ std::string DecodeUCH::decode()
 	ss >> x;
 
 	std::ostringstream result;
-	result << x * static_cast<unsigned short>(m_factor);
+	result << std::setprecision(3) << std::fixed << static_cast<float>(x * m_factor);
 
 	return result.str();
 }
@@ -75,9 +75,11 @@ std::string DecodeSCH::decode()
 
 	std::ostringstream result;
 	if ((x & 0x80) == 0x80)
-		result << static_cast<short>((- ( ((unsigned char) (~ x)) + 1) ) * static_cast<short>(m_factor));
+		result << std::setprecision(3) << std::fixed
+		       << static_cast<float>(static_cast<short>(- ( ((unsigned char) (~ x)) + 1) ) * m_factor);
 	else
-		result << static_cast<short>(x) * static_cast<short>(m_factor);
+		result << std::setprecision(3) << std::fixed
+		       << static_cast<float>(static_cast<short>(x) * m_factor);
 
 	return result.str();
 }
@@ -91,7 +93,7 @@ std::string DecodeUIN::decode()
 	ss >> x;
 
 	std::ostringstream result;
-	result << x * static_cast<unsigned short>(m_factor);
+	result << std::setprecision(3) << std::fixed << static_cast<float>(x * m_factor);
 
 	return result.str();
 }
@@ -105,7 +107,7 @@ std::string DecodeSIN::decode()
 	ss >> x;
 
 	std::ostringstream result;
-	result << static_cast<short>(x) * static_cast<short>(m_factor);
+	result << std::setprecision(3) << std::fixed << static_cast<float>(static_cast<short>(x) * m_factor);
 
 	return result.str();
 }
@@ -119,7 +121,7 @@ std::string DecodeULG::decode()
 	ss >> x;
 
 	std::ostringstream result;
-	result << x * static_cast<unsigned short>(m_factor);
+	result << std::setprecision(3) << std::fixed << static_cast<float>(x * m_factor);
 
 	return result.str();
 }
@@ -133,7 +135,7 @@ std::string DecodeSLG::decode()
 	ss >> x;
 
 	std::ostringstream result;
-	result << static_cast<int>(x) * static_cast<short>(m_factor);
+	result << std::setprecision(3) << std::fixed <<static_cast<float>(static_cast<int>(x) * m_factor);
 
 	return result.str();
 }
