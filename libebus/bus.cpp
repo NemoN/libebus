@@ -186,7 +186,7 @@ int Bus::sendCommand()
 	}
 
 	// BC -> send SYN
-	if (busCommand->getType() == "BC") {
+	if (strcasecmp(busCommand->getType().c_str(), "BC") == 0) {
 		sendByte(SYN);
 		goto on_exit;
 	}
@@ -230,7 +230,7 @@ int Bus::sendCommand()
 	}
 
 	// MM -> send SYN
-	if (busCommand->getType() == "MM") {
+	if (strcasecmp(busCommand->getType().c_str(), "MM") == 0) {
 		sendByte(SYN);
 		goto on_exit;
 	}
@@ -310,7 +310,7 @@ on_exit:
 		break;
 	case 0:
 	default:
-		if (busCommand->getType() == "MS") {
+		if (strcasecmp(busCommand->getType().c_str(), "MS") == 0) {
 			result = busCommand->getCommand();
 			result += "00";
 			result += unesc(slaveData);
