@@ -368,6 +368,30 @@ int main()
 		std::cout << std::endl;
 	}
 
+	// BDA
+	{
+		const char* bda[] = {"171113", "220901"};
+		for (size_t i = 0; i < sizeof(bda)/sizeof(bda[0]); i++) {
+			help_dec = new DecodeBDA(bda[i]);
+			std::cout << "DecodeBDA: " << std::setw(20) << bda[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* bda[] = {"17.11.2013", "22.09.2001"};
+		for (size_t i = 0; i < sizeof(bda)/sizeof(bda[0]); i++) {
+			help_enc = new EncodeBDA(bda[i]);
+			std::cout << "EncodeBDA: " << std::setw(20) << bda[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+
 	// HDA
 	{
 		const char* hda[] = {"010101", "1f0c1b"};
@@ -392,6 +416,30 @@ int main()
 		std::cout << std::endl;
 	}
 
+	// BTI
+	{
+		const char* bti[] = {"010101", "174209", "235959"};
+		for (size_t i = 0; i < sizeof(bti)/sizeof(bti[0]); i++) {
+			help_dec = new DecodeBTI(bti[i]);
+			std::cout << "DecodeBTI: " << std::setw(20) << bti[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* bti[] = {"01:01:01", "17:42:09", "23:59:59"};
+		for (size_t i = 0; i < sizeof(bti)/sizeof(bti[0]); i++) {
+			help_enc = new EncodeBTI(bti[i]);
+			std::cout << "EncodeBTI: " << std::setw(20) << bti[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+
 	// HTI
 	{
 		const char* hti[] = {"010101", "112a09", "173b3b"};
@@ -405,7 +453,7 @@ int main()
 		std::cout << std::endl;
 	}
 	{
-		const char* hti[] = {"00:00:00", "17:42:09", "23:59:59"};
+		const char* hti[] = {"01:01:01", "17:42:09", "23:59:59"};
 		for (size_t i = 0; i < sizeof(hti)/sizeof(hti[0]); i++) {
 			help_enc = new EncodeHTI(hti[i]);
 			std::cout << "EncodeHTI: " << std::setw(20) << hti[i] << " = " << help_enc->encode() << std::endl;
@@ -416,9 +464,34 @@ int main()
 		std::cout << std::endl;
 	}
 
+	// BDY
+	{
+		const char* bdy[] = {"01", "03", "06", "07"};
+		for (size_t i = 0; i < sizeof(bdy)/sizeof(bdy[0]); i++) {
+			help_dec = new DecodeBDY(bdy[i]);
+			std::cout << "DecodeBDY: " << std::setw(20) << bdy[i] << " = " << help_dec->decode() << std::endl;
+
+			delete help_dec;
+		}
+
+		std::cout << std::endl;
+	}
+	{
+		const char* bdy[] = {"Tue", "Thu", "Sun", "Err"};
+		for (size_t i = 0; i < sizeof(bdy)/sizeof(bdy[0]); i++) {
+			help_enc = new EncodeBDY(bdy[i]);
+			std::cout << "EncodeBDY: " << std::setw(20) << bdy[i] << " = " << help_enc->encode() << std::endl;
+
+			delete help_enc;
+		}
+
+		std::cout << std::endl;
+	}
+
+
 	// HDY
 	{
-		const char* hdy[] = {"01", "03", "06", "07"};
+		const char* hdy[] = {"01", "03", "07", "08"};
 		for (size_t i = 0; i < sizeof(hdy)/sizeof(hdy[0]); i++) {
 			help_dec = new DecodeHDY(hdy[i]);
 			std::cout << "DecodeHDY: " << std::setw(20) << hdy[i] << " = " << help_dec->decode() << std::endl;
@@ -429,7 +502,7 @@ int main()
 		std::cout << std::endl;
 	}
 	{
-		const char* hdy[] = {"Tue", "Thu", "Sun", "Err"};
+		const char* hdy[] = {"Mon", "Wed", "Sun", "Err"};
 		for (size_t i = 0; i < sizeof(hdy)/sizeof(hdy[0]); i++) {
 			help_enc = new EncodeHDY(hdy[i]);
 			std::cout << "EncodeHDY: " << std::setw(20) << hdy[i] << " = " << help_enc->encode() << std::endl;

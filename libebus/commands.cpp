@@ -202,17 +202,33 @@ void Command::decode(const std::string& data, const std::string& position,
 		value << data.substr((pos[0]-1)*2, 2) << data.substr((pos[1]-1)*2, 2);
 		help = new DecodeD2C(value.str(), factor);
 	}
+	else if (strcasecmp(type.c_str(), "BDA") == 0) {
+		value << data.substr((pos[0]-1)*2, 2)
+		      << data.substr((pos[1]-1)*2, 2)
+		      << data.substr((pos[2]-1)*2, 2);
+		help = new DecodeBDA(value.str());
+	}
 	else if (strcasecmp(type.c_str(), "HDA") == 0) {
 		value << data.substr((pos[0]-1)*2, 2)
 		      << data.substr((pos[1]-1)*2, 2)
 		      << data.substr((pos[2]-1)*2, 2);
 		help = new DecodeHDA(value.str());
 	}
+	else if (strcasecmp(type.c_str(), "BTI") == 0) {
+		value << data.substr((pos[0]-1)*2, 2)
+		      << data.substr((pos[1]-1)*2, 2)
+		      << data.substr((pos[2]-1)*2, 2);
+		help = new DecodeBTI(value.str());
+	}
 	else if (strcasecmp(type.c_str(), "HTI") == 0) {
 		value << data.substr((pos[0]-1)*2, 2)
 		      << data.substr((pos[1]-1)*2, 2)
 		      << data.substr((pos[2]-1)*2, 2);
 		help = new DecodeHTI(value.str());
+	}
+	else if (strcasecmp(type.c_str(), "BDY") == 0) {
+		value << data.substr((pos[0]-1)*2, 2);
+		help = new DecodeBDY(value.str());
 	}
 	else if (strcasecmp(type.c_str(), "HDY") == 0) {
 		value << data.substr((pos[0]-1)*2, 2);
@@ -286,11 +302,20 @@ void Command::encode(const std::string& data, const std::string& type,
 	else if (strcasecmp(type.c_str(), "D2C") == 0) {
 		help = new EncodeD2C(data, factor);
 	}
+	else if (strcasecmp(type.c_str(), "BDA") == 0) {
+		help = new EncodeBDA(data);
+	}
 	else if (strcasecmp(type.c_str(), "HDA") == 0) {
 		help = new EncodeHDA(data);
 	}
+	else if (strcasecmp(type.c_str(), "BTI") == 0) {
+		help = new EncodeBTI(data);
+	}
 	else if (strcasecmp(type.c_str(), "HTI") == 0) {
 		help = new EncodeHTI(data);
+	}
+	else if (strcasecmp(type.c_str(), "BDY") == 0) {
+		help = new EncodeBDY(data);
 	}
 	else if (strcasecmp(type.c_str(), "HDY") == 0) {
 		help = new EncodeHDY(data);

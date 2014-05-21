@@ -242,6 +242,24 @@ std::string DecodeD2C::decode()
 	return result.str();
 }
 
+std::string DecodeBDA::decode()
+{
+	std::ostringstream result;
+	Decode* decode;
+	short array[3];
+	for (int i = 0; i < 3; i++) {
+		decode = new DecodeBCD(m_data.substr(i*2, 2), "1.0");
+		array[i] = static_cast<short>(strtol(decode->decode().c_str(), NULL, 10));
+		delete decode;
+	}
+
+	result << std::setw(2) << std::setfill('0') << array[0] << "."
+	       << std::setw(2) << std::setfill('0') << array[1] << "."
+	       << array[2] + 2000;
+
+	return result.str();
+}
+
 std::string DecodeHDA::decode()
 {
 	std::ostringstream result;
@@ -252,6 +270,24 @@ std::string DecodeHDA::decode()
 	result << std::setw(2) << std::setfill('0') << dd << "."
 	       << std::setw(2) << std::setfill('0') << mm << "."
 	       << yy + 2000;
+
+	return result.str();
+}
+
+std::string DecodeBTI::decode()
+{
+	std::ostringstream result;
+	Decode* decode;
+	short array[3];
+	for (int i = 0; i < 3; i++) {
+		decode = new DecodeBCD(m_data.substr(i*2, 2), "1.0");
+		array[i] = static_cast<short>(strtol(decode->decode().c_str(), NULL, 10));
+		delete decode;
+	}
+
+	result << std::setw(2) << std::setfill('0') << array[0] << ":"
+	       << std::setw(2) << std::setfill('0') << array[1] << ":"
+	       << std::setw(2) << std::setfill('0') << array[2];
 
 	return result.str();
 }
@@ -270,12 +306,27 @@ std::string DecodeHTI::decode()
 	return result.str();
 }
 
-std::string DecodeHDY::decode()
+std::string DecodeBDY::decode()
 {
 	const char *days[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Err"};
 
 	std::ostringstream result;
 	short day = static_cast<short>(strtol(m_data.c_str(), NULL, 16));
+
+	if (day < 0 || day > 6)
+		day = 7;
+
+	result << days[day];
+
+	return result.str();
+}
+
+std::string DecodeHDY::decode()
+{
+	const char *days[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Err"};
+
+	std::ostringstream result;
+	short day = static_cast<short>(strtol(m_data.c_str(), NULL, 16)) - 1;
 
 	if (day < 0 || day > 6)
 		day = 7;
@@ -500,6 +551,27 @@ std::string EncodeD2C::encode()
 	return result.str();
 }
 
+std::string EncodeBDA::encode()
+{
+	// prepare data
+	std::string token;
+	std::istringstream stream(m_data);
+	std::vector<std::string> data;
+
+	while (std::getline(stream, token, '.') != 0)
+		data.push_back(token);
+
+	std::ostringstream result;
+	result << std::setw(2) << std::dec << std::setfill('0')
+	       << static_cast<short>(strtod(data[0].c_str(), NULL))
+	       << std::setw(2) << std::dec << std::setfill('0')
+	       << static_cast<short>(strtod(data[1].c_str(), NULL))
+	       << std::setw(2) << std::dec << std::setfill('0')
+	       << static_cast<short>(strtod(data[2].c_str(), NULL) - 2000);
+
+	return result.str();
+}
+
 std::string EncodeHDA::encode()
 {
 	// prepare data
@@ -517,6 +589,27 @@ std::string EncodeHDA::encode()
 	       << static_cast<short>(strtod(data[1].c_str(), NULL))
 	       << std::setw(2) << std::hex << std::setfill('0')
 	       << static_cast<short>(strtod(data[2].c_str(), NULL) - 2000);
+
+	return result.str();
+}
+
+std::string EncodeBTI::encode()
+{
+	// prepare data
+	std::string token;
+	std::istringstream stream(m_data);
+	std::vector<std::string> data;
+
+	while (std::getline(stream, token, ':') != 0)
+		data.push_back(token);
+
+	std::ostringstream result;
+	result << std::setw(2) << std::dec << std::setfill('0')
+	       << static_cast<short>(strtod(data[0].c_str(), NULL))
+	       << std::setw(2) << std::dec << std::setfill('0')
+	       << static_cast<short>(strtod(data[1].c_str(), NULL))
+	       << std::setw(2) << std::dec << std::setfill('0')
+	       << static_cast<short>(strtod(data[2].c_str(), NULL));
 
 	return result.str();
 }
@@ -542,7 +635,7 @@ std::string EncodeHTI::encode()
 	return result.str();
 }
 
-std::string EncodeHDY::encode()
+std::string EncodeBDY::encode()
 {
 	const char *days[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Err"};
 	short day = 7;
@@ -550,6 +643,21 @@ std::string EncodeHDY::encode()
 	for (short i = 0; i < 7; i++)
 		if (strcasecmp(days[i], m_data.c_str()) == 0)
 			day = i;
+
+	std::ostringstream result;
+	result << std::setw(2) << std::hex << std::setfill('0') << day;
+
+	return result.str();
+}
+
+std::string EncodeHDY::encode()
+{
+	const char *days[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Err"};
+	short day = 8;
+
+	for (short i = 0; i < 7; i++)
+		if (strcasecmp(days[i], m_data.c_str()) == 0)
+			day = i + 1;
 
 	std::ostringstream result;
 	result << std::setw(2) << std::hex << std::setfill('0') << day;

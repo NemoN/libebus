@@ -209,6 +209,17 @@ public:
 
 };
 
+class DecodeBDA : public Decode
+{
+
+public:
+	DecodeBDA(const std::string& data) : Decode(data) {}
+	~DecodeBDA() {}
+
+	std::string decode();
+
+};
+
 class DecodeHDA : public Decode
 {
 
@@ -220,12 +231,34 @@ public:
 
 };
 
+class DecodeBTI : public Decode
+{
+
+public:
+	DecodeBTI(const std::string& data) : Decode(data) {}
+	~DecodeBTI() {}
+
+	std::string decode();
+
+};
+
 class DecodeHTI : public Decode
 {
 
 public:
 	DecodeHTI(const std::string& data) : Decode(data) {}
 	~DecodeHTI() {}
+
+	std::string decode();
+
+};
+
+class DecodeBDY : public Decode
+{
+
+public:
+	DecodeBDY(const std::string& data) : Decode(data) {}
+	~DecodeBDY() {}
 
 	std::string decode();
 
@@ -436,6 +469,17 @@ public:
 
 };
 
+class EncodeBDA : public Encode
+{
+
+public:
+	EncodeBDA(const std::string& data) : Encode(data) {}
+	~EncodeBDA() {}
+
+	std::string encode();
+
+};
+
 class EncodeHDA : public Encode
 {
 
@@ -447,12 +491,34 @@ public:
 
 };
 
+class EncodeBTI : public Encode
+{
+
+public:
+	EncodeBTI(const std::string& data) : Encode(data) {}
+	~EncodeBTI() {}
+
+	std::string encode();
+
+};
+
 class EncodeHTI : public Encode
 {
 
 public:
 	EncodeHTI(const std::string& data) : Encode(data) {}
 	~EncodeHTI() {}
+
+	std::string encode();
+
+};
+
+class EncodeBDY : public Encode
+{
+
+public:
+	EncodeBDY(const std::string& data) : Encode(data) {}
+	~EncodeBDY() {}
 
 	std::string encode();
 
