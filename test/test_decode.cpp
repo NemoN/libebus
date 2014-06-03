@@ -226,7 +226,7 @@ int main()
 
 	// STR
 	{
-		const char* str[] = {"53706569636865722020"};
+		const char* str[] = {"53706569636865722020", "5644363030" };
 		for (size_t i = 0; i < sizeof(str)/sizeof(str[0]); i++) {
 			help_dec = new DecodeSTR(str[i]);
 			std::cout << "DecodeSTR: " << std::setw(20) << str[i] << " = " << help_dec->decode() << std::endl;
@@ -237,7 +237,7 @@ int main()
 		std::cout << std::endl;
 	}
 	{
-		const char* str[] = {"Speicher  "};
+		const char* str[] = {"Speicher  ", "VD600" };
 		for (size_t i = 0; i < sizeof(str)/sizeof(str[0]); i++) {
 			help_enc = new EncodeSTR(str[i]);
 			std::cout << "EncodeSTR: " << std::setw(20) << str[i] << " = " << help_enc->encode() << std::endl;

@@ -158,7 +158,7 @@ std::string DecodeSTR::decode()
 {
 	std::ostringstream result;
 
-	for (size_t i = 0; i < m_data.length()/2; i++) {
+	for (size_t i = 0; i <= m_data.length()/2; i++) {
 		char tmp = static_cast<char>(strtol(m_data.substr(i*2, 2).c_str(), NULL, 16));
 		if (tmp == 0x00) tmp = 0x20;
 		result << tmp;
