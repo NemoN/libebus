@@ -59,7 +59,7 @@ void Bus::printBytes() const
 	unsigned char byte;
 	ssize_t bytes_read;
 
-	bytes_read = m_port->recv();
+	bytes_read = m_port->recv(0);
 
 	for (int i = 0; i < bytes_read; i++) {
 		byte = m_port->byte();
@@ -85,7 +85,7 @@ int Bus::proceed()
 	}
 
 	// wait for new data
-	bytes_recv = m_port->recv();
+	bytes_recv = m_port->recv(0);
 
 	for (int i = 0; i < bytes_recv; i++) {
 
@@ -146,7 +146,7 @@ int Bus::getBus(const unsigned char byte_sent)
 		return -1;
 
 	// receive 1 byte - must be QQ
-	bytes_recv = m_port->recv();
+	bytes_recv = m_port->recv(0);
 
 	for (int i = 0; i < bytes_recv; i++) {
 
@@ -192,9 +192,12 @@ int Bus::sendCommand()
 	}
 
 	// receive ACK
-	bytes_recv = m_port->recv();
+	bytes_recv = m_port->recv(10000);
 	if (bytes_recv > 1) {
 		retval = -2;
+		goto on_exit;
+	} else if (bytes_recv < 0) {
+		retval = -6;
 		goto on_exit;
 	}
 
@@ -211,9 +214,12 @@ int Bus::sendCommand()
 		}
 
 		// receive ACK
-		bytes_recv = m_port->recv();
+		bytes_recv = m_port->recv(10000);
 		if (bytes_recv > 1) {
 			retval = -2;
+			goto on_exit;
+		} else if (bytes_recv < 0) {
+			retval = -6;
 			goto on_exit;
 		}
 
@@ -308,6 +314,9 @@ on_exit:
 	case -5:
 		result = "-5: ACK error";
 		break;
+	case -6:
+		result = "-6: read timeout";
+		break;
 	case 0:
 	default:
 		if (strcasecmp(busCommand->getType().c_str(), "MS") == 0) {
@@ -341,7 +350,7 @@ int Bus::sendByte(const unsigned char byte_sent)
 	bytes_sent = m_port->send(&byte_sent, 1);
 
 	// receive 1 byte - must be equal
-	bytes_recv = m_port->recv();
+	bytes_recv = m_port->recv(0);
 	if (bytes_sent != bytes_recv)
 		return -2;
 
@@ -373,7 +382,7 @@ int Bus::recvSlaveData(std::string& result)
 	std::stringstream sstr;
 
 	// receive NN
-	bytes_recv = m_port->recv();
+	bytes_recv = m_port->recv(0);
 	if (bytes_recv > 1)
 		return -2;
 
@@ -385,7 +394,7 @@ int Bus::recvSlaveData(std::string& result)
 
 	// receive Dx
 	for (int i = 0; i < NN; i++) {
-		bytes_recv = m_port->recv();
+		bytes_recv = m_port->recv(0);
 		if (bytes_recv > 1)
 			return -2;
 
@@ -409,7 +418,7 @@ int Bus::recvCRC(std::string& result)
 	std::stringstream sstr;
 
 	// receive CRC
-	bytes_recv = m_port->recv();
+	bytes_recv = m_port->recv(0);
 	if (bytes_recv > 1)
 		return -2;
 
@@ -419,7 +428,7 @@ int Bus::recvCRC(std::string& result)
 
 	if (byte_recv == 0xA9) {
 		// receive CRC
-		bytes_recv = m_port->recv();
+		bytes_recv = m_port->recv(0);
 		if (bytes_recv > 1)
 			return -2;
 

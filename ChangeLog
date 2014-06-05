@@ -1,7 +1,13 @@
-2014-05-11  Roland Jax  <roland.jax@liwest.at>
+libebus - ChangeLog
+-------------------
 
-	* Beta-Test.
+2014-06-05  Roland Jax  <roland.jax@liwest.at>
+* Feature: timeout option in Device::recvBytes function added.
+* BUG: in DecodeSTR the last character was not decoded correctly.
+* Version changed from 0.1.0 to 0.1.1
+
+2014-05-11  Roland Jax  <roland.jax@liwest.at>
+* Beta-Test.
 
 2014-01-09  Roland Jax  <roland.jax@liwest.at>
-
-	* Initial commit.
+* Initial commit.

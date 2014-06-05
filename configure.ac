@@ -1,5 +1,5 @@
 AC_PREREQ([2.65])
-AC_INIT([libebus], [0.1.0], [roland.jax@liwest.at], [libebus], [https://github.com/yuhu-/libebus])
+AC_INIT([libebus], [0.1.1], [roland.jax@liwest.at], [libebus], [https://github.com/yuhu-/libebus])
 
 AC_CONFIG_SRCDIR([libebus/bus.cpp])
 AC_CONFIG_AUX_DIR([build])

@@ -42,11 +42,11 @@ public:
 	bool isOpen();
 
 	ssize_t sendBytes(const unsigned char* buffer, size_t nbytes);
-	ssize_t recvBytes();
+	ssize_t recvBytes(const long timeout);
 
 	unsigned char getByte();
 	ssize_t sizeRecvBuffer() const { return m_recvBuffer.size(); }
-	
+
 protected:
 	int m_fd;
 	bool m_open;
@@ -63,10 +63,10 @@ class DeviceSerial : public Device
 
 public:
 	~DeviceSerial() { closeDevice(); }
-	
+
 	void openDevice(const std::string deviceName, const bool noDeviceCheck);
 	void closeDevice();
-	
+
 private:
 	termios m_oldSettings;
 
@@ -80,7 +80,7 @@ public:
 
 	void openDevice(const std::string deviceName, const bool noDeviceCheck);
 	void closeDevice();
-	
+
 private:
 
 };
@@ -99,7 +99,7 @@ public:
 
 	ssize_t send(const unsigned char* buffer, size_t nbytes)
 		{ return m_device->sendBytes(buffer, nbytes); }
-	ssize_t recv() { return m_device->recvBytes(); }
+	ssize_t recv(const long timeout) { return m_device->recvBytes(timeout); }
 
 	unsigned char byte() { return m_device->getByte(); }
 	ssize_t size() const { return m_device->sizeRecvBuffer(); }
@@ -108,10 +108,10 @@ private:
 	std::string m_deviceName;
 	Device* m_device;
 	bool m_noDeviceCheck;
-	
+
 
 	void setType(const DeviceType type);
-	
+
 };
 
 

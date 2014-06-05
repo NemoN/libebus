@@ -38,7 +38,7 @@ bool Device::isOpen()
 {
 	if (isValid() == false)
 		m_open = false;
-	
+
 	return m_open;
 }
 
@@ -61,20 +61,35 @@ ssize_t Device::sendBytes(const unsigned char* buffer, size_t nbytes)
 {
 	if (isValid() == false)
 		return -1;
-		
-	// write bytes to device	
+
+	// write bytes to device
 	return write(m_fd, buffer, nbytes);
 }
 
-ssize_t Device::recvBytes()
+ssize_t Device::recvBytes(const long timeout)
 {
 	if (isValid() == false)
 		return -1;
-		
+
+	if (timeout > 0) {
+		fd_set readfds;
+		struct timeval tdiff;
+
+		// set select timeout
+		tdiff.tv_sec = 0;
+		tdiff.tv_usec = timeout;
+
+		FD_ZERO(&readfds);
+		FD_SET(m_fd, &readfds);
+
+		if (select(m_fd + 1, &readfds, NULL, NULL, &tdiff) != 1)
+			return -2;
+	}
+
 	size_t nbytes;
 	ssize_t bytes_read;
 	unsigned char buffer[100];
-		
+
 	memset(buffer, '\0', sizeof(buffer));
 	nbytes = sizeof(buffer);
 
@@ -83,7 +98,7 @@ ssize_t Device::recvBytes()
 
 	for (int i = 0; i < bytes_read; i++)
 		m_recvBuffer.push(buffer[i]);
-		
+
 	return bytes_read;
 }
 
@@ -94,7 +109,7 @@ unsigned char Device::getByte()
 	if (m_recvBuffer.empty() == false) {
 		byte = m_recvBuffer.front();
 		m_recvBuffer.pop();
-	
+
 		return byte;
 	}
 
@@ -105,7 +120,7 @@ unsigned char Device::getByte()
 void DeviceSerial::openDevice(const std::string deviceName, const bool noDeviceCheck)
 {
 	m_noDeviceCheck = noDeviceCheck;
-	
+
 	termios newSettings;
 
 	m_open = false;
@@ -115,10 +130,10 @@ void DeviceSerial::openDevice(const std::string deviceName, const bool noDeviceC
 
 	if (m_fd < 0)
 		return;
-		
+
 	// save current settings of serial device
 	tcgetattr(m_fd, &m_oldSettings);
-	
+
 	memset(&newSettings, '\0', sizeof(newSettings));
 
 	newSettings.c_cflag = B2400 | CS8 | CLOCAL | CREAD;
@@ -137,8 +152,8 @@ void DeviceSerial::openDevice(const std::string deviceName, const bool noDeviceC
 
 	// set serial device into blocking mode
 	fcntl(m_fd, F_SETFL, fcntl(m_fd, F_GETFL) & ~O_NONBLOCK);
-	
-	m_open = true;		
+
+	m_open = true;
 
 }
 
@@ -147,7 +162,7 @@ void DeviceSerial::closeDevice()
 	if (m_open == true) {
 		// empty device buffer
 		tcflush(m_fd, TCIOFLUSH);
-		
+
 		// activate old settings of serial device
 		tcsetattr(m_fd, TCSANOW, &m_oldSettings);
 
@@ -221,7 +236,7 @@ Port::Port(const std::string deviceName, const bool noDeviceCheck)
 	: m_deviceName(deviceName), m_noDeviceCheck(noDeviceCheck)
 {
 	m_device = NULL;
-	
+
 	if (strchr(deviceName.c_str(), '/') == NULL &&
 	    strchr(deviceName.c_str(), ':') != NULL)
 		setType(NETWORK);
@@ -233,7 +248,7 @@ void Port::setType(const DeviceType type)
 {
 	if (m_device != NULL)
 		delete m_device;
-	
+
 	switch (type) {
 	case SERIAL:
 		m_device = new DeviceSerial();

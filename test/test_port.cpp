@@ -38,23 +38,23 @@ int main ()
 	while (1) {
 		ssize_t bytes_read;
 		unsigned char byte = 0;
-		bytes_read = port.recv();
+		bytes_read = port.recv(0);
 
 		for (int i = 0; i < bytes_read; i++)
 			byte = port.byte();
 			std::cout << std::hex << std::setw(2) << std::setfill('0')
 			<< static_cast<unsigned>(byte) << std::endl;
-		
+
 		bytes_read = 0;
 
 		count++;
-	} 
+	}
 
 	port.close();
 
 	if(port.isOpen() == false)
 		std::cout << "closePort successful." << std::endl;
-			
+
 	return 0;
 
 }
