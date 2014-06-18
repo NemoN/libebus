@@ -55,7 +55,7 @@ class Bus
 {
 
 public:
-	Bus(const std::string deviceName, const bool noDeviceCheck,
+	Bus(const std::string deviceName, const bool noDeviceCheck, const long recvTimeout,
 		const std::string dumpFile, const long dumpSize, const bool dumpState);
 	~Bus();
 
@@ -82,6 +82,8 @@ private:
 	std::queue<std::string> m_cycBuffer;
 	std::queue<BusCommand*> m_sendBuffer;
 	std::queue<BusCommand*> m_recvBuffer;
+
+	const long m_recvTimeout;
 
 	Dump* m_dump;
 	bool m_dumpState;

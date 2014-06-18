@@ -37,9 +37,9 @@ BusCommand::BusCommand(const std::string type, const std::string command) : m_ty
 }
 
 
-Bus::Bus(const std::string deviceName, const bool noDeviceCheck,
+Bus::Bus(const std::string deviceName, const bool noDeviceCheck, const long recvTimeout,
 	const std::string dumpFile, const long dumpSize, const bool dumpState)
-	: m_dumpState(dumpState)
+	: m_recvTimeout(recvTimeout), m_dumpState(dumpState)
 {
 	m_port = new Port(deviceName, noDeviceCheck);
 	m_dump = new Dump(dumpFile, dumpSize);
@@ -192,7 +192,7 @@ int Bus::sendCommand()
 	}
 
 	// receive ACK
-	bytes_recv = m_port->recv(10000);
+	bytes_recv = m_port->recv(m_recvTimeout);
 	if (bytes_recv > 1) {
 		retval = -2;
 		goto on_exit;
@@ -214,7 +214,7 @@ int Bus::sendCommand()
 		}
 
 		// receive ACK
-		bytes_recv = m_port->recv(10000);
+		bytes_recv = m_port->recv(m_recvTimeout);
 		if (bytes_recv > 1) {
 			retval = -2;
 			goto on_exit;

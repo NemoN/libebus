@@ -25,7 +25,7 @@ using namespace libebus;
 
 int main ()
 {
-	Bus bus("/dev/ttyUSB0", true, "/tmp/dump_bus.bin", 100, false);
+	Bus bus("/dev/ttyUSB0", true, 15000, "/tmp/dump_bus.bin", 100, false);
 
 	bus.connect();
 
@@ -35,24 +35,24 @@ int main ()
 	int cout = 0;
 
 	while (cout++ < 1000) {
-		if (bus.isConnected() == true) {	
+		if (bus.isConnected() == true) {
 			bus.printBytes();
 		} else {
 			sleep(5);
 			bus.connect();
-			
+
 			if (bus.isConnected() == false)
 				std::cout << "can't open /dev/ttyUSB0" << std::endl;
 			else
 				std::cout << "reconnect successful." << std::endl;
 		}
-	} 
+	}
 
 	bus.disconnect();
 
 	if (bus.isConnected() == false)
 		std::cout << "disconnect successful." << std::endl;
-	
+
 	return 0;
 
 }
