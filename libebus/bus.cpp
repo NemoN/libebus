@@ -179,7 +179,7 @@ int Bus::sendCommand()
 	m_sendBuffer.pop();
 
 	// send ZZ PB SB NN Dx CRC
-	for (size_t i = 2; i < busCommand->getCommandSize(); i = i + 2) {
+	for (size_t i = 2; i < busCommand->getSize(); i = i + 2) {
 		retval = sendByte(busCommand->getByte(i));
 		if (retval < 0)
 			goto on_exit;
@@ -207,7 +207,7 @@ int Bus::sendCommand()
 	if (byte_recv == NAK) {
 
 		// send data (full)
-		for (size_t i = 0; i < busCommand->getCommandSize(); i = i + 2) {
+		for (size_t i = 0; i < busCommand->getSize(); i = i + 2) {
 			retval = sendByte(busCommand->getByte(i));
 			if (retval < 0)
 				goto on_exit;
