@@ -203,6 +203,12 @@ int Bus::sendCommand()
 
 	byte_recv = recvByte();
 
+	// is received byte SYN?
+	if (byte_recv == SYN) {
+		retval = -7;
+		goto on_exit;
+	}
+
 	// is slave ACK negative?
 	if (byte_recv == NAK) {
 
@@ -224,6 +230,12 @@ int Bus::sendCommand()
 		}
 
 		byte_recv = recvByte();
+
+		// is received byte SYN?
+		if (byte_recv == SYN) {
+			retval = -7;
+			goto on_exit;
+		}
 
 		// is slave ACK negative?
 		if (byte_recv == NAK) {
@@ -316,6 +328,9 @@ on_exit:
 		break;
 	case -6:
 		result = "-6: read timeout";
+		break;
+	case -7:
+		result = "-7: SYN received";
 		break;
 	case 0:
 	default:
