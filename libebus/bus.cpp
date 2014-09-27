@@ -186,7 +186,8 @@ int Bus::sendCommand()
 	}
 
 	// BC -> send SYN
-	if (strcasecmp(busCommand->getType().c_str(), "BC") == 0) {
+	if ((strcasecmp(busCommand->getType().c_str(), "BC") == 0)
+	||  (busCommand->getByte(2) == 0xFE)) {
 		sendByte(SYN);
 		goto on_exit;
 	}
@@ -212,7 +213,7 @@ int Bus::sendCommand()
 	// is slave ACK negative?
 	if (byte_recv == NAK) {
 
-		// send data (full)
+		// send QQ ZZ PB SB NN Dx CRC again
 		for (size_t i = 0; i < busCommand->getSize(); i = i + 2) {
 			retval = sendByte(busCommand->getByte(i));
 			if (retval < 0)
