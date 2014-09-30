@@ -19,6 +19,7 @@
 
 #include "commands.h"
 #include "decode.h"
+#include "encode.h"
 #include <iostream>
 #include <algorithm>
 #include <sstream>

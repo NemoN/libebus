@@ -26,5 +26,6 @@
 #include <libebus/config.h>
 #include <libebus/dump.h>
 #include <libebus/decode.h>
+#include <libebus/encode.h>
 
 #endif // LIBEBUS_H_

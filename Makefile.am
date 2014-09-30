@@ -11,7 +11,8 @@ libebus_@LIBEBUS_API_VERSION@_la_SOURCES = libebus/port.cpp \
 					   libebus/commands.cpp \
 					   libebus/config.cpp \
 					   libebus/dump.cpp \
-					   libebus/decode.cpp
+					   libebus/decode.cpp \
+					   libebus/encode.cpp
 
 libebus_@LIBEBUS_API_VERSION@_la_LDFLAGS = -version-info $(LIBEBUS_SO_VERSION)
 
@@ -22,7 +23,8 @@ nobase_libebus_include_HEADERS = libebus.h \
                                  libebus/commands.h \
                                  libebus/config.h \
                                  libebus/dump.h \
-                                 libebus/decode.h
+                                 libebus/decode.h \
+                                 libebus/encode.h
 
 libebus_libincludedir = $(libdir)/libebus-$(LIBEBUS_API_VERSION)/include
 nodist_libebus_libinclude_HEADERS = libebusconfig.h
@@ -37,7 +39,8 @@ noinst_PROGRAMS = test_port \
 		  test_bus \
 		  test_commands \
 		  test_config \
-		  test_decode
+		  test_decode \
+		  test_encode
 
 test_port_SOURCES = test/test_port.cpp
 test_port_LDADD = libebus-$(LIBEBUS_API_VERSION).la
@@ -53,3 +56,6 @@ test_config_LDADD = libebus-$(LIBEBUS_API_VERSION).la
 
 test_decode_SOURCES = test/test_decode.cpp
 test_decode_LDADD = libebus-$(LIBEBUS_API_VERSION).la
+
+test_encode_SOURCES = test/test_encode.cpp
+test_encode_LDADD = libebus-$(LIBEBUS_API_VERSION).la

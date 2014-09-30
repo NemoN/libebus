@@ -1,6 +1,9 @@
 libebus - ChangeLog
 -------------------
 
+2014-09-30  Roland Jax  <roland.jax@liwest.at>
+* decode/encode splitted into two files.
+
 2014-06-05  Roland Jax  <roland.jax@liwest.at>
 * Feature: timeout option in Device::recvBytes function added.
 * BUG: in DecodeSTR the last character was not decoded correctly.
