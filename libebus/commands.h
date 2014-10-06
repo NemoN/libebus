@@ -29,6 +29,9 @@ namespace libebus
 {
 
 
+typedef std::vector<cmd_t> cmdDB_t;
+typedef cmdDB_t::const_iterator cmdDBCI_t;
+
 typedef std::map<int, Command*> map_t;
 typedef map_t::const_iterator mapCI_t;
 typedef std::pair<int, Command*> pair_t;
@@ -37,20 +40,26 @@ class Commands
 {
 
 public:
-	void addCommand(const cmd_t& command) { m_cmdDB.push_back(command); }
+	~Commands();
+
+	void addCommand(const cmd_t& command);
 	void printCommands() const;
 
-	std::size_t size() const { return m_cmdDB.size(); }
+	std::size_t sizeCmd() const { return m_cmdDB.size(); }
+	std::size_t sizeData() const { return m_dataDB.size(); }
 
 	cmd_t const& operator[](const std::size_t& index) const { return m_cmdDB[index]; }
 
 	int findCommand(const std::string& data) const;
-	int findData(const std::string& data) const;
 	std::string getType(const int index) const { return std::string(m_cmdDB.at(index)[4]); }
 	std::string getEbusCommand(const int index) const;
 
+	int storeData(const std::string& data) const;
+	std::string getData(int index) const;
+
 private:
 	cmdDB_t m_cmdDB;
+	map_t m_dataDB;
 
 	void printCommand(const cmd_t& command) const;
 

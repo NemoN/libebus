@@ -1,6 +1,10 @@
 libebus - ChangeLog
 -------------------
 
+2014-10-06  Roland Jax  <roland.jax@liwest.at>
+* class Command separated from class Commands.
+* map dataDB to class Commands added.
+
 2014-09-30  Roland Jax  <roland.jax@liwest.at>
 * decode/encode splitted into two files.
 

@@ -30,9 +30,6 @@ namespace libebus
 typedef std::vector<std::string> cmd_t;
 typedef cmd_t::const_iterator cmdCI_t;
 
-typedef std::vector<cmd_t> cmdDB_t;
-typedef cmdDB_t::const_iterator cmdDBCI_t;
-
 class Command
 {
 

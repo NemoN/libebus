@@ -32,9 +32,9 @@ int main() {
 	std::string dir("test");
 	ConfigCommands config(dir, CSV);
 
-	Commands* commands = config.getCommands(); 
+	Commands* commands = config.getCommands();
 
-	std::cout << "size: " << commands->size() << std::endl;
+	std::cout << "size: " << commands->sizeCmd() << std::endl;
 
 	commands->findCommand("get ci Password");
 
