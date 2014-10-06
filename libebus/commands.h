@@ -20,6 +20,7 @@
 #ifndef LIBEBUS_COMMANDS_H_
 #define LIBEBUS_COMMANDS_H_
 
+#include "command.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -28,44 +29,9 @@ namespace libebus
 {
 
 
-typedef std::vector<std::string> cmd_t;
-typedef cmd_t::const_iterator cmdCI_t;
-
-typedef std::vector<cmd_t> cmdDB_t;
-typedef cmdDB_t::const_iterator cmdDBCI_t;
-
-class Command
-{
-
-public:
-	Command(int index, cmd_t command) : m_index(index), m_command(command) {}
-	Command(int index, cmd_t command, std::string data)
-		: m_index(index), m_command(command), m_data(data) {}
-
-	cmd_t getCommand() const { return m_command; }
-	void setData(const std::string& data) { m_data = data; }
-	std::string getData() const { return m_data; }
-	std::string calcData();
-
-	std::string calcResult(const cmd_t& cmd);
-
-private:
-	int m_index;
-	cmd_t m_command;
-	std::string m_data;
-	std::string m_result;
-	std::string m_error;
-
-	void calcSub(const std::string& part, const std::string& position,
-		     const std::string& type, const std::string& factor);
-
-	void decode(const std::string& data, const std::string& position,
-		    const std::string& type, const std::string& factor);
-
-	void encode(const std::string& data, const std::string& type,
-		    const std::string& factor);
-
-};
+typedef std::map<int, Command*> map_t;
+typedef map_t::const_iterator mapCI_t;
+typedef std::pair<int, Command*> pair_t;
 
 class Commands
 {

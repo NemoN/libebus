@@ -22,6 +22,7 @@
 
 #include <libebus/port.h>
 #include <libebus/bus.h>
+#include <libebus/command.h>
 #include <libebus/commands.h>
 #include <libebus/config.h>
 #include <libebus/dump.h>
