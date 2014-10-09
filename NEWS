@@ -1,6 +1,10 @@
 libebus - NEWS
 --------------
 
+2014-10-09  Roland Jax  <roland.jax@liwest.at>
+* Polling ability implemented.
+* Version changed from 0.1.1 to 0.2.0
+
 2014-06-05  Roland Jax  <roland.jax@liwest.at>
 * Version changed from 0.1.0 to 0.1.1
 
