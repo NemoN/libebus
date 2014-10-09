@@ -73,6 +73,7 @@ public:
 
 	int getBus(const unsigned char byte);
 	int sendCommand();
+	void delCommand() { m_sendBuffer.pop(); }
 
 	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
 
