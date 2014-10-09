@@ -34,9 +34,9 @@ int main() {
 
 	Commands* commands = config.getCommands();
 
-	std::cout << "size: " << commands->sizeCmd() << std::endl;
+	std::cout << "size: " << commands->sizeCmdDB() << std::endl;
 
-	commands->findCommand("get ci Password");
+	commands->findCommand("g ci Password");
 
 	std::cout << (*commands)[0][0] << std::endl;
 

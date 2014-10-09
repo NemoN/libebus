@@ -31,10 +31,16 @@ namespace libebus
 
 Commands::~Commands()
 {
-	for (mapCI_t iter = m_dataDB.begin(); iter != m_dataDB.end(); ++iter)
+	for (mapCI_t iter = m_polDB.begin(); iter != m_polDB.end(); ++iter)
 		delete iter->second;
 
-	m_dataDB.clear();
+	m_polDB.clear();
+
+	for (mapCI_t iter = m_cycDB.begin(); iter != m_cycDB.end(); ++iter)
+		delete iter->second;
+
+	m_cycDB.clear();
+
 	m_cmdDB.clear();
 }
 
@@ -42,9 +48,14 @@ void Commands::addCommand(const cmd_t& command)
 {
 	m_cmdDB.push_back(command);
 
-	if (strcasecmp(command[0].c_str(),"cyc") == 0) {
+	if (strcasecmp(command[0].c_str(),"C") == 0) {
 		Command* cmd = new Command(m_cmdDB.size()-1, command);
-		m_dataDB.insert(pair_t(m_cmdDB.size()-1, cmd));
+		m_cycDB.insert(pair_t(m_cmdDB.size()-1, cmd));
+	}
+
+	if (strcasecmp(command[0].c_str(),"P") == 0) {
+		Command* cmd = new Command(m_cmdDB.size()-1, command);
+		m_polDB.insert(pair_t(m_cmdDB.size()-1, cmd));
 	}
 }
 
@@ -77,18 +88,39 @@ int Commands::findCommand(const std::string& data) const
 	std::size_t index;
 	cmdDBCI_t i = m_cmdDB.begin();
 
-	// walk through commands
-	for (index = 0; i != m_cmdDB.end(); i++, index++) {
+	// walk through commands - GET
+	if (strcasecmp(cmd[0].c_str(), "GET") == 0) {
+		for (index = 0; i != m_cmdDB.end(); i++, index++) {
 
-		// empty line
-		if ((*i).size() == 0)
-			continue;
+			// empty line
+			if ((*i).size() == 0)
+				continue;
 
-		if (strcasecmp((*i)[0].c_str(), cmd[0].c_str()) == 0 &&
-		    strcasecmp((*i)[1].c_str(), cmd[1].c_str()) == 0 &&
-		    strcasecmp((*i)[2].c_str(), cmd[2].c_str()) == 0)
-			return index;
+			if (((strcasecmp((*i)[0].c_str(), "R") == 0)
+			||   (strcasecmp((*i)[0].c_str(), "P") == 0))
+			&&   (strcasecmp((*i)[1].c_str(), cmd[1].c_str()) == 0)
+			&&   (strcasecmp((*i)[2].c_str(), cmd[2].c_str()) == 0))
+				return index;
+		}
+	// walk through commands - SET, CYC
+	} else {
+		// correct type
+		if (strcasecmp(cmd[0].c_str(), "SET") == 0)
+			cmd[0] = "W";
+		else if (strcasecmp(cmd[0].c_str(), "CYC") == 0)
+			cmd[0] = "C";
 
+		for (index = 0; i != m_cmdDB.end(); i++, index++) {
+
+			// empty line
+			if ((*i).size() == 0)
+				continue;
+
+			if (strcasecmp((*i)[0].c_str(), cmd[0].c_str()) == 0 &&
+			    strcasecmp((*i)[1].c_str(), cmd[1].c_str()) == 0 &&
+			    strcasecmp((*i)[2].c_str(), cmd[2].c_str()) == 0)
+				return index;
+		}
 	}
 
 	// command not found
@@ -108,10 +140,10 @@ std::string Commands::getEbusCommand(const int index) const
 	return cmd;
 }
 
-int Commands::storeData(const std::string& data) const
+int Commands::storeCycData(const std::string& data) const
 {
 	// no commands defined
-	if (m_dataDB.size() == 0)
+	if (m_cycDB.size() == 0)
 		return -2;
 
 	// search skipped - string too short
@@ -121,11 +153,10 @@ int Commands::storeData(const std::string& data) const
 	// prepare string for searching command
 	std::string search(data.substr(2, 8 + strtol(data.substr(8,2).c_str(), NULL, 16) * 2));
 
-	std::size_t index;
-	mapCI_t iter = m_dataDB.begin();
+	mapCI_t iter = m_cycDB.begin();
 
 	// walk through commands
-	for (index = 0; iter != m_dataDB.end(); iter++, index++) {
+	for (; iter != m_cycDB.end(); iter++) {
 
 		std::string command = getEbusCommand(iter->first);
 
@@ -137,22 +168,69 @@ int Commands::storeData(const std::string& data) const
 			iter->second->setData(data);
 			return iter->first;
 		}
-
 	}
 
 	// command not found
 	return -1;
 }
 
-std::string Commands::getData(int index) const
+std::string Commands::getCycData(int index) const
 {
-	mapCI_t iter = m_dataDB.find(index);
-	if (iter != m_dataDB.end())
+	mapCI_t iter = m_cycDB.find(index);
+	if (iter != m_cycDB.end())
 		return iter->second->getData();
 	else
 		return "";
 }
 
+int Commands::nextPolCommand()
+{
+	size_t index = 0;
+
+	m_polIndex++;
+
+	if (m_polIndex == m_polDB.size())
+		m_polIndex = 0;
+
+	mapCI_t iter = m_polDB.begin();
+
+	for (; iter != m_polDB.end(); iter++, index++)
+		if (index == m_polIndex)
+			return iter->first;
+
+	return -1;
+}
+
+void Commands::storePolData(const std::string& data) const
+{
+	// prepare string for searching command
+	std::string search(data.substr(2, 8 + strtol(data.substr(8,2).c_str(), NULL, 16) * 2));
+
+	mapCI_t iter = m_polDB.begin();
+
+	// walk through commands
+	for (; iter != m_polDB.end(); iter++) {
+
+		std::string command = getEbusCommand(iter->first);
+
+		// skip wrong search string length
+		if (command.length() > search.length())
+			continue;
+
+		if (strcasecmp(command.c_str(), search.substr(0,command.length()).c_str()) == 0)
+			iter->second->setData(data);
+
+	}
+}
+
+std::string Commands::getPolData(int index) const
+{
+	mapCI_t iter = m_polDB.find(index);
+	if (iter != m_polDB.end())
+		return iter->second->getData();
+	else
+		return "";
+}
 
 void Commands::printCommand(const cmd_t& command) const
 {

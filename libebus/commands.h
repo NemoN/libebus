@@ -40,26 +40,36 @@ class Commands
 {
 
 public:
+	Commands() : m_polIndex(-1) {}
 	~Commands();
 
 	void addCommand(const cmd_t& command);
 	void printCommands() const;
 
-	std::size_t sizeCmd() const { return m_cmdDB.size(); }
-	std::size_t sizeData() const { return m_dataDB.size(); }
+	std::size_t sizeCmdDB() const { return m_cmdDB.size(); }
+	std::size_t sizeCycDB() const { return m_cycDB.size(); }
+	std::size_t sizePolDB() const { return m_polDB.size(); }
 
 	cmd_t const& operator[](const std::size_t& index) const { return m_cmdDB[index]; }
 
 	int findCommand(const std::string& data) const;
-	std::string getType(const int index) const { return std::string(m_cmdDB.at(index)[4]); }
+
+	std::string getCmdType(const int index) const { return std::string(m_cmdDB.at(index)[0]); }
+	std::string getEbusType(const int index) const { return std::string(m_cmdDB.at(index)[4]); }
 	std::string getEbusCommand(const int index) const;
 
-	int storeData(const std::string& data) const;
-	std::string getData(int index) const;
+	int storeCycData(const std::string& data) const;
+	std::string getCycData(int index) const;
+
+	int nextPolCommand();
+	void storePolData(const std::string& data) const;
+	std::string getPolData(int index) const;
 
 private:
 	cmdDB_t m_cmdDB;
-	map_t m_dataDB;
+	map_t m_cycDB;
+	map_t m_polDB;
+	size_t m_polIndex;
 
 	void printCommand(const cmd_t& command) const;
 

@@ -53,10 +53,10 @@ void readCSV(std::istream& is, Commands& commands){
 int main()
 {
 	Commands* commands = ConfigCommands("test", CSV).getCommands();
-	std::cout << "Commands: " << commands->sizeCmd() << std::endl;
+	std::cout << "Commands: " << commands->sizeCmdDB() << std::endl;
 
-	//~ std::string data("get ci password pin1");
-	std::string data("set vwxmk DesiredTemp");
+	//~ std::string data("g ci password pin1");
+	std::string data("s vwxmk DesiredTemp");
 
 	int index = commands->findCommand(data);
 	std::cout << "found at index: " << index << std::endl;
