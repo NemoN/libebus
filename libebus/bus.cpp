@@ -27,7 +27,7 @@ namespace libebus
 static const unsigned char ESC = 0xA9; // escape symbol, either followed by 0x00 for the value 0xA9, or 0x01 for the value 0xAA
 static const unsigned char SYN = 0xAA; // synchronisation symbol
 static const unsigned char ACK = 0x00; // positive acknowledge
-static const unsigned char NAK = 0xFF; // negative  acknowledge
+static const unsigned char NAK = 0xFF; // negative acknowledge
 static const unsigned char BROADCAST = 0xFE; // the singular broadcast destination address
 
 // the maximum time allowed for retrieving a byte from an addressed slave
@@ -83,7 +83,9 @@ const char* BusCommand::getResultCodeCStr() {
 		case RESULT_ERR_ACK: return "ERR_ACK: ACK error";
 		case RESULT_ERR_TIMEOUT: return "ERR_TIMEOUT: read timeout";
 		case RESULT_ERR_SYN: return "ERR_SYN: SYN received";
-		case RESULT_ERR_ESC:return "ERR_ESC: invalid escape sequence received";
+		case RESULT_ERR_BUS_LOST: return "ERR_BUS_LOST: lost bus arbitration";
+		case RESULT_ERR_ESC: return "ERR_ESC: invalid escape sequence received";
+		case RESULT_ERR_INVALID_ARG: return "ERR_INVALID_ARG: invalid argument specified";
 		default: return "success";
 	}
 }
