@@ -24,14 +24,20 @@
 namespace libebus
 {
 
-const unsigned char ESC = 0xA9;
-const unsigned char SYN = 0xAA;
-const unsigned char ACK = 0x00;
-const unsigned char NAK = 0xFF;
-const unsigned char BROADCAST = 0xFE;
+static const unsigned char ESC = 0xA9; // escape symbol, either followed by 0x00 for the value 0xA9, or 0x01 for the value 0xAA
+static const unsigned char SYN = 0xAA; // synchronisation symbol
+static const unsigned char ACK = 0x00; // positive acknowledge
+static const unsigned char NAK = 0xFF; // negative  acknowledge
+static const unsigned char BROADCAST = 0xFE; // the singular broadcast destination address
 
+// the maximum time allowed for retrieving a byte from an addressed slave
 #define RECV_TIMEOUT 10000
 
+/**
+ * Return whether the address is one of the 25 master addresses.
+ * @param addr the address to check.
+ * @return <code>true</code> if the specified address is a master address.
+ */
 bool isMaster(unsigned char addr) {
 	unsigned char addrHi = (addr&0xf0)>>4;
 	unsigned char addrLo = (addr&0x0f);
