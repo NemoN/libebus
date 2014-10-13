@@ -30,31 +30,26 @@
 namespace libebus
 {
 
-enum CommandType {
-		     invalid,
-		     broadcast,
-		     masterMaster,
-		     masterSlave
-		   };
+enum CommandType { invalid, broadcast, masterMaster, masterSlave };
 
 
-const int RESULT_OK = 0;
+static const int RESULT_OK = 0;
 
-const int RESULT_BUS_ACQUIRED = 1;
-const int RESULT_SYN = 2; // regular SYN after message received
-const int RESULT_DATA = 3; // some data received
-const int RESULT_AUTO_SYN = 4; // AUTO SYN (without message) received
+static const int RESULT_BUS_ACQUIRED = 1;
+static const int RESULT_SYN = 2; // regular SYN after message received
+static const int RESULT_DATA = 3; // some data received
+static const int RESULT_AUTO_SYN = 4; // AUTO SYN (without message) received
 
-const int RESULT_ERR_SEND = -1; // send error
-const int RESULT_ERR_EXTRA_DATA = -2; // received bytes > sent bytes
-const int RESULT_ERR_NAK = -3; // NAK received
-const int RESULT_ERR_CRC = -4; // CRC error
-const int RESULT_ERR_ACK = -5; // ACK error
-const int RESULT_ERR_TIMEOUT = -6; // read timeout
-const int RESULT_ERR_SYN = -7; // SYN received
-const int RESULT_ERR_BUS_LOST = -8; // arbitration los
-const int RESULT_ERR_ESC = -9; // invalid escape sequence received
-const int RESULT_ERR_INVALID_ARG = -10; // invalid argument
+static const int RESULT_ERR_SEND = -1; // send error
+static const int RESULT_ERR_EXTRA_DATA = -2; // received bytes > sent bytes
+static const int RESULT_ERR_NAK = -3; // NAK received
+static const int RESULT_ERR_CRC = -4; // CRC error
+static const int RESULT_ERR_ACK = -5; // ACK error
+static const int RESULT_ERR_TIMEOUT = -6; // read timeout
+static const int RESULT_ERR_SYN = -7; // SYN received
+static const int RESULT_ERR_BUS_LOST = -8; // arbitration los
+static const int RESULT_ERR_ESC = -9; // invalid escape sequence received
+static const int RESULT_ERR_INVALID_ARG = -10; // invalid argument
 
 
 class BusCommand
