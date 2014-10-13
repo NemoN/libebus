@@ -88,16 +88,14 @@ ssize_t Device::recvBytes(const long timeout)
 
 	size_t nbytes;
 	ssize_t bytes_read;
-	unsigned char buffer[100];
 
-	memset(buffer, '\0', sizeof(buffer));
-	nbytes = sizeof(buffer);
+	nbytes = sizeof(m_buffer);
 
 	// read bytes from device
-	bytes_read = read(m_fd, buffer, nbytes);
+	bytes_read = read(m_fd, m_buffer, nbytes);
 
 	for (int i = 0; i < bytes_read; i++)
-		m_recvBuffer.push(buffer[i]);
+		m_recvBuffer.push(m_buffer[i]);
 
 	return bytes_read;
 }

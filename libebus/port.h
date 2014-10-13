@@ -52,6 +52,7 @@ protected:
 	bool m_open;
 	bool m_noDeviceCheck;
 	std::queue<unsigned char> m_recvBuffer;
+	unsigned char m_buffer[100];
 
 private:
 	bool isValid();
