@@ -30,25 +30,54 @@
 namespace libebus
 {
 
+enum CommandType {
+		     invalid,
+		     broadcast,
+		     masterMaster,
+		     masterSlave
+		   };
+
+
+const int RESULT_OK = 0;
+
+const int RESULT_BUS_ACQUIRED = 1;
+const int RESULT_SYN = 2; // regular SYN after message received
+const int RESULT_DATA = 3; // some data received
+const int RESULT_AUTO_SYN = 4; // AUTO SYN (without message) received
+
+const int RESULT_ERR_SEND = -1; // send error
+const int RESULT_ERR_EXTRA_DATA = -2; // received bytes > sent bytes
+const int RESULT_ERR_NAK = -3; // NAK received
+const int RESULT_ERR_CRC = -4; // CRC error
+const int RESULT_ERR_ACK = -5; // ACK error
+const int RESULT_ERR_TIMEOUT = -6; // read timeout
+const int RESULT_ERR_SYN = -7; // SYN received
+const int RESULT_ERR_BUS_LOST = -8; // arbitration los
+const int RESULT_ERR_ESC = -9; // invalid escape sequence received
+const int RESULT_ERR_INVALID_ARG = -10; // invalid argument
+
 
 class BusCommand
 {
 
 public:
-	BusCommand(const std::string type, const std::string command);
+	BusCommand(const std::string command);
 
-	std::string getType() const { return m_type; }
+	CommandType getType() const { return m_type; }
+	const char* getTypeCStr();
 	std::string getCommand() const { return m_command; }
 	unsigned char getByte(const int index) const { return strtoul(m_command.substr(index, 2).c_str(), NULL, 16); }
 	size_t getSize() const { return m_command.size(); }
+        bool isErrorResult() const { return m_resultCode<0; }
+	const char* getResultCodeCStr();
 	std::string getResult() const { return m_result; }
-	void setResult(const std::string result) { m_result = result; }
+	void setResult(const std::string result, const int resultCode) { m_result = result; m_resultCode = resultCode; }
 
 private:
-	std::string m_type;
+	CommandType m_type;
 	std::string m_command;
 	std::string m_result;
-
+	int m_resultCode;
 };
 
 class Bus
