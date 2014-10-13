@@ -88,9 +88,7 @@ ssize_t Device::recvBytes(const long timeout)
 
 	size_t nbytes;
 	ssize_t bytes_read;
-	unsigned char buffer[100];
 
-	memset(buffer, '\0', sizeof(buffer));
 	nbytes = sizeof(buffer);
 
 	// read bytes from device
@@ -106,7 +104,7 @@ unsigned char Device::getByte()
 {
 	unsigned char byte;
 
-	if (m_recvBuffer.empty() == false) {
+	if (!m_recvBuffer.empty()) {
 		byte = m_recvBuffer.front();
 		m_recvBuffer.pop();
 
