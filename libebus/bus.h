@@ -46,9 +46,9 @@ enum CommandType { invalid, broadcast, masterMaster, masterSlave };
 static const int RESULT_OK = 0;
 
 static const int RESULT_BUS_ACQUIRED = 1;
-static const int RESULT_SYN = 2;               // regular SYN after message received
-static const int RESULT_DATA = 3;              // some data received
-static const int RESULT_AUTO_SYN = 4;          // AUTO SYN (without message) received
+static const int RESULT_DATA = 2;              // some data received
+static const int RESULT_SYN = 3;               // regular SYN after message received
+static const int RESULT_BUS_LOCKED = 4;        // bus is locked for access
 
 static const int RESULT_ERR_SEND = -1;         // send error
 static const int RESULT_ERR_EXTRA_DATA = -2;   // received bytes > sent bytes
@@ -123,6 +123,8 @@ private:
 	Dump* m_dump;
 	bool m_dumpState;
 
+	bool m_busLocked;
+
 	int proceedCycData(const unsigned char byte);
 	int sendByte(const unsigned char byte_sent);
 	unsigned char recvByte();
@@ -139,6 +141,7 @@ unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc);
 std::string calc_crc(const std::string& data);
 
 bool isMaster(unsigned char addr);
+
 
 } //namespace
 

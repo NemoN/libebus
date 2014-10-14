@@ -71,7 +71,7 @@ const char* BusCommand::getResultCodeCStr() {
 
 Bus::Bus(const std::string deviceName, const bool noDeviceCheck, const long recvTimeout,
 	const std::string dumpFile, const long dumpSize, const bool dumpState)
-	: m_recvTimeout(recvTimeout), m_dumpState(dumpState)
+	: m_recvTimeout(recvTimeout), m_dumpState(dumpState), m_busLocked(false)
 {
 	m_port = new Port(deviceName, noDeviceCheck);
 	m_dump = new Dump(dumpFile, dumpSize);
@@ -106,7 +106,7 @@ int Bus::proceed()
 {
 	unsigned char byte_recv;
 	ssize_t bytes_recv;
-	int result = RESULT_AUTO_SYN;
+	int result = RESULT_SYN;
 
 	// fetch new message and get bus
 	if (m_sendBuffer.size() != 0 && m_sstr.str().size() == 0) {
@@ -136,16 +136,26 @@ int Bus::proceedCycData(const unsigned char byte)
 	if (byte != SYN) {
 		m_sstr << std::nouppercase << std::hex << std::setw(2)
 		       << std::setfill('0') << static_cast<unsigned>(byte);
+
+		if (m_busLocked == true)
+			m_busLocked = false;
+
 		return RESULT_DATA;
 	}
 
 	if (byte == SYN && m_sstr.str().size() != 0) {
+		// lock bus after SYN-BYTE-SYN Sequence
+		if (m_sstr.str().size() == 2)
+			m_busLocked = true;
+
 		m_cycBuffer.push(m_sstr.str());
 		m_sstr.str(std::string());
-		return RESULT_SYN;
+
+		if (m_busLocked == true)
+			return RESULT_BUS_LOCKED;
 	}
 
-	return RESULT_AUTO_SYN;
+	return RESULT_SYN;
 }
 
 std::string Bus::getCycData()
