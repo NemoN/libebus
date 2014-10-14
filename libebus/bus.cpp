@@ -24,21 +24,6 @@
 namespace libebus
 {
 
-const unsigned char ESC = 0xA9;
-const unsigned char SYN = 0xAA;
-const unsigned char ACK = 0x00;
-const unsigned char NAK = 0xFF;
-const unsigned char BROADCAST = 0xFE;
-
-#define RECV_TIMEOUT 10000
-
-bool isMaster(unsigned char addr) {
-	unsigned char addrHi = (addr&0xf0)>>4;
-	unsigned char addrLo = (addr&0x0f);
-	return ((addrHi==0x0) || (addrHi==0x1) || (addrHi==0x3) || (addrHi==0x7) || (addrHi==0xf))
-		&& ((addrLo==0x0) || (addrLo==0x1) || (addrLo==0x3) || (addrLo==0x7) || (addrLo==0xf));
-}
-
 
 BusCommand::BusCommand(const std::string command)
 {
@@ -50,13 +35,14 @@ BusCommand::BusCommand(const std::string command)
 	m_command += esc(crc);
 
 	unsigned char dstAddress = strtoul(command.substr(2, 2).c_str(), NULL, 16);
-	if (dstAddress==BROADCAST) {
+
+	if (dstAddress == BROADCAST)
 		m_type = broadcast;
-	} else if ( isMaster(dstAddress) ) {
+	else if (isMaster(dstAddress) == true)
 		m_type = masterMaster;
-	} else {
+	else
 		m_type = masterSlave;
-	}
+
 }
 
 const char* BusCommand::getTypeCStr() {
@@ -557,6 +543,15 @@ std::string calc_crc(const std::string& data)
 	     << std::setfill('0') << static_cast<unsigned>(crc);
 
 	return sstr.str();
+}
+
+
+bool isMaster(unsigned char addr) {
+	unsigned char addrHi = (addr & 0xF0) >> 4;
+	unsigned char addrLo = (addr & 0x0F);
+
+	return ((addrHi == 0x0) || (addrHi == 0x1) || (addrHi == 0x3) || (addrHi == 0x7) || (addrHi == 0xF))
+	    && ((addrLo == 0x0) || (addrLo == 0x1) || (addrLo == 0x3) || (addrLo == 0x7) || (addrLo == 0xF));
 }
 
 
