@@ -1,0 +1,63 @@
+diff --git libebus/bus.cpp libebus/bus.cpp
+index e419446..6092078 100644
+--- libebus/bus.cpp
++++ libebus/bus.cpp
+@@ -71,7 +71,7 @@ const char* BusCommand::getResultCodeCStr() {
+ 
+ Bus::Bus(const std::string deviceName, const bool noDeviceCheck, const long recvTimeout,
+ 	const std::string dumpFile, const long dumpSize, const bool dumpState)
+-	: m_recvTimeout(recvTimeout), m_dumpState(dumpState), m_busLocked(false)
++	: m_recvTimeout(recvTimeout), m_dumpState(dumpState), m_busLocked(false), m_busPriorRetry(false)
+ {
+ 	m_port = new Port(deviceName, noDeviceCheck);
+ 	m_dump = new Dump(dumpFile, dumpSize);
+@@ -145,7 +145,7 @@ int Bus::proceedCycData(const unsigned char byte)
+ 
+ 	if (byte == SYN && m_sstr.str().size() != 0) {
+ 		// lock bus after SYN-BYTE-SYN Sequence
+-		if (m_sstr.str().size() == 2)
++		if (m_sstr.str().size() == 2 && m_busPriorRetry == false)
+ 			m_busLocked = true;
+ 
+ 		m_cycBuffer.push(m_sstr.str());
+@@ -196,11 +196,19 @@ int Bus::getBus(const unsigned char byte_sent)
+ 		byte_recv = recvByte();
+ 
+ 		// compare sent and received byte
+-		if (bytes_recv == 1 && byte_sent == byte_recv)
++		if (bytes_recv == 1 && byte_sent == byte_recv) {
++			m_busPriorRetry = false;
+ 			return RESULT_BUS_ACQUIRED;
++		}
+ 
+ 		// store byte
+ 		proceedCycData(byte_recv);
++
++		// compare prior nibble for retry
++		if (bytes_recv == 1 && (byte_sent & 0x0F) == (byte_recv & 0x0F)) {
++			m_busPriorRetry = true;
++			return RESULT_BUS_PRIOR_RETRY;
++		}
+ 	}
+ 
+ 	return RESULT_ERR_BUS_LOST;
+diff --git libebus/bus.h libebus/bus.h
+index 12aded6..7fc83e2 100755
+--- libebus/bus.h
++++ libebus/bus.h
+@@ -49,6 +49,7 @@ static const int RESULT_BUS_ACQUIRED = 1;
+ static const int RESULT_DATA = 2;              // some data received
+ static const int RESULT_SYN = 3;               // regular SYN after message received
+ static const int RESULT_BUS_LOCKED = 4;        // bus is locked for access
++static const int RESULT_BUS_PRIOR_RETRY = 5;   // retry to access bus
+ 
+ static const int RESULT_ERR_SEND = -1;         // send error
+ static const int RESULT_ERR_EXTRA_DATA = -2;   // received bytes > sent bytes
+@@ -124,6 +125,7 @@ private:
+ 	bool m_dumpState;
+ 
+ 	bool m_busLocked;
++	bool m_busPriorRetry;
+ 
+ 	int proceedCycData(const unsigned char byte);
+ 	int sendByte(const unsigned char byte_sent);

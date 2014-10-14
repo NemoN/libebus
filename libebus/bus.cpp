@@ -71,7 +71,7 @@ const char* BusCommand::getResultCodeCStr() {
 
 Bus::Bus(const std::string deviceName, const bool noDeviceCheck, const long recvTimeout,
 	const std::string dumpFile, const long dumpSize, const bool dumpState)
-	: m_recvTimeout(recvTimeout), m_dumpState(dumpState), m_busLocked(false)
+	: m_recvTimeout(recvTimeout), m_dumpState(dumpState), m_busLocked(false), m_busPriorRetry(false)
 {
 	m_port = new Port(deviceName, noDeviceCheck);
 	m_dump = new Dump(dumpFile, dumpSize);
@@ -145,7 +145,7 @@ int Bus::proceedCycData(const unsigned char byte)
 
 	if (byte == SYN && m_sstr.str().size() != 0) {
 		// lock bus after SYN-BYTE-SYN Sequence
-		if (m_sstr.str().size() == 2)
+		if (m_sstr.str().size() == 2 && m_busPriorRetry == false)
 			m_busLocked = true;
 
 		m_cycBuffer.push(m_sstr.str());
@@ -196,11 +196,19 @@ int Bus::getBus(const unsigned char byte_sent)
 		byte_recv = recvByte();
 
 		// compare sent and received byte
-		if (bytes_recv == 1 && byte_sent == byte_recv)
+		if (bytes_recv == 1 && byte_sent == byte_recv) {
+			m_busPriorRetry = false;
 			return RESULT_BUS_ACQUIRED;
+		}
 
 		// store byte
 		proceedCycData(byte_recv);
+
+		// compare prior nibble for retry
+		if (bytes_recv == 1 && (byte_sent & 0x0F) == (byte_recv & 0x0F)) {
+			m_busPriorRetry = true;
+			return RESULT_BUS_PRIOR_RETRY;
+		}
 	}
 
 	return RESULT_ERR_BUS_LOST;

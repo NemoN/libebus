@@ -49,6 +49,7 @@ static const int RESULT_BUS_ACQUIRED = 1;
 static const int RESULT_DATA = 2;              // some data received
 static const int RESULT_SYN = 3;               // regular SYN after message received
 static const int RESULT_BUS_LOCKED = 4;        // bus is locked for access
+static const int RESULT_BUS_PRIOR_RETRY = 5;   // retry to access bus
 
 static const int RESULT_ERR_SEND = -1;         // send error
 static const int RESULT_ERR_EXTRA_DATA = -2;   // received bytes > sent bytes
@@ -124,6 +125,7 @@ private:
 	bool m_dumpState;
 
 	bool m_busLocked;
+	bool m_busPriorRetry;
 
 	int proceedCycData(const unsigned char byte);
 	int sendByte(const unsigned char byte_sent);
