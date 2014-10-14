@@ -66,6 +66,7 @@ const char* BusCommand::getResultCodeCStr() {
 		case RESULT_ERR_BUS_LOST: return "ERR_BUS_LOST: lost bus arbitration";
 		case RESULT_ERR_ESC: return "ERR_ESC: invalid escape sequence received";
 		case RESULT_ERR_INVALID_ARG: return "ERR_INVALID_ARG: invalid argument specified";
+		case RESULT_ERR_DEVICE: return "ERR_DEVICE: generic device error";
 		default: return "success";
 	}
 }
@@ -121,8 +122,8 @@ int Bus::proceed()
 	// wait for new data
 	bytes_recv = m_port->recv(0);
 
-  if (bytes_recv < 0)
-      return RESULT_ERR_DEVICE;
+	if (bytes_recv < 0)
+		return RESULT_ERR_DEVICE;
 
 	for (int i = 0; i < bytes_recv; i++) {
 
@@ -132,6 +133,7 @@ int Bus::proceed()
 		// store byte
 		result = proceedCycData(byte_recv);
 	}
+
 	return result;
 }
 
@@ -147,7 +149,7 @@ int Bus::proceedCycData(const unsigned char byte)
 		return RESULT_DATA;
 	}
 
-	if (m_sstr.str().size() != 0) {
+	if (byte == SYN && m_sstr.str().size() != 0) {
 		// lock bus after SYN-BYTE-SYN Sequence
 		if (m_sstr.str().size() == 2 && m_busPriorRetry == false)
 			m_busLocked = true;
@@ -158,7 +160,6 @@ int Bus::proceedCycData(const unsigned char byte)
 		if (m_busLocked == true)
 			return RESULT_BUS_LOCKED;
 	}
-//TODO	m_sstr.str(std::string());
 
 	return RESULT_SYN;
 }
@@ -195,8 +196,8 @@ int Bus::getBus(const unsigned char byte_sent)
 	// receive 1 byte - must be QQ
 	bytes_recv = m_port->recv(0, 1);
 
-  if (bytes_recv < 0)
-      return RESULT_ERR_DEVICE;
+	if (bytes_recv < 0)
+		return RESULT_ERR_DEVICE;
 
 	// fetch next byte
 	byte_recv = recvByte();
@@ -207,8 +208,8 @@ int Bus::getBus(const unsigned char byte_sent)
 		return RESULT_BUS_ACQUIRED;
   	}
 
-	result = proceedCycData(byte_recv);
-	m_lastSyn = result==RESULT_AUTO_SYN;
+	// store byte
+	proceedCycData(byte_recv); // TODO do something useful with return value
 
 	// compare prior nibble for retry
 	if (bytes_recv == 1 && (byte_sent & 0x0F) == (byte_recv & 0x0F)) {
@@ -216,7 +217,7 @@ int Bus::getBus(const unsigned char byte_sent)
 		return RESULT_BUS_PRIOR_RETRY;
 	}
 
-  	return RESULT_ERR_BUS_LOST;
+	return RESULT_ERR_BUS_LOST;
 }
 
 int Bus::sendCommand()
