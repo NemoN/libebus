@@ -44,7 +44,7 @@ public:
 	bool isOpen();
 
 	ssize_t sendBytes(const unsigned char* buffer, size_t nbytes);
-	ssize_t recvBytes(const long timeout, ssize_t maxCount);
+	ssize_t recvBytes(const long timeout, size_t maxCount);
 
 	unsigned char getByte();
 	ssize_t sizeRecvBuffer() const { return m_recvBuffer.size(); }
@@ -102,7 +102,7 @@ public:
 
 	ssize_t send(const unsigned char* buffer, size_t nbytes)
 		{ return m_device->sendBytes(buffer, nbytes); }
-	ssize_t recv(const long timeout, ssize_t maxCount=MAX_READ_SIZE) { return m_device->recvBytes(timeout, maxCount); }
+	ssize_t recv(const long timeout, size_t maxCount=MAX_READ_SIZE) { return m_device->recvBytes(timeout, maxCount); }
 
 	unsigned char byte() { return m_device->getByte(); }
 	ssize_t size() const { return m_device->sizeRecvBuffer(); }
