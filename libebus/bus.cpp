@@ -211,6 +211,7 @@ int Bus::getBus(const unsigned char byte_sent)
 		}
 	}
 
+	m_busLocked = true;
 	return RESULT_ERR_BUS_LOST;
 }
 
