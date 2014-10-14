@@ -24,27 +24,6 @@
 namespace libebus
 {
 
-static const unsigned char ESC = 0xA9; // escape symbol, either followed by 0x00 for the value 0xA9, or 0x01 for the value 0xAA
-static const unsigned char SYN = 0xAA; // synchronisation symbol
-static const unsigned char ACK = 0x00; // positive acknowledge
-static const unsigned char NAK = 0xFF; // negative acknowledge
-static const unsigned char BROADCAST = 0xFE; // the singular broadcast destination address
-
-// the maximum time allowed for retrieving a byte from an addressed slave
-#define RECV_TIMEOUT 10000
-
-/**
- * Return whether the address is one of the 25 master addresses.
- * @param addr the address to check.
- * @return <code>true</code> if the specified address is a master address.
- */
-bool isMaster(unsigned char addr) {
-	unsigned char addrHi = (addr&0xf0)>>4;
-	unsigned char addrLo = (addr&0x0f);
-	return ((addrHi==0x0) || (addrHi==0x1) || (addrHi==0x3) || (addrHi==0x7) || (addrHi==0xf))
-		&& ((addrLo==0x0) || (addrLo==0x1) || (addrLo==0x3) || (addrLo==0x7) || (addrLo==0xf));
-}
-
 
 BusCommand::BusCommand(const std::string command)
 {
@@ -56,13 +35,14 @@ BusCommand::BusCommand(const std::string command)
 	m_command += esc(crc);
 
 	unsigned char dstAddress = strtoul(command.substr(2, 2).c_str(), NULL, 16);
-	if (dstAddress==BROADCAST) {
+
+	if (dstAddress == BROADCAST)
 		m_type = broadcast;
-	} else if ( isMaster(dstAddress) ) {
+	else if (isMaster(dstAddress) == true)
 		m_type = masterMaster;
-	} else {
+	else
 		m_type = masterSlave;
-	}
+
 }
 
 const char* BusCommand::getTypeCStr() {
@@ -93,7 +73,7 @@ const char* BusCommand::getResultCodeCStr() {
 
 Bus::Bus(const std::string deviceName, const bool noDeviceCheck, const long recvTimeout,
 	const std::string dumpFile, const long dumpSize, const bool dumpState)
-	: m_recvTimeout(recvTimeout), m_dumpState(dumpState)
+	: m_recvTimeout(recvTimeout), m_dumpState(dumpState), m_busLocked(false), m_busPriorRetry(false)
 {
 	m_port = new Port(deviceName, noDeviceCheck);
 	m_dump = new Dump(dumpFile, dumpSize);
@@ -128,7 +108,7 @@ int Bus::proceed()
 {
 	unsigned char byte_recv;
 	ssize_t bytes_recv;
-	int result = RESULT_AUTO_SYN;
+	int result = RESULT_SYN;
 
 	// fetch new message and get bus
 	if (m_sendBuffer.size() != 0 && m_sstr.str().size() == 0) {
@@ -141,6 +121,9 @@ int Bus::proceed()
 	// wait for new data
 	bytes_recv = m_port->recv(0);
 
+  if (bytes_recv < 0)
+      return RESULT_ERR_DEVICE;
+
 	for (int i = 0; i < bytes_recv; i++) {
 
 		// fetch next byte
@@ -149,7 +132,6 @@ int Bus::proceed()
 		// store byte
 		result = proceedCycData(byte_recv);
 	}
-
 	return result;
 }
 
@@ -158,16 +140,27 @@ int Bus::proceedCycData(const unsigned char byte)
 	if (byte != SYN) {
 		m_sstr << std::nouppercase << std::hex << std::setw(2)
 		       << std::setfill('0') << static_cast<unsigned>(byte);
+
+		if (m_busLocked == true)
+			m_busLocked = false;
+
 		return RESULT_DATA;
 	}
 
-	if (byte == SYN && m_sstr.str().size() != 0) {
+	if (m_sstr.str().size() != 0) {
+		// lock bus after SYN-BYTE-SYN Sequence
+		if (m_sstr.str().size() == 2 && m_busPriorRetry == false)
+			m_busLocked = true;
+
 		m_cycBuffer.push(m_sstr.str());
 		m_sstr.str(std::string());
-		return RESULT_SYN;
-	}
 
-	return RESULT_AUTO_SYN;
+		if (m_busLocked == true)
+			return RESULT_BUS_LOCKED;
+	}
+//TODO	m_sstr.str(std::string());
+
+	return RESULT_SYN;
 }
 
 std::string Bus::getCycData()
@@ -200,22 +193,30 @@ int Bus::getBus(const unsigned char byte_sent)
 		return RESULT_ERR_SEND;
 
 	// receive 1 byte - must be QQ
-	bytes_recv = m_port->recv(0);
+	bytes_recv = m_port->recv(0, 1);
 
-	for (int i = 0; i < bytes_recv; i++) {
+  if (bytes_recv < 0)
+      return RESULT_ERR_DEVICE;
 
-		// fetch next byte
-		byte_recv = recvByte();
+	// fetch next byte
+	byte_recv = recvByte();
 
-		// compare sent and received byte
-		if (bytes_recv == 1 && byte_sent == byte_recv)
-			return RESULT_BUS_ACQUIRED;
+	// compare sent and received byte
+	if (bytes_recv == 1 && byte_sent == byte_recv) {
+		m_busPriorRetry = false;
+		return RESULT_BUS_ACQUIRED;
+  	}
 
-		// store byte
-		proceedCycData(byte_recv);
+	result = proceedCycData(byte_recv);
+	m_lastSyn = result==RESULT_AUTO_SYN;
+
+	// compare prior nibble for retry
+	if (bytes_recv == 1 && (byte_sent & 0x0F) == (byte_recv & 0x0F)) {
+		m_busPriorRetry = true;
+		return RESULT_BUS_PRIOR_RETRY;
 	}
 
-	return RESULT_ERR_BUS_LOST;
+  	return RESULT_ERR_BUS_LOST;
 }
 
 int Bus::sendCommand()
@@ -565,6 +566,20 @@ std::string calc_crc(const std::string& data)
 	     << std::setfill('0') << static_cast<unsigned>(crc);
 
 	return sstr.str();
+}
+
+
+/**
+ * Return whether the address is one of the 25 master addresses.
+ * @param addr the address to check.
+ * @return <code>true</code> if the specified address is a master address.
+ */
+bool isMaster(unsigned char addr) {
+	unsigned char addrHi = (addr & 0xF0) >> 4;
+	unsigned char addrLo = (addr & 0x0F);
+
+	return ((addrHi == 0x0) || (addrHi == 0x1) || (addrHi == 0x3) || (addrHi == 0x7) || (addrHi == 0xF))
+	    && ((addrLo == 0x0) || (addrLo == 0x1) || (addrLo == 0x3) || (addrLo == 0x7) || (addrLo == 0xF));
 }
 
 
