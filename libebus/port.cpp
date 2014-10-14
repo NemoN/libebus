@@ -66,10 +66,10 @@ ssize_t Device::sendBytes(const unsigned char* buffer, size_t nbytes)
 	return write(m_fd, buffer, nbytes);
 }
 
-ssize_t Device::recvBytes(const long timeout)
+ssize_t Device::recvBytes(const long timeout, ssize_t maxCount)
 {
 	if (isValid() == false)
-		return -1;
+		return -1; // TODO RESULT_ERR_DEVICE
 
 	if (timeout > 0) {
 		fd_set readfds;
@@ -83,16 +83,16 @@ ssize_t Device::recvBytes(const long timeout)
 		FD_SET(m_fd, &readfds);
 
 		if (select(m_fd + 1, &readfds, NULL, NULL, &tdiff) != 1)
-			return -2;
+			return -2; // TODO RESULT_ERR_TIMEOUT
 	}
 
-	size_t nbytes;
-	ssize_t bytes_read;
-
-	nbytes = sizeof(m_buffer);
+	ssize_t bytes_read = sizeof(m_buffer);
+	if (maxCount>sizeof(m_buffer))
+		maxCount = sizeof(m_buffer);
+	
 
 	// read bytes from device
-	bytes_read = read(m_fd, m_buffer, nbytes);
+	bytes_read = read(m_fd, m_buffer, maxCount);
 
 	for (int i = 0; i < bytes_read; i++)
 		m_recvBuffer.push(m_buffer[i]);

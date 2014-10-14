@@ -30,6 +30,8 @@ namespace libebus
 
 enum DeviceType { SERIAL, NETWORK };
 
+#define MAX_READ_SIZE 100
+
 class Device
 {
 
@@ -42,7 +44,7 @@ public:
 	bool isOpen();
 
 	ssize_t sendBytes(const unsigned char* buffer, size_t nbytes);
-	ssize_t recvBytes(const long timeout);
+	ssize_t recvBytes(const long timeout, ssize_t maxCount);
 
 	unsigned char getByte();
 	ssize_t sizeRecvBuffer() const { return m_recvBuffer.size(); }
@@ -52,7 +54,7 @@ protected:
 	bool m_open;
 	bool m_noDeviceCheck;
 	std::queue<unsigned char> m_recvBuffer;
-	unsigned char m_buffer[100];
+	unsigned char m_buffer[MAX_READ_SIZE];
 
 private:
 	bool isValid();
@@ -100,7 +102,7 @@ public:
 
 	ssize_t send(const unsigned char* buffer, size_t nbytes)
 		{ return m_device->sendBytes(buffer, nbytes); }
-	ssize_t recv(const long timeout) { return m_device->recvBytes(timeout); }
+	ssize_t recv(const long timeout, ssize_t maxCount=MAX_READ_SIZE) { return m_device->recvBytes(timeout, maxCount); }
 
 	unsigned char byte() { return m_device->getByte(); }
 	ssize_t size() const { return m_device->sizeRecvBuffer(); }
@@ -109,7 +111,6 @@ private:
 	std::string m_deviceName;
 	Device* m_device;
 	bool m_noDeviceCheck;
-
 
 	void setType(const DeviceType type);
 
