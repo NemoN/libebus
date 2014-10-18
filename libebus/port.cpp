@@ -87,7 +87,7 @@ ssize_t Device::recvBytes(const long timeout, size_t maxCount)
 	}
 
 	ssize_t bytes_read = sizeof(m_buffer);
-	if (maxCount>sizeof(m_buffer))
+	if (maxCount > sizeof(m_buffer))
 		maxCount = sizeof(m_buffer);
 	
 
