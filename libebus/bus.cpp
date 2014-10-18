@@ -217,6 +217,7 @@ int Bus::getBus(const unsigned char byte_sent)
 		return RESULT_BUS_PRIOR_RETRY;
 	}
 
+	m_busLocked = true;
 	return RESULT_ERR_BUS_LOST;
 }
 
