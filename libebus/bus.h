@@ -58,7 +58,7 @@ static const int RESULT_ERR_CRC = -4;          // CRC error
 static const int RESULT_ERR_ACK = -5;          // ACK error
 static const int RESULT_ERR_TIMEOUT = -6;      // read timeout
 static const int RESULT_ERR_SYN = -7;          // SYN received
-static const int RESULT_ERR_BUS_LOST = -8;     // arbitration los
+static const int RESULT_ERR_BUS_LOST = -8;     // arbitration lost
 static const int RESULT_ERR_ESC = -9;          // invalid escape sequence received
 static const int RESULT_ERR_INVALID_ARG = -10; // invalid argument
 
@@ -70,14 +70,19 @@ public:
 	BusCommand(const std::string command);
 
 	CommandType getType() const { return m_type; }
-	const char* getTypeCStr();
+	const char* getTypeCStr() const;
+
 	std::string getCommand() const { return m_command; }
+
 	unsigned char getByte(const int index) const { return strtoul(m_command.substr(index, 2).c_str(), NULL, 16); }
+
 	size_t getSize() const { return m_command.size(); }
+
         bool isErrorResult() const { return m_resultCode < 0; }
-	const char* getResultCodeCStr();
-	std::string getResult() const { return m_result; }
 	void setResult(const std::string result, const int resultCode) { m_result = result; m_resultCode = resultCode; }
+	const char* getResultCodeCStr() const;
+	std::string getResult() const { return m_result; }
+
 
 private:
 	CommandType m_type;
@@ -108,7 +113,7 @@ public:
 
 	int getBus(const unsigned char byte);
 	int sendCommand();
-	void delCommand() { m_sendBuffer.pop(); }
+	void delCommand();
 
 	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
 

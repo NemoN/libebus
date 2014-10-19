@@ -134,9 +134,9 @@ void DeviceSerial::openDevice(const std::string deviceName, const bool noDeviceC
 
 	memset(&newSettings, '\0', sizeof(newSettings));
 
-	newSettings.c_cflag = B2400 | CS8 | CLOCAL | CREAD;
+	newSettings.c_cflag |= (B2400 | CS8 | CLOCAL | CREAD);
 	newSettings.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-	newSettings.c_iflag = IGNPAR;
+	newSettings.c_iflag |= IGNPAR;
 	newSettings.c_oflag &= ~OPOST;
 
 	newSettings.c_cc[VMIN]  = 1;

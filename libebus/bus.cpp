@@ -45,7 +45,7 @@ BusCommand::BusCommand(const std::string command)
 
 }
 
-const char* BusCommand::getTypeCStr() {
+const char* BusCommand::getTypeCStr() const {
 	switch (m_type) {
 		case broadcast: return "BC";
 		case masterMaster: return "MM";
@@ -54,7 +54,7 @@ const char* BusCommand::getTypeCStr() {
 	}
 }
 
-const char* BusCommand::getResultCodeCStr() {
+const char* BusCommand::getResultCodeCStr() const {
 	switch (m_resultCode) {
 		case RESULT_ERR_SEND: return "ERR_SEND: send error";
 		case RESULT_ERR_EXTRA_DATA: return "ERR_EXTRA_DATA: received bytes > sent bytes";
@@ -63,7 +63,8 @@ const char* BusCommand::getResultCodeCStr() {
 		case RESULT_ERR_ACK: return "ERR_ACK: ACK error";
 		case RESULT_ERR_TIMEOUT: return "ERR_TIMEOUT: read timeout";
 		case RESULT_ERR_SYN: return "ERR_SYN: SYN received";
-		case RESULT_ERR_ESC:return "ERR_ESC: invalid escape sequence received";
+		case RESULT_ERR_ESC: return "ERR_ESC: invalid escape sequence received";
+		case RESULT_ERR_BUS_LOST: return "ERR_BUS_LOST: arbitration lost";
 		default: return "success";
 	}
 }
@@ -377,6 +378,15 @@ on_exit:
 	m_recvBuffer.push(busCommand);
 	return retval;
 
+}
+
+void Bus::delCommand()
+{
+	BusCommand* busCommand = m_sendBuffer.front();
+	m_sendBuffer.pop();
+
+	busCommand->setResult("", RESULT_ERR_BUS_LOST);
+	m_recvBuffer.push(busCommand);
 }
 
 int Bus::sendByte(const unsigned char byte_sent)
