@@ -70,7 +70,6 @@ public:
 	BusCommand(const std::string command);
 
 	CommandType getType() const { return m_type; }
-	const char* getTypeCStr() const;
 
 	std::string getCommand() const { return m_command; }
 

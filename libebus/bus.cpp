@@ -45,15 +45,6 @@ BusCommand::BusCommand(const std::string command)
 
 }
 
-const char* BusCommand::getTypeCStr() const {
-	switch (m_type) {
-		case broadcast: return "BC";
-		case masterMaster: return "MM";
-		case masterSlave: return "MS";
-		default: return "?";
-	}
-}
-
 const char* BusCommand::getResultCodeCStr() const {
 	switch (m_resultCode) {
 		case RESULT_ERR_SEND: return "ERR_SEND: send error";
@@ -107,14 +98,11 @@ int Bus::proceed()
 {
 	unsigned char byte_recv;
 	ssize_t bytes_recv;
-	int result = RESULT_SYN;
 
 	// fetch new message and get bus
 	if (m_sendBuffer.size() != 0 && m_sstr.str().size() == 0) {
 		BusCommand* busCommand = m_sendBuffer.front();
-		result = getBus(busCommand->getByte(0));
-
-		return result;
+		return getBus(busCommand->getByte(0));
 	}
 
 	// wait for new data
@@ -126,10 +114,10 @@ int Bus::proceed()
 		byte_recv = recvByte();
 
 		// store byte
-		result = proceedCycData(byte_recv);
+		return proceedCycData(byte_recv);
 	}
 
-	return result;
+	return RESULT_SYN;
 }
 
 int Bus::proceedCycData(const unsigned char byte)
@@ -234,7 +222,7 @@ int Bus::sendCommand()
 	}
 
 	// BC -> send SYN
-	if (busCommand->getType()==broadcast) {
+	if (busCommand->getType() == broadcast) {
 		sendByte(SYN);
 		goto on_exit;
 	}
@@ -296,7 +284,7 @@ int Bus::sendCommand()
 	}
 
 	// MM -> send SYN
-	if (busCommand->getType()==masterMaster) {
+	if (busCommand->getType() == masterMaster) {
 		sendByte(SYN);
 		goto on_exit;
 	}
@@ -358,8 +346,8 @@ int Bus::sendCommand()
 	sendByte(SYN);
 
 on_exit:
-	if (retval>=0) {
-		if (busCommand->getType()==masterSlave) {
+	if (retval >= 0) {
+		if (busCommand->getType() == masterSlave) {
 			result = busCommand->getCommand();
 			result += "00";
 			result += unesc(slaveData);
