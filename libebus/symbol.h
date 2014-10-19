@@ -36,27 +36,6 @@ static const unsigned char NAK = 0xFF;       // negative acknowledge
 static const unsigned char BROADCAST = 0xFE; // the broadcast destination address
 
 
-static const int RESULT_OK = 0;
-
-static const int RESULT_BUS_ACQUIRED = 1;      // bus successfully acquired
-static const int RESULT_DATA = 2;              // some data received
-static const int RESULT_SYN = 3;               // regular SYN after message received
-static const int RESULT_BUS_LOCKED = 4;        // bus is locked for access
-static const int RESULT_BUS_PRIOR_RETRY = 5;   // retry to access bus
-
-static const int RESULT_ERR_SEND = -1;         // send error
-static const int RESULT_ERR_EXTRA_DATA = -2;   // received bytes > sent bytes
-static const int RESULT_ERR_NAK = -3;          // NAK received
-static const int RESULT_ERR_CRC = -4;          // CRC error
-static const int RESULT_ERR_ACK = -5;          // ACK error
-static const int RESULT_ERR_TIMEOUT = -6;      // read timeout
-static const int RESULT_ERR_SYN = -7;          // SYN received
-static const int RESULT_ERR_BUS_LOST = -8;     // arbitration lost
-static const int RESULT_ERR_ESC = -9;          // invalid escape sequence received
-static const int RESULT_ERR_INVALID_ARG = -10; // invalid argument
-static const int RESULT_ERR_DEVICE = -11;      // generic device error (usually fatal)
-
-
 /**
  * @brief A string of bus symbols.
  */
@@ -128,10 +107,6 @@ public:
 	 * @return the number of available symbols.
 	 */
 	size_t size() const { return m_data.size(); }
-	/**
-	 * @brief Replaces ESC and ACK symbols with the escape sequence.
-	 */
-	//void escape();
 	/**
 	 * @brief Returns the calculated CRC.
 	 * @return the calculated CRC.
