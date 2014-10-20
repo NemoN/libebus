@@ -70,4 +70,4 @@ const char* getResultCodeCStr(int resultCode) {
 
 } //namespace
 
-#endif // LIBEBUS_SYMBOL_HPP_
+#endif // LIBEBUS_RESULT_H_
