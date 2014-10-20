@@ -25,16 +25,10 @@ namespace libebus
 {
 
 
-BusCommand::BusCommand(const std::string command)
+BusCommand::BusCommand(const std::string commandStr)
+	: m_command(commandStr), m_resultCode(RESULT_OK)
 {
-	// esc
-	m_command = esc(command);
-
-	// crc + esc
-	std::string crc = calc_crc(m_command);
-	m_command += esc(crc);
-
-	unsigned char dstAddress = strtoul(command.substr(2, 2).c_str(), NULL, 16);
+	unsigned char dstAddress = m_command[1];
 
 	if (dstAddress == BROADCAST)
 		m_type = broadcast;
@@ -55,26 +49,14 @@ const char* BusCommand::getTypeCStr() {
 }
 
 const char* BusCommand::getResultCodeCStr() {
-	switch (m_resultCode) {
-		case RESULT_ERR_SEND: return "ERR_SEND: send error";
-		case RESULT_ERR_EXTRA_DATA: return "ERR_EXTRA_DATA: received bytes > sent bytes";
-		case RESULT_ERR_NAK: return "ERR_NAK: NAK received";
-		case RESULT_ERR_CRC: return "ERR_CRC: CRC error";
-		case RESULT_ERR_ACK: return "ERR_ACK: ACK error";
-		case RESULT_ERR_TIMEOUT: return "ERR_TIMEOUT: read timeout";
-		case RESULT_ERR_SYN: return "ERR_SYN: SYN received";
-		case RESULT_ERR_BUS_LOST: return "ERR_BUS_LOST: lost bus arbitration";
-		case RESULT_ERR_ESC: return "ERR_ESC: invalid escape sequence received";
-		case RESULT_ERR_INVALID_ARG: return "ERR_INVALID_ARG: invalid argument specified";
-		case RESULT_ERR_DEVICE: return "ERR_DEVICE: generic device error";
-		default: return "success";
-	}
+	return libebus::getResultCodeCStr(m_resultCode);
 }
 
 
 Bus::Bus(const std::string deviceName, const bool noDeviceCheck, const long recvTimeout,
 	const std::string dumpFile, const long dumpSize, const bool dumpState)
-	: m_recvTimeout(recvTimeout), m_dumpState(dumpState), m_busLocked(false), m_busPriorRetry(false)
+	: m_previousEscape(false), m_recvTimeout(recvTimeout), m_dumpState(dumpState),
+	  m_busLocked(false), m_busPriorRetry(false)
 {
 	m_port = new Port(deviceName, noDeviceCheck);
 	m_dump = new Dump(dumpFile, dumpSize);
@@ -112,9 +94,9 @@ int Bus::proceed()
 	int result = RESULT_SYN;
 
 	// fetch new message and get bus
-	if (m_sendBuffer.size() != 0 && m_sstr.str().size() == 0) {
+	if (m_sendBuffer.size() != 0 && m_sstr.size() == 0) {
 		BusCommand* busCommand = m_sendBuffer.front();
-		result = getBus(busCommand->getByte(0));
+		result = getBus(busCommand->getCommand()[0]);
 
 		return result;
 	}
@@ -140,22 +122,21 @@ int Bus::proceed()
 int Bus::proceedCycData(const unsigned char byte)
 {
 	if (byte != SYN) {
-		m_sstr << std::nouppercase << std::hex << std::setw(2)
-		       << std::setfill('0') << static_cast<unsigned>(byte);
-
+		m_sstr.push_back_unescape(byte, m_previousEscape, false);
 		if (m_busLocked == true)
 			m_busLocked = false;
 
 		return RESULT_DATA;
 	}
 
-	if (byte == SYN && m_sstr.str().size() != 0) {
+	m_previousEscape = false;
+	if (byte == SYN && m_sstr.size() != 0) {
 		// lock bus after SYN-BYTE-SYN Sequence
-		if (m_sstr.str().size() == 2 && m_busPriorRetry == false)
+		if (m_sstr.size() == 1 && m_busPriorRetry == false)
 			m_busLocked = true;
 
-		m_cycBuffer.push(m_sstr.str());
-		m_sstr.str(std::string());
+		m_cycBuffer.push(m_sstr);
+		m_sstr.clear();
 
 		if (m_busLocked == true)
 			return RESULT_BUS_LOCKED;
@@ -164,9 +145,9 @@ int Bus::proceedCycData(const unsigned char byte)
 	return RESULT_SYN;
 }
 
-std::string Bus::getCycData()
+SymbolString Bus::getCycData()
 {
-	std::string data;
+	SymbolString data;
 
 	if (m_cycBuffer.empty() == false) {
 		data = m_cycBuffer.front();
@@ -225,15 +206,17 @@ int Bus::sendCommand()
 {
 	unsigned char byte_recv;
 	ssize_t bytes_recv;
-	std::string crc_calc, crc_recv, slaveData, result;
+	std::string result;
+	SymbolString slaveData;
 	int retval = RESULT_OK;
 
 	BusCommand* busCommand = m_sendBuffer.front();
 	m_sendBuffer.pop();
 
 	// send ZZ PB SB NN Dx CRC
-	for (size_t i = 2; i < busCommand->getSize(); i = i + 2) {
-		retval = sendByte(busCommand->getByte(i));
+	SymbolString command = busCommand->getCommand();
+	for (size_t i = 1; i < command.size(); i++) {
+		retval = sendByte(command[i]);
 		if (retval < 0)
 			goto on_exit;
 	}
@@ -266,8 +249,8 @@ int Bus::sendCommand()
 	if (byte_recv == NAK) {
 
 		// send QQ ZZ PB SB NN Dx CRC again
-		for (size_t i = 0; i < busCommand->getSize(); i = i + 2) {
-			retval = sendByte(busCommand->getByte(i));
+		for (size_t i = 0; i < command.size(); i++) {
+			retval = sendByte(command[i]);
 			if (retval < 0)
 				goto on_exit;
 		}
@@ -306,57 +289,39 @@ int Bus::sendCommand()
 		goto on_exit;
 	}
 
-	// receive NN
-	retval = recvSlaveData(slaveData);
-	if (retval < 0)
-		goto on_exit;
-
-	// calculate CRC
-	crc_calc = calc_crc(slaveData);
-
-	// receive CRC
-	retval = recvCRC(crc_recv);
-	if (retval < 0)
-		goto on_exit;
+	// receive NN, Dx, CRC
+	retval = recvSlaveDataAndCRC(slaveData);
 
 	// are calculated and received CRC equal?
-	if (crc_calc != crc_recv) {
+	if (retval == RESULT_ERR_CRC) {
 
 		// send NAK
 		retval = sendByte(NAK);
 		if (retval < 0)
 			goto on_exit;
 
-		// receive NN
-		retval = recvSlaveData(slaveData);
-		if (retval < 0)
-			goto on_exit;
+		// receive NN, Dx, CRC
+		slaveData = SymbolString();
+		retval = recvSlaveDataAndCRC(slaveData);
 
-		// calculate CRC
-		crc_calc = calc_crc(slaveData);
+		// are calculated and received CRC equal?
+		if (retval == RESULT_ERR_CRC) {
 
-		// receive CRC
-		retval = recvCRC(crc_recv);
-		if (retval < 0)
-			goto on_exit;
-
+			// send NAK
+			retval = sendByte(NAK);
+			if (retval >= 0)
+				retval = RESULT_ERR_CRC;
+		}
 	}
 
-	// are calculated and received CRC equal?
-	if (crc_calc != crc_recv) {
-		// send NAK
-		retval = sendByte(NAK);
-		if (retval < 0)
-			goto on_exit;
+	if (retval < 0)
+		goto on_exit;
 
-		retval = RESULT_ERR_CRC;
-	} else {
-		// send ACK
-		retval = sendByte(ACK);
-		if (retval == -1) {
-			retval = RESULT_ERR_ACK;
-			goto on_exit;
-		}
+	// send ACK
+	retval = sendByte(ACK);
+	if (retval == -1) {
+		retval = RESULT_ERR_ACK;
+		goto on_exit;
 	}
 
 	// MS -> send SYN
@@ -365,10 +330,9 @@ int Bus::sendCommand()
 on_exit:
 	if (retval>=0) {
 		if (busCommand->getType()==masterSlave) {
-			result = busCommand->getCommand();
+			result = busCommand->getCommandStr();
 			result += "00";
-			result += unesc(slaveData);
-			result += crc_recv;
+			result += slaveData.getDataStr();
 			result += "00";
 		} else {
 			result = "success";
@@ -379,7 +343,7 @@ on_exit:
 	while (m_port->size() != 0)
 		byte_recv = recvByte();
 
-	busCommand->setResult(result.c_str(), retval);
+	busCommand->setResult(result, retval);
 	m_recvBuffer.push(busCommand);
 	return retval;
 
@@ -418,170 +382,81 @@ unsigned char Bus::recvByte()
 	return byte_recv;
 }
 
-int Bus::recvSlaveData(std::string& result)
+int Bus::recvSlaveDataAndCRC(SymbolString& result)
 {
 	unsigned char byte_recv;
 	ssize_t bytes_recv;
-	std::stringstream sstr;
+	bool previousEscape = false;
 
 	// receive NN
-	bytes_recv = m_port->recv(RECV_TIMEOUT);
-	if (bytes_recv > 1)
-		return RESULT_ERR_EXTRA_DATA;
+	bytes_recv = m_port->recv(RECV_TIMEOUT, 1);
+	if (bytes_recv < 0)
+		return RESULT_ERR_TIMEOUT;
 
 	byte_recv = recvByte();
-	sstr << std::nouppercase << std::setw(2) << std::hex
-	     << std::setfill('0') << static_cast<unsigned>(byte_recv);
+	byte_recv = result.push_back_unescape(byte_recv, previousEscape);
+	if (previousEscape == true && byte_recv == 0)
+		return RESULT_ERR_ESC;
+
+	// escape sequence: get another symbol to find NN
+	if (previousEscape == true) {
+		bytes_recv = m_port->recv(RECV_TIMEOUT, 1);
+		if (bytes_recv < 0)
+			return RESULT_ERR_TIMEOUT;
+
+		byte_recv = recvByte();
+		byte_recv = result.push_back_unescape(byte_recv, previousEscape);
+		if (previousEscape == true)
+			return RESULT_ERR_ESC;
+	}
 
 	int NN = byte_recv;
 
 	// receive Dx
 	for (int i = 0; i < NN; i++) {
-		bytes_recv = m_port->recv(RECV_TIMEOUT);
-		if (bytes_recv > 1)
-			return RESULT_ERR_EXTRA_DATA;
+		bytes_recv = m_port->recv(RECV_TIMEOUT, 1);
+		if (bytes_recv < 0)
+			return RESULT_ERR_TIMEOUT;
 
 		byte_recv = recvByte();
-		sstr << std::nouppercase << std::setw(2) << std::hex
-		     << std::setfill('0') << static_cast<unsigned>(byte_recv);
+		byte_recv = result.push_back_unescape(byte_recv, previousEscape);
+		if (previousEscape == true && byte_recv == 0)
+			return RESULT_ERR_ESC;
 
-		// escape sequence increase NN
-		if (byte_recv == ESC)
+		// escape sequence: increase NN
+		if (previousEscape == true)
 			NN++;
 	}
+	if (previousEscape == true)
+		return RESULT_ERR_ESC;
 
-	result = sstr.str();
-	return RESULT_OK;
-}
-
-int Bus::recvCRC(std::string& result)
-{
-	unsigned char byte_recv;
-	ssize_t bytes_recv;
-	std::stringstream sstr;
-
+	unsigned char crc_calc = result.getCRC();
 	// receive CRC
-	bytes_recv = m_port->recv(RECV_TIMEOUT);
-	if (bytes_recv > 1)
-		return RESULT_ERR_EXTRA_DATA;
+	bytes_recv = m_port->recv(RECV_TIMEOUT, 1);
+	if (bytes_recv < 0)
+		return RESULT_ERR_TIMEOUT;
 
 	byte_recv = recvByte();
-	sstr << std::nouppercase << std::setw(2) << std::hex
-	     << std::setfill('0') << static_cast<unsigned>(byte_recv);
+	byte_recv = result.push_back_unescape(byte_recv, previousEscape, false);
+	if (previousEscape == true && byte_recv == 0)
+		return RESULT_ERR_ESC;
 
-	if (byte_recv == ESC) {
-		// receive CRC
-		bytes_recv = m_port->recv(RECV_TIMEOUT);
-		if (bytes_recv > 1)
-			return RESULT_ERR_EXTRA_DATA;
+	// escape sequence: get another symbol to find CRC
+	if (previousEscape == true) {
+		bytes_recv = m_port->recv(RECV_TIMEOUT, 1);
+		if (bytes_recv < 0)
+			return RESULT_ERR_TIMEOUT;
 
 		byte_recv = recvByte();
-		sstr << std::nouppercase << std::setw(2) << std::hex
-		     << std::setfill('0') << static_cast<unsigned>(byte_recv);
+		byte_recv = result.push_back_unescape(byte_recv, previousEscape);
+		if (previousEscape == true)
+			return RESULT_ERR_ESC;
 	}
 
-	result = unesc(sstr.str());
+	if (crc_calc != byte_recv)
+		return RESULT_ERR_CRC;
 
 	return RESULT_OK;
-}
-
-
-std::string esc(const std::string& data)
-{
-	std::string escaped;
-
-	for (size_t i = 0; i < data.size(); i = i + 2) {
-		long test = strtol(data.substr(i, 2).c_str(), NULL, 16);
-
-		if (test == SYN)
-			escaped += "a901";
-		else if (test == ESC)
-			escaped += "a900";
-		else
-			escaped += data.substr(i, 2).c_str();
-	}
-
-	return escaped;
-}
-
-std::string unesc(const std::string& data)
-{
-	std::string unescaped;
-	bool found = false;
-
-	for (size_t i = 0; i < data.size(); i = i + 2) {
-		long test = strtol(data.substr(i,2).c_str(), NULL, 16);
-
-		if (test == ESC) {
-			found = true;
-
-		} else if (found == true) {
-			if (test == 0x01)
-				unescaped += "aa";
-			else
-				unescaped += "a9";
-
-			found = false;
-		} else {
-			unescaped += data.substr(i,2).c_str();
-		}
-	}
-
-	return unescaped;
-}
-
-
-unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc)
-{
-	unsigned char crc, polynom;
-
-	crc = init_crc;
-
-	for (int i = 0; i < 8; i++) {
-
-		if (crc & 0x80)
-			polynom = (unsigned char) 0x9B;
-		else
-			polynom = (unsigned char) 0;
-
-		crc = (unsigned char) ((crc & ~0x80) << 1);
-
-		if (byte & 0x80)
-			crc = (unsigned char) (crc | 1);
-
-		crc = (unsigned char) (crc ^ polynom);
-		byte = (unsigned char) (byte << 1);
-	}
-
-	return crc;
-}
-
-std::string calc_crc(const std::string& data)
-{
-	unsigned char crc = 0;
-
-	for (size_t i = 0 ; i < data.size() ; i = i + 2)
-		crc = calc_crc_byte(strtol(data.substr(i, 2).c_str(), NULL, 16), crc);
-
-	std::stringstream sstr;
-	sstr << std::nouppercase << std::setw(2) << std::hex
-	     << std::setfill('0') << static_cast<unsigned>(crc);
-
-	return sstr.str();
-}
-
-
-/**
- * Return whether the address is one of the 25 master addresses.
- * @param addr the address to check.
- * @return <code>true</code> if the specified address is a master address.
- */
-bool isMaster(unsigned char addr) {
-	unsigned char addrHi = (addr & 0xF0) >> 4;
-	unsigned char addrLo = (addr & 0x0F);
-
-	return ((addrHi == 0x0) || (addrHi == 0x1) || (addrHi == 0x3) || (addrHi == 0x7) || (addrHi == 0xF))
-	    && ((addrLo == 0x0) || (addrLo == 0x1) || (addrLo == 0x3) || (addrLo == 0x7) || (addrLo == 0xF));
 }
 
 
