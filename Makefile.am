@@ -6,7 +6,9 @@ AM_CXXFLAGS = -fpic -Wall -Wextra
 
 lib_LTLIBRARIES = libebus-@LIBEBUS_API_VERSION@.la
 
-libebus_@LIBEBUS_API_VERSION@_la_SOURCES = libebus/port.cpp \
+libebus_@LIBEBUS_API_VERSION@_la_SOURCES = libebus/result.cpp \
+					   libebus/symbol.cpp \
+					   libebus/port.cpp \
 					   libebus/bus.cpp \
 					   libebus/command.cpp \
 					   libebus/commands.cpp \
@@ -19,6 +21,8 @@ libebus_@LIBEBUS_API_VERSION@_la_LDFLAGS = -version-info $(LIBEBUS_SO_VERSION)
 
 libebus_includedir = $(includedir)/libebus-$(LIBEBUS_API_VERSION)
 nobase_libebus_include_HEADERS = libebus.h \
+                                 libebus/result.h \
+                                 libebus/symbol.h \
                                  libebus/port.h \
                                  libebus/bus.h \
                                  libebus/command.h \
@@ -38,11 +42,15 @@ dist_noinst_SCRIPTS = autogen.sh
 
 
 noinst_PROGRAMS = test_port \
+		  test_symbol \
 		  test_bus \
 		  test_commands \
 		  test_config \
 		  test_decode \
 		  test_encode
+
+test_symbol_SOURCES = test/test_symbol.cpp
+test_symbol_LDADD = libebus-$(LIBEBUS_API_VERSION).la
 
 test_port_SOURCES = test/test_port.cpp
 test_port_LDADD = libebus-$(LIBEBUS_API_VERSION).la
