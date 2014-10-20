@@ -143,4 +143,4 @@ bool isMaster(unsigned char addr);
 
 } //namespace
 
-#endif // LIBEBUS_SYMBOL_HPP_
+#endif // LIBEBUS_SYMBOL_H_
