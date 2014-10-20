@@ -112,6 +112,10 @@ public:
 	 * @return the calculated CRC.
 	 */
 	unsigned char getCRC() const { return m_crc; }
+	/**
+	 * @brief Clears the symbols.
+	 */
+	void clear() { m_crc=0; m_data.clear(); }
 
 private:
 	/**
@@ -130,8 +134,6 @@ private:
 	unsigned char m_crc;
 };
 
-
-unsigned char calc_crc_byte(unsigned char byte, const unsigned char init_crc);
 
 /**
  * Returns whether the address is one of the 25 master addresses.
