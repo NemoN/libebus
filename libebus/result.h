@@ -50,22 +50,7 @@ static const int RESULT_ERR_DEVICE = -11;      // generic device error (usually 
  * @param resultCode the result code (see RESULT_ constants).
  * @return the string corresponding to the result code.
  */
-const char* getResultCodeCStr(int resultCode) {
-	switch (resultCode) {
-		case RESULT_ERR_SEND: return "ERR_SEND: send error";
-		case RESULT_ERR_EXTRA_DATA: return "ERR_EXTRA_DATA: received bytes > sent bytes";
-		case RESULT_ERR_NAK: return "ERR_NAK: NAK received";
-		case RESULT_ERR_CRC: return "ERR_CRC: CRC error";
-		case RESULT_ERR_ACK: return "ERR_ACK: ACK error";
-		case RESULT_ERR_TIMEOUT: return "ERR_TIMEOUT: read timeout";
-		case RESULT_ERR_SYN: return "ERR_SYN: SYN received";
-		case RESULT_ERR_BUS_LOST: return "ERR_BUS_LOST: lost bus arbitration";
-		case RESULT_ERR_ESC: return "ERR_ESC: invalid escape sequence received";
-		case RESULT_ERR_INVALID_ARG: return "ERR_INVALID_ARG: invalid argument specified";
-		case RESULT_ERR_DEVICE: return "ERR_DEVICE: generic device error";
-		default: return "success";
-	}
-}
+const char* getResultCodeCStr(int resultCode);
 
 
 } //namespace
