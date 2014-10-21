@@ -43,6 +43,15 @@ BusCommand::BusCommand(const std::string command)
 	else
 		m_type = masterSlave;
 
+
+	pthread_mutex_init(&m_mutex, NULL);
+	pthread_cond_init(&m_cond, NULL);
+}
+
+BusCommand::~BusCommand()
+{
+	pthread_mutex_destroy(&m_mutex);
+	pthread_cond_destroy(&m_cond);
 }
 
 const char* BusCommand::getResultCodeCStr() const {
@@ -159,13 +168,6 @@ std::string Bus::getCycData()
 	return data;
 }
 
-BusCommand* Bus::recvCommand()
-{
-	BusCommand* busCommand = m_recvBuffer.front();
-	m_recvBuffer.pop();
-	return busCommand;
-}
-
 int Bus::getBus(const unsigned char byte_sent)
 {
 	unsigned char byte_recv;
@@ -204,7 +206,7 @@ int Bus::getBus(const unsigned char byte_sent)
 	return RESULT_ERR_BUS_LOST;
 }
 
-int Bus::sendCommand()
+BusCommand* Bus::sendCommand()
 {
 	unsigned char byte_recv;
 	ssize_t bytes_recv;
@@ -363,8 +365,7 @@ on_exit:
 		byte_recv = recvByte();
 
 	busCommand->setResult(result.c_str(), retval);
-	m_recvBuffer.push(busCommand);
-	return retval;
+	return busCommand;
 
 }
 
@@ -374,7 +375,6 @@ void Bus::delCommand()
 	m_sendBuffer.pop();
 
 	busCommand->setResult("", RESULT_ERR_BUS_LOST);
-	m_recvBuffer.push(busCommand);
 }
 
 int Bus::sendByte(const unsigned char byte_sent)

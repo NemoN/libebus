@@ -68,6 +68,7 @@ class BusCommand
 
 public:
 	BusCommand(const std::string command);
+	~BusCommand();
 
 	CommandType getType() const { return m_type; }
 
@@ -82,12 +83,18 @@ public:
 	const char* getResultCodeCStr() const;
 	std::string getResult() const { return m_result; }
 
+	void waitSignal() { pthread_cond_wait(&m_cond, &m_mutex); }
+	void sendSignal() { pthread_cond_signal(&m_cond); }
+
 
 private:
 	CommandType m_type;
 	std::string m_command;
 	std::string m_result;
 	int m_resultCode;
+
+	pthread_mutex_t m_mutex;
+	pthread_cond_t m_cond;
 };
 
 class Bus
@@ -108,10 +115,9 @@ public:
 	std::string getCycData();
 
 	void addCommand(BusCommand* busCommand) { m_sendBuffer.push(busCommand); }
-	BusCommand* recvCommand();
 
 	int getBus(const unsigned char byte);
-	int sendCommand();
+	BusCommand* sendCommand();
 	void delCommand();
 
 	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
@@ -121,7 +127,6 @@ private:
 	std::stringstream m_sstr;
 	std::queue<std::string> m_cycBuffer;
 	std::queue<BusCommand*> m_sendBuffer;
-	std::queue<BusCommand*> m_recvBuffer;
 
 	const long m_recvTimeout;
 

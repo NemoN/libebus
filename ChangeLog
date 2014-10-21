@@ -1,6 +1,10 @@
 libebus - ChangeLog
 -------------------
 
+2014-10-21  Roland Jax  <roland.jax@liwest.at>
+* class Bus: recvBuffer removed.
+* class BusCommand: pthread condition methods added.
+
 2014-10-09  Roland Jax  <roland.jax@liwest.at>
 * class commands: polling functionality implemented.
 * Version changed from 0.1.1 to 0.2.0
