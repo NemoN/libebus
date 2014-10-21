@@ -39,8 +39,29 @@ BusCommand::BusCommand(const std::string commandStr)
 
 }
 
-const char* BusCommand::getResultCodeCStr() {
+const char* BusCommand::getResultCodeCStr()
+{
 	return libebus::getResultCodeCStr(m_resultCode);
+}
+
+const std::string BusCommand::getMessageStr()
+{
+	std::string result;
+
+	if (m_resultCode >= 0) {
+		if (m_type == masterSlave) {
+			result = m_command.getDataStr(true);
+			result += "00";
+			result += m_result.getDataStr();
+			result += "00";
+		} else {
+			result = "success";
+		}
+	}
+	else
+		result = "error";
+
+	return result;
 }
 
 
@@ -316,22 +337,12 @@ int Bus::sendCommand()
 	sendByte(SYN);
 
 on_exit:
-	if (retval >= 0) {
-		if (busCommand->getType() == masterSlave) {
-			result = busCommand->getCommandStr();
-			result += "00";
-			result += slaveData.getDataStr();
-			result += "00";
-		} else {
-			result = "success";
-		}
-	}
 
 	// empty receive buffer
 	while (m_port->size() != 0)
 		byte_recv = recvByte();
 
-	busCommand->setResult(result, retval); // TODO set slaveData instead
+	busCommand->setResult(slaveData, retval);
 	m_recvBuffer.push(busCommand);
 	return retval;
 

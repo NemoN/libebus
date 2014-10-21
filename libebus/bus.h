@@ -48,12 +48,11 @@ public:
 
 	CommandType getType() const { return m_type; }
 	SymbolString getCommand() const { return m_command; }
-	const std::string getCommandStr() { return m_command.getDataStr(true); } // TODO remove
 	bool isErrorResult() const { return m_resultCode < 0; }
 	const char* getResultCodeCStr();
 	SymbolString getResult() const { return m_result; }
-	const std::string getResultStr() { return m_result.getDataStr(); } // TODO remove
 	void setResult(const SymbolString result, const int resultCode) { m_result = result; m_resultCode = resultCode; }
+	const std::string getMessageStr();
 
 private:
 	CommandType m_type;
