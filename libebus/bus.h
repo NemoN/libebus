@@ -47,7 +47,6 @@ public:
 	BusCommand(const std::string commandStr);
 
 	CommandType getType() const { return m_type; }
-	const char* getTypeCStr();
 	SymbolString getCommand() const { return m_command; }
 	const std::string getCommandStr() { return m_command.getDataStr(true); } // TODO remove
 	bool isErrorResult() const { return m_resultCode < 0; }
@@ -85,7 +84,7 @@ public:
 
 	int getBus(const unsigned char byte);
 	int sendCommand();
-	void delCommand() { m_sendBuffer.pop(); }
+	void delCommand();
 
 	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
 
@@ -111,11 +110,6 @@ private:
 	int recvSlaveDataAndCRC(SymbolString& result);
 
 };
-
-
-std::string unesc(const std::string& data);
-
-std::string calc_crc(const std::string& data);
 
 
 } //namespace

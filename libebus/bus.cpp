@@ -39,15 +39,6 @@ BusCommand::BusCommand(const std::string commandStr)
 
 }
 
-const char* BusCommand::getTypeCStr() {
-	switch (m_type) {
-		case broadcast: return "BC";
-		case masterMaster: return "MM";
-		case masterSlave: return "MS";
-		default: return "?";
-	}
-}
-
 const char* BusCommand::getResultCodeCStr() {
 	return libebus::getResultCodeCStr(m_resultCode);
 }
@@ -91,14 +82,11 @@ int Bus::proceed()
 {
 	unsigned char byte_recv;
 	ssize_t bytes_recv;
-	int result = RESULT_SYN;
 
 	// fetch new message and get bus
 	if (m_sendBuffer.size() != 0 && m_sstr.size() == 0) {
 		BusCommand* busCommand = m_sendBuffer.front();
-		result = getBus(busCommand->getCommand()[0]);
-
-		return result;
+		return getBus(busCommand->getCommand()[0]);
 	}
 
 	// wait for new data
@@ -113,10 +101,10 @@ int Bus::proceed()
 		byte_recv = recvByte();
 
 		// store byte
-		result = proceedCycData(byte_recv);
+		return proceedCycData(byte_recv); // TODO what if more than one byte was received?
 	}
 
-	return result;
+	return RESULT_SYN;
 }
 
 int Bus::proceedCycData(const unsigned char byte)
@@ -222,7 +210,7 @@ int Bus::sendCommand()
 	}
 
 	// BC -> send SYN
-	if (busCommand->getType()==broadcast) {
+	if (busCommand->getType() == broadcast) {
 		sendByte(SYN);
 		goto on_exit;
 	}
@@ -284,7 +272,7 @@ int Bus::sendCommand()
 	}
 
 	// MM -> send SYN
-	if (busCommand->getType()==masterMaster) {
+	if (busCommand->getType() == masterMaster) {
 		sendByte(SYN);
 		goto on_exit;
 	}
@@ -328,8 +316,8 @@ int Bus::sendCommand()
 	sendByte(SYN);
 
 on_exit:
-	if (retval>=0) {
-		if (busCommand->getType()==masterSlave) {
+	if (retval >= 0) {
+		if (busCommand->getType() == masterSlave) {
 			result = busCommand->getCommandStr();
 			result += "00";
 			result += slaveData.getDataStr();
@@ -343,10 +331,19 @@ on_exit:
 	while (m_port->size() != 0)
 		byte_recv = recvByte();
 
-	busCommand->setResult(result, retval);
+	busCommand->setResult(result, retval); // TODO set slaveData instead
 	m_recvBuffer.push(busCommand);
 	return retval;
 
+}
+
+void Bus::delCommand()
+{
+	BusCommand* busCommand = m_sendBuffer.front();
+	m_sendBuffer.pop();
+
+	busCommand->setResult(SymbolString(), RESULT_ERR_BUS_LOST);
+	m_recvBuffer.push(busCommand);
 }
 
 int Bus::sendByte(const unsigned char byte_sent)
