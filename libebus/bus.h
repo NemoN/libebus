@@ -44,21 +44,28 @@ class BusCommand
 {
 
 public:
-	BusCommand(const std::string commandStr);
+	BusCommand(const std::string commandStr, const bool isPoll);
+	~BusCommand();
 
 	CommandType getType() const { return m_type; }
+	bool isPoll() const { return m_isPoll; }
 	SymbolString getCommand() const { return m_command; }
 	bool isErrorResult() const { return m_resultCode < 0; }
 	const char* getResultCodeCStr();
 	SymbolString getResult() const { return m_result; }
 	void setResult(const SymbolString result, const int resultCode) { m_result = result; m_resultCode = resultCode; }
 	const std::string getMessageStr();
+	void waitSignal() { pthread_cond_wait(&m_cond, &m_mutex); } // TODO timeout
+	void sendSignal() { pthread_cond_signal(&m_cond); }
 
 private:
 	CommandType m_type;
+	bool m_isPoll;
 	SymbolString m_command;
 	SymbolString m_result;
 	int m_resultCode;
+	pthread_mutex_t m_mutex;
+	pthread_cond_t m_cond;
 };
 
 class Bus
@@ -79,11 +86,10 @@ public:
 	SymbolString getCycData();
 
 	void addCommand(BusCommand* busCommand) { m_sendBuffer.push(busCommand); }
-	BusCommand* recvCommand();
 
 	int getBus(const unsigned char byte);
-	int sendCommand();
-	void delCommand();
+	BusCommand* sendCommand();
+	BusCommand* delCommand();
 
 	void setDumpState(const bool dumpState) { m_dumpState = dumpState; }
 
@@ -93,7 +99,6 @@ private:
 	SymbolString m_sstr;
 	std::queue<SymbolString> m_cycBuffer;
 	std::queue<BusCommand*> m_sendBuffer;
-	std::queue<BusCommand*> m_recvBuffer;
 
 	const long m_recvTimeout;
 

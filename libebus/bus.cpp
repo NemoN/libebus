@@ -25,8 +25,8 @@ namespace libebus
 {
 
 
-BusCommand::BusCommand(const std::string commandStr)
-	: m_command(commandStr), m_resultCode(RESULT_OK)
+BusCommand::BusCommand(const std::string commandStr, const bool isPoll)
+	: m_isPoll(isPoll), m_command(commandStr), m_resultCode(RESULT_OK)
 {
 	unsigned char dstAddress = m_command[1];
 
@@ -36,7 +36,14 @@ BusCommand::BusCommand(const std::string commandStr)
 		m_type = masterMaster;
 	else
 		m_type = masterSlave;
+	pthread_mutex_init(&m_mutex, NULL);
+	pthread_cond_init(&m_cond, NULL);
+}
 
+BusCommand::~BusCommand()
+{
+	pthread_mutex_destroy(&m_mutex);
+	pthread_cond_destroy(&m_cond);
 }
 
 const char* BusCommand::getResultCodeCStr()
@@ -166,13 +173,6 @@ SymbolString Bus::getCycData()
 	return data;
 }
 
-BusCommand* Bus::recvCommand()
-{
-	BusCommand* busCommand = m_recvBuffer.front();
-	m_recvBuffer.pop();
-	return busCommand;
-}
-
 int Bus::getBus(const unsigned char byte_sent)
 {
 	unsigned char byte_recv;
@@ -199,8 +199,10 @@ int Bus::getBus(const unsigned char byte_sent)
   	}
 
 	// store byte
-	proceedCycData(byte_recv); // TODO do something useful with return value
-
+	int ret = proceedCycData(byte_recv);
+	if (ret >= 0)
+		return ret;
+// TODO this needs to be re-designed with above proceedCycData()
 	// compare prior nibble for retry
 	if (bytes_recv == 1 && (byte_sent & 0x0F) == (byte_recv & 0x0F)) {
 		m_busPriorRetry = true;
@@ -211,7 +213,7 @@ int Bus::getBus(const unsigned char byte_sent)
 	return RESULT_ERR_BUS_LOST;
 }
 
-int Bus::sendCommand()
+BusCommand* Bus::sendCommand()
 {
 	unsigned char byte_recv;
 	ssize_t bytes_recv;
@@ -343,18 +345,17 @@ on_exit:
 		byte_recv = recvByte();
 
 	busCommand->setResult(slaveData, retval);
-	m_recvBuffer.push(busCommand);
-	return retval;
+	return busCommand;
 
 }
 
-void Bus::delCommand()
+BusCommand* Bus::delCommand()
 {
 	BusCommand* busCommand = m_sendBuffer.front();
 	m_sendBuffer.pop();
 
 	busCommand->setResult(SymbolString(), RESULT_ERR_BUS_LOST);
-	m_recvBuffer.push(busCommand);
+	return busCommand;
 }
 
 int Bus::sendByte(const unsigned char byte_sent)
