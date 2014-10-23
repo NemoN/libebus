@@ -64,6 +64,7 @@ private:
 	SymbolString m_command;
 	SymbolString m_result;
 	int m_resultCode;
+
 	pthread_mutex_t m_mutex;
 	pthread_cond_t m_cond;
 };
