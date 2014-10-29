@@ -26,7 +26,7 @@ namespace libebus
 
 
 BusCommand::BusCommand(const std::string commandStr, const bool isPoll)
-	: m_isPoll(isPoll), m_command(commandStr), m_resultCode(RESULT_OK)
+	: m_isPoll(isPoll), m_command(commandStr), m_result(), m_resultCode(RESULT_OK)
 {
 	unsigned char dstAddress = m_command[1];
 
@@ -57,7 +57,7 @@ const std::string BusCommand::getMessageStr()
 
 	if (m_resultCode >= 0) {
 		if (m_type == masterSlave) {
-			result = m_command.getDataStr(true);
+			result = m_command.getDataStr();
 			result += "00";
 			result += m_result.getDataStr();
 			result += "00";
@@ -66,7 +66,7 @@ const std::string BusCommand::getMessageStr()
 		}
 	}
 	else
-		result = "error";
+		result = "error: "+std::string(getResultCodeCStr());
 
 	return result;
 }
@@ -74,7 +74,7 @@ const std::string BusCommand::getMessageStr()
 
 Bus::Bus(const std::string deviceName, const bool noDeviceCheck, const long recvTimeout,
 	const std::string dumpFile, const long dumpSize, const bool dumpState)
-	: m_previousEscape(false), m_recvTimeout(recvTimeout), m_dumpState(dumpState),
+	: m_sstr(), m_recvTimeout(recvTimeout), m_dumpState(dumpState),
 	  m_busLocked(false), m_busPriorRetry(false)
 {
 	m_port = new Port(deviceName, noDeviceCheck);
@@ -138,14 +138,13 @@ int Bus::proceed()
 int Bus::proceedCycData(const unsigned char byte)
 {
 	if (byte != SYN) {
-		m_sstr.push_back_unescape(byte, m_previousEscape, false);
+		m_sstr.push_back(byte, true, false);
 		if (m_busLocked == true)
 			m_busLocked = false;
 
 		return RESULT_DATA;
 	}
 
-	m_previousEscape = false;
 	if (byte == SYN && m_sstr.size() != 0) {
 		// lock bus after SYN-BYTE-SYN Sequence
 		if (m_sstr.size() == 1 && m_busPriorRetry == false)
@@ -312,7 +311,7 @@ BusCommand* Bus::sendCommand()
 			goto on_exit;
 
 		// receive NN, Dx, CRC
-		slaveData = SymbolString();
+		slaveData.clear();
 		retval = recvSlaveDataAndCRC(slaveData);
 
 		// are calculated and received CRC equal?
@@ -393,76 +392,39 @@ unsigned char Bus::recvByte()
 
 int Bus::recvSlaveDataAndCRC(SymbolString& result)
 {
-	unsigned char byte_recv;
+	unsigned char byte_recv, crc_calc = 0;
 	ssize_t bytes_recv;
-	bool previousEscape = false;
+	size_t NN = 0;
+	bool updateCrc = true;
+	int retval = 0;
 
-	// receive NN
-	bytes_recv = m_port->recv(RECV_TIMEOUT, 1);
-	if (bytes_recv < 0)
-		return RESULT_ERR_TIMEOUT;
-
-	byte_recv = recvByte();
-	byte_recv = result.push_back_unescape(byte_recv, previousEscape);
-	if (previousEscape == true && byte_recv == 0)
-		return RESULT_ERR_ESC;
-
-	// escape sequence: get another symbol to find NN
-	if (previousEscape == true) {
+	for (size_t i = 0, needed = 1; i < needed; i++) {
 		bytes_recv = m_port->recv(RECV_TIMEOUT, 1);
 		if (bytes_recv < 0)
 			return RESULT_ERR_TIMEOUT;
 
 		byte_recv = recvByte();
-		byte_recv = result.push_back_unescape(byte_recv, previousEscape);
-		if (previousEscape == true)
-			return RESULT_ERR_ESC;
+		retval = result.push_back(byte_recv, true, updateCrc);
+		if (retval<0)
+			return retval;
+
+		if (retval==RESULT_IN_ESC)
+			needed++;
+		else if (result.size() == 1) { // NN received
+			NN = result[0];
+			needed += NN;
+		}
+		else if (NN > 0 && result.size() == 1+NN) {// all data received
+			updateCrc = false;
+			crc_calc = result.getCRC();
+			needed++;
+		}
 	}
 
-	int NN = byte_recv;
-
-	// receive Dx
-	for (int i = 0; i < NN; i++) {
-		bytes_recv = m_port->recv(RECV_TIMEOUT, 1);
-		if (bytes_recv < 0)
-			return RESULT_ERR_TIMEOUT;
-
-		byte_recv = recvByte();
-		byte_recv = result.push_back_unescape(byte_recv, previousEscape);
-		if (previousEscape == true && byte_recv == 0)
-			return RESULT_ERR_ESC;
-
-		// escape sequence: increase NN
-		if (previousEscape == true)
-			NN++;
-	}
-	if (previousEscape == true)
+	if (retval==RESULT_IN_ESC)
 		return RESULT_ERR_ESC;
 
-	unsigned char crc_calc = result.getCRC();
-	// receive CRC
-	bytes_recv = m_port->recv(RECV_TIMEOUT, 1);
-	if (bytes_recv < 0)
-		return RESULT_ERR_TIMEOUT;
-
-	byte_recv = recvByte();
-	byte_recv = result.push_back_unescape(byte_recv, previousEscape, false);
-	if (previousEscape == true && byte_recv == 0)
-		return RESULT_ERR_ESC;
-
-	// escape sequence: get another symbol to find CRC
-	if (previousEscape == true) {
-		bytes_recv = m_port->recv(RECV_TIMEOUT, 1);
-		if (bytes_recv < 0)
-			return RESULT_ERR_TIMEOUT;
-
-		byte_recv = recvByte();
-		byte_recv = result.push_back_unescape(byte_recv, previousEscape);
-		if (previousEscape == true)
-			return RESULT_ERR_ESC;
-	}
-
-	if (crc_calc != byte_recv)
+	if (updateCrc || crc_calc != result[result.size()-1])
 		return RESULT_ERR_CRC;
 
 	return RESULT_OK;
